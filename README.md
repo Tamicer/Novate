@@ -69,7 +69,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
         
         });
         
-# Upload
+# UpLoad
 
     RequestBody requestFile =
                     RequestBody.create(MediaType.parse("image/jpg"), new File(you file path));
