@@ -101,6 +101,9 @@ Retrofit requires at minimum Java 7 or Android 2.3.
    
 # Custom Api 
 
+
+如果默认的BaseApiService无法满足你的需求时，novate同样支持你自己的ApiService。
+
  **MyAPI**
     
        
