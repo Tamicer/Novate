@@ -42,5 +42,9 @@ Retrofit requires at minimum Java 7 or Android 2.3.
                 .build();
                 
        
-                
+# Get
+        
+        novate.executeGet(）
+        
+        
 
