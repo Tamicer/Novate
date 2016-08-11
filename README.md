@@ -53,7 +53,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
        
 # Get
         
-        novate.executeGet("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
+        novate.executeGet("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
             .....
         
@@ -63,7 +63,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 # Post        
         
         
-        novate.executePost("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
+        novate.executePost("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
            .............
         
