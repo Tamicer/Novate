@@ -30,14 +30,16 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 
 功能
 ----
-
+ 
+   - 加入基础API，减少Api冗余
    - 支持离线缓存
    - 支持多种方式访问网络（get,put,post ,delete）
    - 支持文件下载和上传
    - 支持请求头统一加入
    - 支持对返回结果的统一处理
-   - 支持自定会的扩展API
-   - 
+   - 支持自定义的扩展API
+   - 支持统一请求访问网络的流程控制
+   
    
 用法
 ----
@@ -49,7 +51,62 @@ Retrofit requires at minimum Java 7 or Android 2.3.
        
 # Get
         
-        novate.executeGet(）
+        novate.executeGet("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
+        
+            .....
+        
+        });
         
         
+# Post        
+        
+        
+        novate.executePost("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
+        
+           .............
+        
+        });
+        
+# Upload
 
+    RequestBody requestFile =
+                    RequestBody.create(MediaType.parse("image/jpg"), new File(you file path));
+
+      novate.upload(url, requestFile, new BaseSubscriber<ResponseBody>{
+      
+        '''''''''''''''
+      });
+
+  
+# DownLoad   
+     
+   
+      novate.download(downUrl, new DownLoadCallBack() {
+      
+         ''''''''''''
+      });
+   
+   
+# Custom Api 
+
+ **MyAPI**
+    
+       
+     public interface MyAPI {
+
+       @GET("url")
+      Observable<MyBean> getdata(@QueryMap Map<String, String> maps);
+   
+     }
+     
+ **Execute**
+
+     MyAPI myAPI = novate.create(MyAPI.class);
+
+    novate.subscribe(myAPI.getdata(parameters),
+                new BaseSubscriber<MyBean>{
+                '''''''
+                });
+
+    }
+   
