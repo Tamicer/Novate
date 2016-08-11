@@ -4,6 +4,16 @@
 # Summary
 
 
+- Join based API, reduce API redundancy
+- Offline caching
+- Support a variety of ways to access the network (a get, put, post, delete)
+- Support file download and upload
+- Unified support request header to join
+- The unity of the support to return the result
+- Support custom extensions API
+- Support the unified request access to the network flow control
+
+
 
 #Download
 
