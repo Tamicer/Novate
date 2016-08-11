@@ -105,7 +105,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 
      MyAPI myAPI = novate.create(MyAPI.class);
 
-    novate.subscribe(myAPI.getdata(parameters),
+     novate.call(myAPI.getdata(parameters),
                 new BaseSubscriber<MyBean>{
                 '''''''
                 });
