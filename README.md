@@ -23,6 +23,11 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 
 # 中文文档
 
+  基于Retrofit和RxJava封装的链式请求库，为何起名 Novate？
+  
+  Novate的英文原意是用新事物代替
+  那我们用新的东西来代替Retrofit,新奇的东西，所以结合了原来的Http用法习惯，又加入了Retrofit的特性，因此起名 Novate
+
 功能
 ----
 
