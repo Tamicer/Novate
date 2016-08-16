@@ -28,7 +28,12 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
-
+/**
+ *  Created by Tamic on 2016-06-15.
+ * {@link # https://github.com/NeglectedByBoss/Novate
+ *  @link # http://blog.csdn.net/sk719887916
+ * }
+ */
 public class ExempleActivity extends AppCompatActivity {
 
     String baseUrl = "http://ip.taobao.com/";
