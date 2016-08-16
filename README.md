@@ -4,10 +4,22 @@
 # Summary
 
 
+- Join based API, reduce API redundancy
+- Offline caching
+- Support a variety of ways to access the network (a get, put, post, delete)
+- Support file download and upload
+- Unified support request header to join
+- The unity of the support to return the result
+- Support custom extensions API
+- Support the unified request access to the network flow control
+
+
 
 #Download
 
-Download the latest JAR:
+Download the latest JAR:( com.tamic.novate-1.0.0.aar)
+
+    compile(name: 'com.tamic.novate-1.0.0', ext: 'aar')
 
 or Gradle:
 
@@ -26,7 +38,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
   基于Retrofit和RxJava封装的链式请求库，为何起名 Novate？
   
   Novate的英文原意是用新事物代替
-  那我们用新的东西来代替Retrofit,新奇的东西，所以结合了原来的Http用法习惯，又加入了Retrofit的特性，因此起名 Novate
+  我的目的是用新的东西来代替Retrofit的有些不易操作的地方，因此起名新奇的东西，所以结合了原来的Http用法习惯，又加入了Retrofit的特性，因此起名 ：Novate
 
 功能
 ----
@@ -51,7 +63,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
        
 # Get
         
-        novate.executeGet("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
+        novate.executeGet("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
             .....
         
@@ -61,13 +73,13 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 # Post        
         
         
-        novate.executePost("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
+        novate.executePost("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
            .............
         
         });
         
-# Upload
+# UpLoad
 
     RequestBody requestFile =
                     RequestBody.create(MediaType.parse("image/jpg"), new File(you file path));
@@ -89,6 +101,9 @@ Retrofit requires at minimum Java 7 or Android 2.3.
    
 # Custom Api 
 
+
+如果默认的BaseApiService无法满足你的需求时，novate同样支持你自己的ApiService。
+
  **MyAPI**
     
        
@@ -103,7 +118,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 
      MyAPI myAPI = novate.create(MyAPI.class);
 
-    novate.subscribe(myAPI.getdata(parameters),
+     novate.call(myAPI.getdata(parameters),
                 new BaseSubscriber<MyBean>{
                 '''''''
                 });
