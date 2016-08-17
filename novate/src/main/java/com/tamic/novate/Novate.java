@@ -113,9 +113,7 @@ public final class Novate {
      * @param subscriber
      */
     public <T> T call(Observable<T> observable, Subscriber<T> subscriber) {
-        observable.subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        observable.compose(schedulersTransformer)
                 .subscribe(subscriber);
         return null;
     }
@@ -142,9 +140,7 @@ public final class Novate {
 
 
         apiManager.executeGet(url, maps)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(schedulersTransformer)
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
         return null;
 
@@ -182,6 +178,15 @@ public final class Novate {
         return needtypes;
     }
 
+    final Observable.Transformer schedulersTransformer = new  Observable.Transformer() {
+        @Override public Object call(Object observable) {
+            return ((Observable)  observable).subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+        }
+    };
+
+
 
     /**
      * Retroift get
@@ -194,9 +199,7 @@ public final class Novate {
     public <T> T get(String url, Map<String, String> maps, BaseSubscriber<ResponseBody> subscriber) {
 
         apiManager.executeGet(url, maps)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(schedulersTransformer)
                 .subscribe(subscriber);
 
         return null;
@@ -236,9 +239,7 @@ public final class Novate {
      */
     public void post(String url, Map<String, String> parameters, Subscriber<ResponseBody> subscriber) {
         apiManager.executePost(url, parameters)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(schedulersTransformer)
                 .subscribe(subscriber);
     }
 
@@ -259,9 +260,7 @@ public final class Novate {
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
         apiManager.executePost(url, maps)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(schedulersTransformer)
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
         return null;
     }
@@ -282,9 +281,7 @@ public final class Novate {
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
         apiManager.executeDelete(url, maps)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(schedulersTransformer)
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
         return null;
     }
@@ -305,9 +302,7 @@ public final class Novate {
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
         apiManager.executePut(url, maps)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(schedulersTransformer)
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
         return null;
     }
@@ -324,9 +319,7 @@ public final class Novate {
     public <T> T test(String url, Map<String, String> maps, Subscriber<ResponseBody> subscriber) {
 
         apiManager.getTest(url, maps)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(schedulersTransformer)
                 .subscribe(subscriber);
 
         return null;
@@ -342,9 +335,7 @@ public final class Novate {
      */
     public <T> T upload(String url, RequestBody requestBody, Subscriber<ResponseBody> subscriber) {
         apiManager.upLoadFile(url, requestBody)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+                .compose(schedulersTransformer)
                 .subscribe(subscriber);
         return null;
     }
@@ -371,9 +362,7 @@ public final class Novate {
             return;
         }
         NovateDownLoadManager.isDownLoading = true;
-        downObservable.subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+        downObservable.compose(schedulersTransformer)
                 .subscribe(new DownSubscriber<ResponseBody>(callBack, mContext));
 
     }
