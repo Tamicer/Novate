@@ -125,3 +125,4 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 
     }
    
+更多介绍：http://www.jianshu.com/p/d7734390895e
