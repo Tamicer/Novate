@@ -828,6 +828,24 @@ public final class Novate {
         }
 
         @Override
+        public void onStart() {
+            super.onStart();
+            // todo some common as show loadding  and check netWork is NetworkAvailable
+            if (callBack != null) {
+                callBack.onStart();
+            }
+
+        }
+
+        @Override
+        public void onCompleted() {
+            // todo some common as  dismiss loadding
+            if (callBack != null) {
+                callBack.onCompleted();
+            }
+        }
+
+        @Override
         public void onError(Throwable e) {
             Log.e("novate", "-->:" + e.getMessage());
             if (callBack != null) {
