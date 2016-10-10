@@ -1,5 +1,10 @@
 # Novate
    a  safety client by Https for Android,  (Android线程安全http请求库)
+   
+[![CI Status](http://img.shields.io/travis/NeglectedByBoss/Novate.svg?style=flat)](https://travis-ci.org/NeglectedByBoss/Novate)
+[![Version](https://img.shields.io/cocoapods/v/Novate.svg?style=flat)](http://cocoapods.org/pods/Novate)
+[![License](https://img.shields.io/cocoapods/l/Novate.svg?style=flat)](http://cocoapods.org/pods/Novate)
+[![Platform](https://img.shields.io/cocoapods/p/Novate.svg?style=flat)](http://cocoapods.org/pods/Novate)
 
 # Summary
 
