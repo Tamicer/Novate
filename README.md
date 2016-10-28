@@ -20,7 +20,7 @@
 
 
 
-#Download
+#dependencies
 
 Download the latest JAR:( com.tamic.novate:novate:-1.0.0.aar)
 
