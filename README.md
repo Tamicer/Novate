@@ -22,13 +22,13 @@
 
 #Download
 
-Download the latest JAR:( com.tamic.novate-1.0.0.aar)
+Download the latest JAR:( com.tamic.novate:novate:-1.0.0.aar)
 
     compile(name: 'com.tamic.novate-1.0.0', ext: 'aar')
 
 or Gradle:
 
-     compile project(':novate')
+     compile 'com.tamic.novate:novate:1.0.0'
   
 Snapshots of the development version are available in Sonatype's snapshots repository.
 
