@@ -30,17 +30,19 @@ or Gradle:
    
 - root：
      
-       repositories {
-        maven { url "https://jitpack.io" }
-        jcenter()
-      }
+       
+         repositories {
+            maven { url "https://jitpack.io" }
+            jcenter()
+        }
     
 - app:
      
-       dependencies {
-        .....
-        compile 'com.tamic.novate:novate:1.0.0'
-       }
+      
+         dependencies {
+          .....
+            compile 'com.tamic.novate:novate:1.0.0'
+         }
   
 Snapshots of the development version are available in Sonatype's snapshots repository.
 
