@@ -22,7 +22,7 @@
 
 #dependencies
 
-Download the latest JAR:( com.tamic.novate:novate:-1.0.0.aar)
+Download the laster JAR:( com.tamic.novate:novate:-1.0.0.aar)
 
     compile(name: 'com.tamic.novate-1.0.0', ext: 'aar')
 
