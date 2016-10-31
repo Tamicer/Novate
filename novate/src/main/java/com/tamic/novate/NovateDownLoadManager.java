@@ -55,7 +55,7 @@ public class NovateDownLoadManager {
         return sInstance;
     }
 
-    public boolean  writeResponseBodyToDisk(Context context, ResponseBody body) {
+    public boolean  writeResponseBodyToDisk(String path, String name, Context context, ResponseBody body) {
 
         Log.d(TAG, "contentType:>>>>"+ body.contentType().toString());
 
@@ -65,10 +65,23 @@ public class NovateDownLoadManager {
            fileSuffix = ".apk";
         } else if (type.equals(PNG_CONTENTTYPE)) {
             fileSuffix = ".png";
+        } else if (type.equals(JPG_CONTENTTYPE)) {
+            fileSuffix = ".jpg";
+        } else {
+            fileSuffix = body.contentType().subtype();
+        }
+        if (name == null) {
+            name = System.currentTimeMillis() + fileSuffix;
+        }
+        else {
+            name = name + fileSuffix;
+        }
+        if (path == null) {
+            path = context.getExternalFilesDir(null) + File.separator + name;
         }
         // 其他同上 自己判断加入
-        final String name = System.currentTimeMillis() + fileSuffix;
-        final String path = context.getExternalFilesDir(null) + File.separator + name;
+        //final String name = System.currentTimeMillis() + fileSuffix;
+        //final String path = context.getExternalFilesDir(null) + File.separator + name;
         Log.d(TAG, "path:-->" + path);
         try {
             // todo change the file location/name according to your needs
@@ -117,14 +130,18 @@ public class NovateDownLoadManager {
 
 
                 if (callBack != null) {
+                    final String finalName = name;
+                    final String finalPath = path;
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            callBack.onSucess(path, name, fileSize);
+
+                            callBack.onSucess(finalPath, finalName, fileSize);
 
                         }
                     });
                     Log.d(TAG, "file downloaded: " + fileSizeDownloaded + " of " + fileSize);
+                    Log.d(TAG, "file downloaded: is sucess" );
                 }
 
                 return true;

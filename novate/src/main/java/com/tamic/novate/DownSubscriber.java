@@ -13,8 +13,12 @@ import rx.Subscriber;
 public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends Subscriber<ResponseBody> {
     private DownLoadCallBack callBack;
     private Context context;
+    private String path;
+    private String name;
 
-    public DownSubscriber(DownLoadCallBack callBack, Context context) {
+    public DownSubscriber(String path, String name, DownLoadCallBack callBack, Context context) {
+        this.path = path;
+        this.name = name;
         this.callBack = callBack;
         this.context = context;
     }
@@ -47,7 +51,7 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
 
         Log.d(NovateDownLoadManager.TAG, "DownSubscriber:>>>> onNext");
 
-        NovateDownLoadManager.getInstance(callBack).writeResponseBodyToDisk(context, responseBody);
+        NovateDownLoadManager.getInstance(callBack).writeResponseBodyToDisk(path, name, context, responseBody);
 
     }
 }

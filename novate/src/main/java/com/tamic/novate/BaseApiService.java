@@ -3,6 +3,7 @@ package com.tamic.novate;
 
 import java.util.Map;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.http.DELETE;
@@ -47,9 +48,16 @@ public interface BaseApiService {
 
     @Multipart
     @POST("{url}")
-    Observable<ResponseBody> upLoadFile(
+    Observable<ResponseBody> upLoadImage(
             @Path("url") String url,
             @Part("image\"; filename=\"image.jpg") RequestBody requestBody);
+
+    @Multipart
+    @POST()
+    Observable<ResponseBody> uploadFlie(
+            @Url String fileUrl,
+            @Part("description") RequestBody description,
+            @Part("files") MultipartBody.Part file);
 
     @Multipart
     @POST("{url}")

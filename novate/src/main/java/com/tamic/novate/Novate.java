@@ -186,6 +186,14 @@ public final class Novate {
         }
     };
 
+    final Observable.Transformer schedulersTransformerDown = new  Observable.Transformer() {
+        @Override public Object call(Object observable) {
+            return ((Observable)  observable).subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io());
+        }
+    };
+
 
 
     /**
@@ -334,7 +342,7 @@ public final class Novate {
      * @return
      */
     public <T> T upload(String url, RequestBody requestBody, Subscriber<ResponseBody> subscriber) {
-        apiManager.upLoadFile(url, requestBody)
+        apiManager.upLoadImage(url, requestBody)
                 .compose(schedulersTransformer)
                 .subscribe(subscriber);
         return null;
@@ -342,11 +350,32 @@ public final class Novate {
 
 
     /**
-     * download
      * @param url
      * @param callBack
      */
     public void download(String url, DownLoadCallBack callBack) {
+         download(url, null, callBack);
+
+    }
+
+
+    /**
+     * @param url
+     * @param name
+     * @param callBack
+     */
+    public void download(String url, String name, DownLoadCallBack callBack) {
+        download(url, null, name, callBack);
+    }
+
+
+    /**
+     * @param url
+     * @param savePath
+     * @param name
+     * @param callBack
+     */
+    public void download(String url, String savePath, String name, DownLoadCallBack callBack) {
 
         if (downMaps.get(url) == null) {
             downObservable = apiManager.downloadFile(url);
@@ -362,8 +391,8 @@ public final class Novate {
             return;
         }
         NovateDownLoadManager.isDownLoading = true;
-        downObservable.compose(schedulersTransformer)
-                .subscribe(new DownSubscriber<ResponseBody>(callBack, mContext));
+        downObservable.compose(schedulersTransformerDown)
+                .subscribe(new DownSubscriber<ResponseBody>(savePath, name, callBack, mContext));
 
     }
 
@@ -777,7 +806,7 @@ public final class Novate {
             if (cookieManager == null) {
                 cookieManager = new NovateCookieManger(context);
             }
-            okhttpBuilder.cookieJar(new NovateCookieManger(context));
+            okhttpBuilder.cookieJar(cookieManager);
 
             /**
              *okhttp3.Call.Factory callFactory = this.callFactory;
