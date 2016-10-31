@@ -6,6 +6,8 @@ import java.util.Map;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.http.DELETE;
+import retrofit2.http.FieldMap;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -64,6 +66,12 @@ public interface BaseApiService {
     @GET
     Observable<ResponseBody> getTest(@Url String fileUrl,
                                     @QueryMap Map<String, String> maps);
+
+    @FormUrlEncoded
+    @POST("{url}")
+    Observable<ResponseBody> postFrom(
+            @Path("url") String url,
+            @FieldMap Map<String , Object> maps);
 
 }
 

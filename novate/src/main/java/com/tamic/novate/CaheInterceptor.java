@@ -58,7 +58,7 @@ public class CaheInterceptor implements Interceptor {
             ((Activity) context).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(context, "当前无网络! 为你智能加载缓存", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.load_cache, Toast.LENGTH_SHORT).show();
                 }
             });
             Log.e("Tamic", " no network load cahe");
