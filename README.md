@@ -20,15 +20,29 @@
 
 
 
-#Download
+#dependencies
 
-Download the latest JAR:( com.tamic.novate-1.0.0.aar)
+Download the laster JAR:( com.tamic.novate:novate:-1.0.0.aar)
 
     compile(name: 'com.tamic.novate-1.0.0', ext: 'aar')
 
 or Gradle:
-
-     compile project(':novate')
+   
+- root：
+     
+       
+         repositories {
+            maven { url "https://jitpack.io" }
+            jcenter()
+        }
+    
+- app:
+     
+      
+         dependencies {
+          .....
+            compile 'com.tamic.novate:novate:1.0.0'
+         }
   
 Snapshots of the development version are available in Sonatype's snapshots repository.
 
@@ -57,6 +71,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
    - 支持自定义的扩展API
    - 支持统一请求访问网络的流程控制
    
+   请求网络无需关心是否在主线程和非UI线程，操作UI直接可在回调处理, 保留了HttpClient的编码习惯，又加入了Builder模式编程！
    
 用法
 ----
