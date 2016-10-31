@@ -15,3 +15,14 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep class com.squareup.retrofit2.** {*;}
+
+-dontwarn com.squareup.okhttp3**
+-keep  class com.squareup.okhttp3.**{*;}
+-dontwarn okio**
+-keep  class okio.**{*;}
+
+-keep class com.tamic.novate.Novate.** {*;}
+
+
+
