@@ -2,6 +2,7 @@ package com.tamic.novate;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Cookie;
@@ -43,7 +44,7 @@ public class NovateCookieManger implements CookieJar {
     @Override
     public List<Cookie> loadForRequest(HttpUrl url) {
         List<Cookie> cookies = cookieStore.get(url);
-        return cookies;
+        return cookies != null ? cookies : new ArrayList<Cookie>();
     }
 
 }

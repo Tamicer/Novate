@@ -2,10 +2,12 @@ package com.tamic.novate;
 
 
 import java.util.Map;
+import java.util.Objects;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -30,6 +32,11 @@ public interface BaseApiService {
     Observable<ResponseBody> executePost(
             @Path("url") String url,
             @QueryMap Map<String , String> maps);
+
+    @POST("{url}")
+    Observable<ResponseBody> executePostBody(
+            @Path("url") String url,
+            @Body Objects objects);
 
     @GET("{url}")
     Observable<ResponseBody> executeGet(
@@ -63,7 +70,6 @@ public interface BaseApiService {
     @POST("{url}")
     Observable<ResponseBody> uploadFiles(
             @Path("url") String url,
-            @Part("filename") String description,
             @PartMap() Map<String, RequestBody> maps);
 
     @Streaming
@@ -72,12 +78,16 @@ public interface BaseApiService {
 
 
     @GET
+    Observable<ResponseBody> downloadSmallFile(@Url String fileUrl);
+
+
+    @GET
     Observable<ResponseBody> getTest(@Url String fileUrl,
                                     @QueryMap Map<String, String> maps);
 
     @FormUrlEncoded
     @POST("{url}")
-    Observable<ResponseBody> postFrom(
+    Observable<ResponseBody> postForm(
             @Path("url") String url,
             @FieldMap Map<String , Object> maps);
 

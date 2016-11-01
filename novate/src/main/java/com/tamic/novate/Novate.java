@@ -27,6 +27,7 @@ import okhttp3.CertificatePinner;
 import okhttp3.ConnectionPool;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -130,15 +131,11 @@ public final class Novate {
     public <T> T executeGet(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
 
         final Type[] types = callBack.getClass().getGenericInterfaces();
-
         if (MethodHandler(types) == null && MethodHandler(types).size() == 0) {
             return null;
-
         }
         final Type finalNeedType = MethodHandler(types).get(0);
-        Log.d("dd", "-->:" + "Type:" + types[0]);
-
-
+        Log.d(TAG, "-->:" + "Type:" + types[0]);
         apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
@@ -194,8 +191,6 @@ public final class Novate {
         }
     };
 
-
-
     /**
      * Retroift get
      * @param url
@@ -209,7 +204,6 @@ public final class Novate {
         apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
                 .subscribe(subscriber);
-
         return null;
     }
     /**
@@ -260,8 +254,6 @@ public final class Novate {
      */
     public <T> T executePost(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
-
-
         if (MethodHandler(types) == null && MethodHandler(types).size() == 0) {
             return null;
         }
@@ -281,8 +273,6 @@ public final class Novate {
      */
     public <T> T executeDelete(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
-
-
         if (MethodHandler(types) == null && MethodHandler(types).size() == 0) {
             return null;
         }
@@ -302,7 +292,6 @@ public final class Novate {
      */
     public <T> T executePut(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
-
 
         if (MethodHandler(types) == null && MethodHandler(types).size() == 0) {
             return null;
@@ -329,7 +318,6 @@ public final class Novate {
         apiManager.getTest(url, maps)
                 .compose(schedulersTransformer)
                 .subscribe(subscriber);
-
         return null;
     }
 
@@ -348,6 +336,35 @@ public final class Novate {
         return null;
     }
 
+    /**
+     * upload Flie
+     * @param url
+     * @param requestBody requestBody
+     * @param subscriber subscriber
+     * @param <T> T
+     * @return
+     */
+    public <T> T uploadFlie(String url, RequestBody requestBody, MultipartBody.Part file, Subscriber<ResponseBody> subscriber) {
+        apiManager.uploadFlie(url, requestBody, file)
+                .compose(schedulersTransformer)
+                .subscribe(subscriber);
+        return null;
+    }
+
+    /**
+     * upload Flies
+     * @param url
+     * @param subscriber subscriber
+     * @param <T> T
+     * @return
+     */
+    public <T> T uploadFlies(String url, Map<String, RequestBody> files, Subscriber<ResponseBody> subscriber) {
+        apiManager.uploadFiles(url, files)
+                .compose(schedulersTransformer)
+                .subscribe(subscriber);
+        return null;
+    }
+
 
     /**
      * @param url
@@ -355,9 +372,7 @@ public final class Novate {
      */
     public void download(String url, DownLoadCallBack callBack) {
          download(url, null, callBack);
-
     }
-
 
     /**
      * @param url
@@ -368,6 +383,40 @@ public final class Novate {
         download(url, null, name, callBack);
     }
 
+    /**downloadMin
+     * @param url
+     * @param callBack
+     */
+    public void downloadMin(String url, DownLoadCallBack callBack) {
+        downloadMin(url, null, callBack);
+    }
+
+    /**
+     * downloadMin
+     * @param url
+     * @param name
+     * @param callBack
+     */
+    public void downloadMin(String url, String name, DownLoadCallBack callBack) {
+        downloadMin(url, null, name, callBack);
+    }
+
+    /** download small file
+     * @param url
+     * @param savePath
+     * @param name
+     * @param callBack
+     */
+    public void downloadMin(String url, String savePath, String name, DownLoadCallBack callBack) {
+
+        if (downMaps.get(url) == null) {
+            downObservable = apiManager.downloadSmallFile(url);
+            downMaps.put(url, downObservable);
+        } else {
+            downObservable = downMaps.get(url);
+        }
+        executeDownload(savePath, name, callBack);
+    }
 
     /**
      * @param url
@@ -383,7 +432,16 @@ public final class Novate {
         } else {
             downObservable = downMaps.get(url);
         }
+        executeDownload(savePath, name, callBack);
+    }
 
+    /**
+     * executeDownload
+     * @param savePath
+     * @param name
+     * @param callBack
+     */
+    private void executeDownload(String savePath, String name, DownLoadCallBack callBack) {
         if (NovateDownLoadManager.isDownLoading) {
             downObservable.unsubscribeOn(Schedulers.io());
             NovateDownLoadManager.isDownLoading = false;
@@ -393,7 +451,6 @@ public final class Novate {
         NovateDownLoadManager.isDownLoading = true;
         downObservable.compose(schedulersTransformerDown)
                 .subscribe(new DownSubscriber<ResponseBody>(savePath, name, callBack, mContext));
-
     }
 
     /**
@@ -409,6 +466,7 @@ public final class Novate {
         private okhttp3.Call.Factory callFactory;
         private String baseUrl;
         private Boolean isLog = false;
+        private Boolean isCookie = false;
         private List<InputStream> certificateList;
         private HostnameVerifier hostnameVerifier;
         private CertificatePinner certificatePinner;
@@ -489,6 +547,11 @@ public final class Novate {
 
         public Builder addLog(boolean isLog) {
             this.isLog = isLog;
+            return this;
+        }
+
+        public Builder addCookie(boolean isCookie) {
+            this.isCookie = isCookie;
             return this;
         }
 
@@ -803,10 +866,13 @@ public final class Novate {
              *
              * <p>If unset, {@link Novate CookieManager#NO_COOKIES no cookies} will be accepted nor provided.
              */
-            if (cookieManager == null) {
-                cookieManager = new NovateCookieManger(context);
+            if (isCookie && cookieManager == null) {
+                okhttpBuilder.cookieJar(new NovateCookieManger(context));
             }
-            okhttpBuilder.cookieJar(cookieManager);
+
+            if (cookieManager != null) {
+                okhttpBuilder.cookieJar(cookieManager);
+            }
 
             /**
              *okhttp3.Call.Factory callFactory = this.callFactory;
