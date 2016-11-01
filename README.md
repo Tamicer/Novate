@@ -38,7 +38,7 @@ or Gradle:
       
          dependencies {
           .....
-            compile 'com.tamic.novate:novate:1.0.0'
+            compile 'com.tamic.novate:novate:1.0.２'
          }
   
 Snapshots of the development version are available in Sonatype's snapshots repository.
