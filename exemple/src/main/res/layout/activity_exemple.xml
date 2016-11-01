@@ -43,7 +43,14 @@
         android:id="@+id/bt_upload"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Up_Load"
+        android:text="UpLoad Image"
+        />
+
+    <Button
+        android:id="@+id/bt_uploadflie"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="UpLoad Flie"
         />
 
     <Button
@@ -52,7 +59,13 @@
         android:layout_height="wrap_content"
         android:text="DownLoad"
         />
-
+    
+    <Button
+        android:id="@+id/bt_download_min"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="DownLoad Min"
+        />
     <Button
         android:id="@+id/bt_my_api"
         android:layout_width="fill_parent"

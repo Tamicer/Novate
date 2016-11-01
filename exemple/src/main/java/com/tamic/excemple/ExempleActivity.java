@@ -29,9 +29,10 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
 /**
- *  Created by Tamic on 2016-06-15.
+ * Created by Tamic on 2016-06-15.
  * {@link # https://github.com/NeglectedByBoss/Novate
- *  @link # http://blog.csdn.net/sk719887916
+ *
+ * @link # http://blog.csdn.net/sk719887916
  * }
  */
 public class ExempleActivity extends AppCompatActivity {
@@ -41,7 +42,8 @@ public class ExempleActivity extends AppCompatActivity {
     private Map<String, String> parameters = new HashMap<String, String>();
     private Map<String, String> headers = new HashMap<>();
 
-    private Button btn, btn_test, btn_get, btn_post, btn_download, btn_upload, btn_myApi;
+    private Button btn, btn_test, btn_get, btn_post, btn_download,
+            btn_download_Min, btn_upload, btn_uploadfile, btn_myApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,8 @@ public class ExempleActivity extends AppCompatActivity {
         btn_post = (Button) findViewById(R.id.bt_post);
         btn_download = (Button) findViewById(R.id.bt_download);
         btn_upload = (Button) findViewById(R.id.bt_upload);
+        btn_download_Min = (Button) findViewById(R.id.bt_download_min);
+        btn_uploadfile = (Button) findViewById(R.id.bt_uploadflie);
         btn_myApi = (Button) findViewById(R.id.bt_my_api);
 
         parameters.put("ip", "21.22.11.33");
@@ -122,16 +126,27 @@ public class ExempleActivity extends AppCompatActivity {
                 performDown();
             }
         });
+        btn_download_Min.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performDownMin();
+            }
+        });
 
         btn_upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                performUpLoad();
+                performUpLoadImage();
             }
         });
 
+        btn_uploadfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performUpLoadFlie();
+            }
+        });
     }
-
 
 
     /**
@@ -153,22 +168,22 @@ public class ExempleActivity extends AppCompatActivity {
 
         novate.test("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海", null,
                 new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
-            @Override
-            public void onError(Throwable e) {
-                super.onError(e);
-                Log.e("OkHttp", e.getMessage());
-                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        Log.e("OkHttp", e.getMessage());
+                        Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
 
-            @Override
-            public void onNext(ResponseBody responseBody) {
-                try {
-                    Toast.makeText(ExempleActivity.this, new String(responseBody.bytes()), Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+                    @Override
+                    public void onNext(ResponseBody responseBody) {
+                        try {
+                            Toast.makeText(ExempleActivity.this, new String(responseBody.bytes()), Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
 
     }
 
@@ -184,7 +199,7 @@ public class ExempleActivity extends AppCompatActivity {
                 .addParameters(parameters)
                 .connectTimeout(5)
                 .baseUrl("http://api.douban.com/")
-                        //.addApiManager(ApiManager.class)
+                //.addApiManager(ApiManager.class)
                 .addLog(true)
                 .build();
 
@@ -268,7 +283,7 @@ public class ExempleActivity extends AppCompatActivity {
         novate = new Novate.Builder(this)
                 .connectTimeout(8)
                 .baseUrl(baseUrl)
-                        //.addApiManager(ApiManager.class)
+                //.addApiManager(ApiManager.class)
                 .addLog(true)
                 .build();
 
@@ -320,6 +335,7 @@ public class ExempleActivity extends AppCompatActivity {
         novate = new Novate.Builder(this)
                 .addHeader(headers)
                 .connectTimeout(10)
+                .addCookie(false)
                 .baseUrl("http://lbs.sougu.net.cn/")
                 .addLog(true)
                 .build();
@@ -343,7 +359,10 @@ public class ExempleActivity extends AppCompatActivity {
     }
 
 
-    private void performUpLoad() {
+    /**
+     * upload
+     */
+    private void performUpLoadImage() {
 
         String mPath = "you File path ";
         String url = "";
@@ -359,12 +378,71 @@ public class ExempleActivity extends AppCompatActivity {
     }
 
     /**
-     * performDown
+     * upload
+     */
+    private void performUpLoadFlie() {
+
+        String mPath = "you File path ";
+        String url = "";
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("image/jpg"), new File(mPath));
+
+        novate.upload(url, requestFile, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+            @Override
+            public void onNext(ResponseBody responseBody) {
+
+            }
+        });
+    }
+
+    /**
+     * performDown file
+     * ex: apk , video...
      */
     private void performDown() {
         String downUrl = "http://apk.hiapk.com/web/api.do?qt=8051&id=723";
-
         novate.download(downUrl, new DownLoadCallBack() {
+
+            @Override
+            public void onStart() {
+                super.onStart();
+                Toast.makeText(ExempleActivity.this, "download is start", Toast.LENGTH_SHORT).show();
+                btn_download.setText("DownLoad cancel");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onCancel() {
+                super.onCancel();
+                btn_download.setText("DownLoad start");
+            }
+
+            @Override
+            public void onProgress(long fileSizeDownloaded) {
+                super.onProgress(fileSizeDownloaded);
+
+            }
+
+            @Override
+            public void onSucess(String path, String name, long fileSize) {
+                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
+                btn_download.setText("DownLoad start");
+            }
+        });
+    }
+
+    /**
+     * performDown small file
+     * ex: image txt
+     */
+    private void performDownMin() {
+
+        String downUrl = "http://img06.tooopen.com/images/20161022/tooopen_sy_182719487645.jpg";
+        novate.downloadMin(downUrl, new DownLoadCallBack() {
 
             @Override
             public void onStart() {
