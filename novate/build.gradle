@@ -41,7 +41,7 @@ dependencies {
 
 }
 
-version = "1.0.0"
+version = "1.0.1"
 def siteUrl = 'https://github.com/NeglectedByBoss/Novate'
 def gitUrl = 'https://github.com/NeglectedByBoss/Novate.git'
 group = "com.tamic.novate"
