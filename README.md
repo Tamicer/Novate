@@ -24,7 +24,7 @@
 
     Download the laster JAR:( com.tamic.novate:novate:-1.1.0.aar)
 
-    compile(name: 'com.tamic.novate:novate-1.1.2', ext: 'aar')
+    compile(name: 'com.tamic.novate:novate-1.1.0', ext: 'aar')
 
 **or Gradle**:
    
@@ -41,7 +41,7 @@
       
          dependencies {
             .....
-            compile 'com.tamic.novate:novate:1.1.2'
+            compile 'com.tamic.novate:novate:1.1.0'
          
          }
   
