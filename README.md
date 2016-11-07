@@ -20,11 +20,13 @@
 
 #dependencies
 
-Download the laster JAR:( com.tamic.novate:novate:-1.0.0.aar)
+**Eclipse:**
 
-    compile(name: 'com.tamic.novate-1.0.2', ext: 'aar')
+    Download the laster JAR:( com.tamic.novate:novate:-1.1.0.aar)
 
-or Gradle:
+    compile(name: 'com.tamic.novate:novate-1.1.2', ext: 'aar')
+
+**or Gradle**:
    
 - root：
      
@@ -39,7 +41,7 @@ or Gradle:
       
          dependencies {
             .....
-            compile 'com.tamic.novate:novate:1.0.2'
+            compile 'com.tamic.novate:novate:1.1.2'
          
          }
   
