@@ -41,7 +41,7 @@
       
          dependencies {
             .....
-            compile 'com.tamic.novate:novate:1.1.0'
+            compile 'com.tamic.novate:novate:1.2.0'
          
          }
   
@@ -145,6 +145,15 @@ Retrofit requires at minimum Java 7 or Android 2.3.
                 });
 
     }
+    
+#Update Log   
+-----
+
+
+  - V1.0.1:	扩展下载接口，可以制定下载路径和文件名，包括修复下载抛异常问题。
+  - V 1.0 :  完成基础get, put, Post delete, upLoad, DownLoad功能
+  
+  
    
 #License
 --------
