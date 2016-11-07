@@ -5,6 +5,11 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.tamic.novate.Exception.ConfigLoader;
+import com.tamic.novate.Exception.FormatException;
+import com.tamic.novate.Exception.NovateException;
+import com.tamic.novate.Exception.ServerException;
 import com.tamic.novate.util.Utils;
 
 import java.io.File;
@@ -42,6 +47,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -80,7 +86,11 @@ public final class Novate {
     private final boolean validateEagerly;
     private NovateSubscriber novateSubscriber;
     private Observable<ResponseBody> downObservable;
-    private Map<String, Observable<ResponseBody>> downMaps = new HashMap<String, Observable<ResponseBody>>(){};
+    private Map<String, Observable<ResponseBody>> downMaps = new HashMap<String, Observable<ResponseBody>>() {
+    };
+    private Observable.Transformer exceptTransformer = null;
+
+
     public static final String TAG = "Novate";
 
     /**
@@ -115,6 +125,7 @@ public final class Novate {
      */
     public <T> T call(Observable<T> observable, Subscriber<T> subscriber) {
         observable.compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(subscriber);
         return null;
     }
@@ -122,22 +133,22 @@ public final class Novate {
 
     /**
      * Retroift execute get
-     *
+     * <p>
      * return parsed data
-     *
-     *  you don't need to parse ResponseBody
-     *
+     * <p>
+     * you don't need to parse ResponseBody
      */
     public <T> T executeGet(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
 
         final Type[] types = callBack.getClass().getGenericInterfaces();
-        if (MethodHandler(types) == null && MethodHandler(types).size() == 0) {
+        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
             return null;
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
         apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
         return null;
 
@@ -175,45 +186,87 @@ public final class Novate {
         return needtypes;
     }
 
-    final Observable.Transformer schedulersTransformer = new  Observable.Transformer() {
-        @Override public Object call(Object observable) {
-            return ((Observable)  observable).subscribeOn(Schedulers.io())
+    final Observable.Transformer schedulersTransformer = new Observable.Transformer() {
+        @Override
+        public Object call(Object observable) {
+            return ((Observable) observable).subscribeOn(Schedulers.io())
                     .unsubscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
         }
     };
 
-    final Observable.Transformer schedulersTransformerDown = new  Observable.Transformer() {
-        @Override public Object call(Object observable) {
-            return ((Observable)  observable).subscribeOn(Schedulers.io())
+    final Observable.Transformer schedulersTransformerDown = new Observable.Transformer() {
+        @Override
+        public Object call(Object observable) {
+            return ((Observable) observable).subscribeOn(Schedulers.io())
                     .unsubscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io());
         }
     };
 
     /**
+     * @param <T>
+     * @return
+     */
+    public <T> Observable.Transformer<NovateResponse<T>, T> handleErrTransformer() {
+
+        if (exceptTransformer != null) return exceptTransformer;
+
+        else return exceptTransformer = new Observable.Transformer() {
+            @Override
+            public Object call(Object observable) {
+                return ((Observable) observable)/*.map(new HandleFuc<T>())*/.onErrorResumeNext(new HttpResponseFunc<T>());
+            }
+        };
+    }
+
+    private static class HttpResponseFunc<T> implements Func1<java.lang.Throwable, Observable<T>> {
+        @Override
+        public Observable<T> call(java.lang.Throwable t) {
+            return Observable.error(NovateException.handleException(t));
+        }
+    }
+
+    private class HandleFuc<T> implements Func1<NovateResponse<T>, T> {
+        @Override
+        public T call(NovateResponse<T> response) {
+            if (response == null || (response.getData() == null && response.getResult() == null)) {
+                throw new JsonParseException("后端数据不对");
+            }
+            /*if (!response.isOk()) {
+                throw new RuntimeException(response.getCode() + "" + response.getMsg() != null ? response.getMsg() : "");
+            }
+*/
+            return response.getData();
+        }
+    }
+
+    /**
      * Retroift get
+     *
      * @param url
      * @param maps
      * @param subscriber
      * @param <T>
-     * @return  no parse data
+     * @return no parse data
      */
     public <T> T get(String url, Map<String, String> maps, BaseSubscriber<ResponseBody> subscriber) {
 
         apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(subscriber);
         return null;
     }
+
     /**
      * /**
      * Retroift executePost
      *
-     * @return  no parse data
-     *
+     * @return no parse data
+     * <p>
      * you must to be parse ResponseBody
-     *
+     * <p>
      * <p/>
      * For example,
      * <pre>{@code
@@ -242,6 +295,7 @@ public final class Novate {
     public void post(String url, Map<String, String> parameters, Subscriber<ResponseBody> subscriber) {
         apiManager.executePost(url, parameters)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(subscriber);
     }
 
@@ -249,57 +303,59 @@ public final class Novate {
      * Retroift executePost
      *
      * @return parsed data
-     *  you don't need to   parse ResponseBody
-     *
+     * you don't need to   parse ResponseBody
      */
     public <T> T executePost(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
-        if (MethodHandler(types) == null && MethodHandler(types).size() == 0) {
+        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
             return null;
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
         apiManager.executePost(url, maps)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
         return null;
     }
 
     /**
      * Execute http by Delete
-     * @return parsed data
-     *  you don't need to   parse ResponseBody
      *
+     * @return parsed data
+     * you don't need to   parse ResponseBody
      */
     public <T> T executeDelete(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
-        if (MethodHandler(types) == null && MethodHandler(types).size() == 0) {
+        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
             return null;
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
         apiManager.executeDelete(url, maps)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
         return null;
     }
 
     /**
      * Execute  Http by Put
-     * @return parsed data
-     *  you don't need to parse ResponseBody
      *
+     * @return parsed data
+     * you don't need to parse ResponseBody
      */
     public <T> T executePut(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
 
-        if (MethodHandler(types) == null && MethodHandler(types).size() == 0) {
+        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
             return null;
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
         apiManager.executePut(url, maps)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
         return null;
     }
@@ -307,60 +363,68 @@ public final class Novate {
 
     /**
      * Test
-     * @param url url
-     * @param maps maps
+     *
+     * @param url        url
+     * @param maps       maps
      * @param subscriber subscriber
-     * @param <T> T
+     * @param <T>        T
      * @return
      */
     public <T> T test(String url, Map<String, String> maps, Subscriber<ResponseBody> subscriber) {
 
         apiManager.getTest(url, maps)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(subscriber);
         return null;
     }
 
     /**
      * upload
+     *
      * @param url
      * @param requestBody requestBody
-     * @param subscriber subscriber
-     * @param <T> T
+     * @param subscriber  subscriber
+     * @param <T>         T
      * @return
      */
     public <T> T upload(String url, RequestBody requestBody, Subscriber<ResponseBody> subscriber) {
         apiManager.upLoadImage(url, requestBody)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(subscriber);
         return null;
     }
 
     /**
      * upload Flie
+     *
      * @param url
      * @param requestBody requestBody
-     * @param subscriber subscriber
-     * @param <T> T
+     * @param subscriber  subscriber
+     * @param <T>         T
      * @return
      */
     public <T> T uploadFlie(String url, RequestBody requestBody, MultipartBody.Part file, Subscriber<ResponseBody> subscriber) {
         apiManager.uploadFlie(url, requestBody, file)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(subscriber);
         return null;
     }
 
     /**
      * upload Flies
+     *
      * @param url
      * @param subscriber subscriber
-     * @param <T> T
+     * @param <T>        T
      * @return
      */
     public <T> T uploadFlies(String url, Map<String, RequestBody> files, Subscriber<ResponseBody> subscriber) {
         apiManager.uploadFiles(url, files)
                 .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
                 .subscribe(subscriber);
         return null;
     }
@@ -371,7 +435,7 @@ public final class Novate {
      * @param callBack
      */
     public void download(String url, DownLoadCallBack callBack) {
-         download(url, null, callBack);
+        download(url, null, callBack);
     }
 
     /**
@@ -383,7 +447,9 @@ public final class Novate {
         download(url, null, name, callBack);
     }
 
-    /**downloadMin
+    /**
+     * downloadMin
+     *
      * @param url
      * @param callBack
      */
@@ -393,6 +459,7 @@ public final class Novate {
 
     /**
      * downloadMin
+     *
      * @param url
      * @param name
      * @param callBack
@@ -401,7 +468,9 @@ public final class Novate {
         downloadMin(url, null, name, callBack);
     }
 
-    /** download small file
+    /**
+     * download small file
+     *
      * @param url
      * @param savePath
      * @param name
@@ -437,6 +506,7 @@ public final class Novate {
 
     /**
      * executeDownload
+     *
      * @param savePath
      * @param name
      * @param callBack
@@ -450,6 +520,7 @@ public final class Novate {
         }
         NovateDownLoadManager.isDownLoading = true;
         downObservable.compose(schedulersTransformerDown)
+                .compose(handleErrTransformer())
                 .subscribe(new DownSubscriber<ResponseBody>(savePath, name, callBack, mContext));
     }
 
@@ -460,7 +531,7 @@ public final class Novate {
 
         private static final int DEFAULT_TIMEOUT = 5;
         private static final int DEFAULT_MAXIDLE_CONNECTIONS = 5;
-        private static final long  DEFAULT_KEEP_ALIVEDURATION = 8;
+        private static final long DEFAULT_KEEP_ALIVEDURATION = 8;
         private static final long caheMaxSize = 10 * 1024 * 1024;
 
         private okhttp3.Call.Factory callFactory;
@@ -536,6 +607,7 @@ public final class Novate {
         public Builder connectTimeout(int timeout) {
             return connectTimeout(timeout, TimeUnit.SECONDS);
         }
+
         /**
          * Sets the default connect timeout for new connections. A value of 0 means no timeout,
          * otherwise values must be between 1 and {@link Integer#MAX_VALUE} when converted to
@@ -559,6 +631,7 @@ public final class Novate {
             okhttpBuilder.proxy(Utils.checkNotNull(proxy, "proxy == null"));
             return this;
         }
+
         /**
          * Sets the default write timeout for new connections. A value of 0 means no timeout,
          * otherwise values must be between 1 and {@link TimeUnit #MAX_VALUE} when converted to
@@ -575,7 +648,7 @@ public final class Novate {
 
         /**
          * Sets the connection pool used to recycle HTTP and HTTPS connections.
-         *
+         * <p>
          * <p>If unset, a new connection pool will be used.
          */
         public Builder connectionPool(ConnectionPool connectionPool) {
@@ -727,8 +800,9 @@ public final class Novate {
 
         /**
          * setCache
+         *
          * @param cache cahe
-         * @return  Builder
+         * @return Builder
          */
         public Builder addCache(Cache cache) {
             int maxStale = 60 * 60 * 24 * 3;
@@ -785,7 +859,7 @@ public final class Novate {
                 throw new IllegalStateException("retrofitBuilder required.");
             }
             /** set Context. */
-            mContext = context;
+            mContext = context.getApplicationContext();
             /**
              * Set a fixed API base URL.
              *
@@ -797,7 +871,7 @@ public final class Novate {
             if (converterFactory == null) {
                 converterFactory = GsonConverterFactory.create();
             }
-           ;
+            ;
 
             retrofitBuilder.addConverterFactory(converterFactory);
             /**
@@ -814,7 +888,7 @@ public final class Novate {
                         new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS));
             }
 
-            if(sslSocketFactory != null) {
+            if (sslSocketFactory != null) {
                 okhttpBuilder.sslSocketFactory(sslSocketFactory);
             }
 
@@ -823,7 +897,7 @@ public final class Novate {
             }
 
 
-            if ( httpCacheDirectory == null) {
+            if (httpCacheDirectory == null) {
                 httpCacheDirectory = new File(mContext.getCacheDir(), "Novate_Http_cache");
             }
 
@@ -907,6 +981,7 @@ public final class Novate {
 
     /**
      * NovateSubscriber
+     *
      * @param <T>
      */
     class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
@@ -942,7 +1017,6 @@ public final class Novate {
 
         @Override
         public void onError(Throwable e) {
-            Log.e("novate", "-->:" + e.getMessage());
             if (callBack != null) {
                 callBack.onError(e);
             }
@@ -963,16 +1037,30 @@ public final class Novate {
                          *  Type finalNeedType = needChildType;
                          */
 
-                        NovateResponse<T> baseResponse = new Gson().fromJson(jsStr, finalNeedType);
+                        NovateResponse<T> baseResponse = null;
 
-                        if (baseResponse.isOk()) {
+                        if (new Gson().fromJson(jsStr, finalNeedType) == null) {
+                            throw new NullPointerException();
+                        }
+                        baseResponse = new Gson().fromJson(jsStr, finalNeedType);
+                        if (ConfigLoader.isFormat(mContext) && baseResponse.getData() == null & baseResponse.getResult() == null) {
+                            throw new FormatException();
+                        }
+
+                        if (baseResponse.isOk(mContext)) {
                             callBack.onSuccee((T) new Gson().fromJson(jsStr, finalNeedType));
+                        } else {
+                            String msg =
+                                    baseResponse.getMsg() != null ? baseResponse.getMsg() : baseResponse.getError() != null ? baseResponse.getError() : baseResponse.getMessage() != null ? baseResponse.getMessage() : "api未知异常";
+
+                            ServerException serverException = new ServerException(baseResponse.getCode(), msg);
+                            callBack.onError(NovateException.handleException(serverException));
                         }
 
                     } catch (Exception e) {
                         e.printStackTrace();
                         if (callBack != null) {
-                            callBack.onError(e);
+                            callBack.onError(NovateException.handleException(new FormatException()));
                         }
                     }
                 }
@@ -980,7 +1068,7 @@ public final class Novate {
             } catch (Exception e) {
                 e.printStackTrace();
                 if (callBack != null) {
-                    callBack.onError(e);
+                    callBack.onError(NovateException.handleException(e));
                 }
             }
         }
@@ -988,8 +1076,6 @@ public final class Novate {
 
     /**
      * ResponseCallBack <T> Support your custom data model
-     *
-     *
      */
     public interface ResponseCallBack<T> {
 

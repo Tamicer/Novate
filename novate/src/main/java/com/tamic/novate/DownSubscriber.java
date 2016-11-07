@@ -3,20 +3,18 @@ package com.tamic.novate;
 import android.content.Context;
 import android.util.Log;
 
-import okhttp3.ResponseBody;
-import rx.Subscriber;
-
 /**
  * DownSubscriber
  * Created by Tamic on 2016-08-03.
  */
-public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends Subscriber<ResponseBody> {
+public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends BaseSubscriber<ResponseBody> {
     private DownLoadCallBack callBack;
     private Context context;
     private String path;
     private String name;
 
     public DownSubscriber(String path, String name, DownLoadCallBack callBack, Context context) {
+        super(context);
         this.path = path;
         this.name = name;
         this.callBack = callBack;
@@ -39,11 +37,9 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
     }
 
     @Override
-    public void onError(Throwable e) {
+    public void onError(final Throwable e) {
         Log.d( NovateDownLoadManager.TAG, "DownSubscriber:>>>> onError:" + e.getMessage());
-        if (callBack != null) {
-            callBack.onError(e);
-        }
+        callBack.onError(e);
     }
 
     @Override

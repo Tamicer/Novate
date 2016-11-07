@@ -1,11 +1,12 @@
 package com.tamic.novate;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Button;
+
+import com.tamic.novate.util.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,7 +31,7 @@ public class NovateDownLoadManager {
 
     private static String JPG_CONTENTTYPE = "image/jpg";
 
-    private static String fileSuffix="";
+    private static String fileSuffix = "";
 
     private Handler handler;
 
@@ -46,7 +47,7 @@ public class NovateDownLoadManager {
     private static NovateDownLoadManager sInstance;
 
     /**
-     *DownLoadManager getInstance
+     * DownLoadManager getInstance
      */
     public static synchronized NovateDownLoadManager getInstance(DownLoadCallBack callBack) {
         if (sInstance == null) {
@@ -55,33 +56,32 @@ public class NovateDownLoadManager {
         return sInstance;
     }
 
-    public boolean  writeResponseBodyToDisk(String path, String name, Context context, ResponseBody body) {
+    public boolean writeResponseBodyToDisk(String path, String name, Context context, ResponseBody body) {
 
-        Log.d(TAG, "contentType:>>>>"+ body.contentType().toString());
+        Log.d(TAG, "contentType:>>>>" + body.contentType().toString());
 
-        String type = body.contentType().toString();
-
-        if (type.equals(APK_CONTENTTYPE)) {
-           fileSuffix = ".apk";
-        } else if (type.equals(PNG_CONTENTTYPE)) {
-            fileSuffix = ".png";
-        } else if (type.equals(JPG_CONTENTTYPE)) {
-            fileSuffix = ".jpg";
+        if (!TextUtils.isEmpty(name)) {
+            String type = "";
+            if (!name.contains(".")) {
+                type = body.contentType().toString();
+                if (type.equals(APK_CONTENTTYPE)) {
+                    fileSuffix = ".apk";
+                } else if (type.equals(PNG_CONTENTTYPE)) {
+                    fileSuffix = ".png";
+                } else if (type.equals(JPG_CONTENTTYPE)) {
+                    fileSuffix = ".jpg";
+                } else {
+                    fileSuffix = body.contentType().subtype();
+                }
+                name = name + fileSuffix;
+            }
         } else {
-            fileSuffix = body.contentType().subtype();
-        }
-        if (name == null) {
             name = System.currentTimeMillis() + fileSuffix;
         }
-        else {
-            name = name + fileSuffix;
-        }
+
         if (path == null) {
             path = context.getExternalFilesDir(null) + File.separator + name;
         }
-        // 其他同上 自己判断加入
-        //final String name = System.currentTimeMillis() + fileSuffix;
-        //final String path = context.getExternalFilesDir(null) + File.separator + name;
         Log.d(TAG, "path:-->" + path);
         try {
             // todo change the file location/name according to your needs
@@ -95,7 +95,7 @@ public class NovateDownLoadManager {
 
                 final long fileSize = body.contentLength();
                 long fileSizeDownloaded = 0;
-                Log.d(TAG, "file length: "+ fileSize);
+                Log.d(TAG, "file length: " + fileSize);
                 inputStream = body.byteStream();
                 outputStream = new FileOutputStream(futureStudioIconFile);
 
@@ -116,7 +116,7 @@ public class NovateDownLoadManager {
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                        callBack.onProgress(finalFileSizeDownloaded);
+                                    callBack.onProgress(finalFileSizeDownloaded);
                                 }
                             }, 200);
                         }
@@ -141,14 +141,12 @@ public class NovateDownLoadManager {
                         }
                     });
                     Log.d(TAG, "file downloaded: " + fileSizeDownloaded + " of " + fileSize);
-                    Log.d(TAG, "file downloaded: is sucess" );
+                    Log.d(TAG, "file downloaded: is sucess");
                 }
 
                 return true;
             } catch (IOException e) {
-                if (callBack != null) {
-                    callBack.onError(e);
-                }
+                finalonError(e);
                 return false;
             } finally {
                 if (inputStream != null) {
@@ -160,10 +158,29 @@ public class NovateDownLoadManager {
                 }
             }
         } catch (IOException e) {
-            if (callBack != null) {
-                callBack.onError(e);
-            }
+            finalonError(e);
             return false;
         }
     }
+
+    private void finalonError(final Exception e) {
+
+        if (callBack == null) {
+            return;
+        }
+
+        if (Utils.checkMain()) {
+            callBack.onError(new Throwable(e, 100));
+        } else {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callBack.onError(new Throwable(e, 100));
+                }
+            });
+        }
+    }
+
+
+
 }

@@ -11,9 +11,18 @@ public abstract class DownLoadCallBack {
 
     public void onCompleted(){}
 
+
+    /** Note : the Fun run not MainThred
+     * @param e
+     */
     abstract public void onError(Throwable e);
 
     public void onProgress(long fileSizeDownloaded){}
 
+    /**  Note : the Fun run UIThred
+     * @param path
+     * @param name
+     * @param fileSize
+     */
     abstract public void onSucess(String path, String name, long fileSize);
 }
