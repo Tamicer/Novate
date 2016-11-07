@@ -6,13 +6,17 @@ android {
 
     defaultConfig {
         applicationId "com.tamic.excemple"
-        minSdkVersion 16
+        minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
         release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug{
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -27,8 +31,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.0'
-    //compile project(':novate')
+    compile project(':novate')
 
-    compile 'com.tamic.novate:novate:1.0.2'
+    //compile 'com.tamic.novate:novate:1.1.0'
 }
 

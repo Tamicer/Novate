@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.tamic.excemple.model.IpResult;
 import com.tamic.excemple.model.MovieModel;
 import com.tamic.excemple.model.ResultModel;
 import com.tamic.excemple.model.SouguBean;
@@ -17,6 +18,7 @@ import com.tamic.novate.NovateResponse;
 import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.DownLoadCallBack;
 import com.tamic.novate.Novate;
+import com.tamic.novate.Throwable;
 
 import java.io.File;
 import java.io.IOException;
@@ -157,8 +159,9 @@ public class ExempleActivity extends AppCompatActivity {
         //http://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海
         Map<String, String> headers = new HashMap<>();
         headers.put("apikey", "27b6fb21f2b42e9d70cd722b2ed038a9");
-
+        headers.put("Accept", "application/json");
         novate = new Novate.Builder(this)
+                .addHeader(headers)
                 .addParameters(parameters)
                 .connectTimeout(5)
                 .baseUrl("https://apis.baidu.com/")
@@ -170,10 +173,16 @@ public class ExempleActivity extends AppCompatActivity {
                 new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
                     @Override
                     public void onError(Throwable e) {
-                        super.onError(e);
                         Log.e("OkHttp", e.getMessage());
                         Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
+
+
+                   /* @Override
+                    public void onError(Throwable e) {
+                        Log.e("OkHttp", e.getMessage());
+                        Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }*/
 
                     @Override
                     public void onNext(ResponseBody responseBody) {
@@ -205,6 +214,11 @@ public class ExempleActivity extends AppCompatActivity {
 
         novate.get("v2/movie/top250", parameters, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
+            public void onError(Throwable e) {
+                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void onNext(ResponseBody responseBody) {
                 try {
 
@@ -232,21 +246,33 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performGet() {
 
-        Map<String, String> parameters = new HashMap<String, String>();
+       Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("ip", "21.22.11.33");
         novate = new Novate.Builder(this)
+                .addHeader(headers)
                 //.addParameters(parameters)
                 .connectTimeout(5)
                 .baseUrl(baseUrl)
                 .addLog(true)
                 .build();
+       /*        parameters.clear();
+        parameters.put("m", "souguapp");
+        parameters.put("c", "appusers");
+        parameters.put("a", "network");
 
+        novate = new Novate.Builder(this)
+                //.addHeader(headers)
+                .connectTimeout(10)
+                .addCookie(false)
+                .baseUrl("http://lbs.sougu.net.cn/")
+                .addLog(true)
+                .build();*/
 
         /**
          * 如果不需要数据解析后返回 则调用novate.Get()
          * 参考 performPost()中的方式
          */
-        novate.executeGet("service/getIpInfo.php", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
+        novate.executePost("service/getIpInfo.php", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
             @Override
             public void onStart() {
 
@@ -268,6 +294,8 @@ public class ExempleActivity extends AppCompatActivity {
             public void onSuccee(NovateResponse<ResultModel> response) {
                 Toast.makeText(ExempleActivity.this, response.getData().toString(), Toast.LENGTH_SHORT).show();
             }
+
+
         });
 
 
@@ -297,9 +325,16 @@ public class ExempleActivity extends AppCompatActivity {
          * 参考 performGet()中的方式
          */
         novate.post("service/getIpInfo.php", parameters, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+/*
+            @Override
+            public void onNext(IpResult ipResult) {
+
+            }*/
+
             @Override
             public void onError(Throwable e) {
-
+                Log.e("OkHttp", e.getMessage());
+                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -344,6 +379,7 @@ public class ExempleActivity extends AppCompatActivity {
         novate.call(myAPI.getSougu(parameters),
                 new BaseSubscriber<SouguBean>(ExempleActivity.this) {
 
+
                     @Override
                     public void onError(Throwable e) {
                         Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -371,6 +407,11 @@ public class ExempleActivity extends AppCompatActivity {
 
         novate.upload(url, requestFile, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
+            public void onError(Throwable e) {
+                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void onNext(ResponseBody responseBody) {
 
             }
@@ -388,6 +429,11 @@ public class ExempleActivity extends AppCompatActivity {
                 RequestBody.create(MediaType.parse("image/jpg"), new File(mPath));
 
         novate.upload(url, requestFile, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
             @Override
             public void onNext(ResponseBody responseBody) {
 
@@ -448,7 +494,7 @@ public class ExempleActivity extends AppCompatActivity {
             public void onStart() {
                 super.onStart();
                 Toast.makeText(ExempleActivity.this, "download is start", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoad cancel");
+                btn_download.setText("DownLoadMin cancel");
             }
 
             @Override
@@ -459,7 +505,7 @@ public class ExempleActivity extends AppCompatActivity {
             @Override
             public void onCancel() {
                 super.onCancel();
-                btn_download.setText("DownLoad start");
+                btn_download.setText("DownLoadMin start");
             }
 
             @Override
@@ -471,7 +517,7 @@ public class ExempleActivity extends AppCompatActivity {
             @Override
             public void onSucess(String path, String name, long fileSize) {
                 Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoad start");
+                btn_download.setText("DownLoadMin start");
             }
         });
     }
