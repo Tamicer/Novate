@@ -66,6 +66,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
    - 加入基础API，减少Api冗余
    - 支持离线缓存
    - 支持多种方式访问网络（get,put,post ,delete）
+   - 支持Json字符串，表单提交
    - 支持文件下载和上传
    - 支持请求头统一加入
    - 支持对返回结果的统一处理
