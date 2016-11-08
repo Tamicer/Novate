@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -305,14 +306,118 @@ public final class Novate {
      * @return parsed data
      * you don't need to   parse ResponseBody
      */
-    public <T> T executePost(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
+    public <T> T executePost(final String url, final Map<String, String> parameters, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
         if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
             return null;
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        apiManager.executePost(url, maps)
+        apiManager.executePost(url, parameters)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+        return null;
+    }
+
+
+    /**
+     *  Post by Form
+     * @param url
+     * @param subscriber
+     */
+    public void Form(String url, Map<String , Object> objs, Subscriber<ResponseBody> subscriber) {
+        apiManager.postForm(url, objs)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(subscriber);
+    }
+
+
+    /**
+     * Retroift execute Post by Form
+     *
+     * @return parsed data
+     * you don't need to   parse ResponseBody
+     */
+    public <T> T executeForm(final String url, final Map<String , Object> objs, final ResponseCallBack<T> callBack) {
+        final Type[] types = callBack.getClass().getGenericInterfaces();
+        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
+            return null;
+        }
+        final Type finalNeedType = MethodHandler(types).get(0);
+        Log.d(TAG, "-->:" + "Type:" + types[0]);
+        apiManager.postForm(url, objs)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+        return null;
+    }
+
+
+    /**
+     *  http Post by Body
+     *  you  need to parse ResponseBody
+     * @param url
+     * @param subscriber
+     */
+    public void body(String url, Object body, Subscriber<ResponseBody> subscriber) {
+        apiManager.executePostBody(url, body)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(subscriber);
+    }
+
+    /**
+     * http execute Post by body
+     *
+     * @return parsed data
+     * you don't need to   parse ResponseBody
+     */
+    public <T> T executeBody(final String url, final Object body, final ResponseCallBack<T> callBack) {
+        final Type[] types = callBack.getClass().getGenericInterfaces();
+        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
+            return null;
+        }
+        final Type finalNeedType = MethodHandler(types).get(0);
+        Log.d(TAG, "-->:" + "Type:" + types[0]);
+        apiManager.executePostBody(url, body)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+        return null;
+    }
+
+
+    /**
+     *  http Post by json
+     *  you  need to parse ResponseBody
+     * @param url
+     * @param jsonStr  Json String
+     * @param subscriber
+     */
+    public void json(String url, String jsonStr, Subscriber<ResponseBody> subscriber) {
+        apiManager.postJson(url, jsonStr)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(subscriber);
+    }
+
+    /**
+     * http execute Post by Json
+     * @param url
+     * @param jsonStr  Json String
+     * @return parsed data
+     * you don't need to   parse ResponseBody
+     */
+    public <T> T executeJson(final String url, final String jsonStr, final ResponseCallBack<T> callBack) {
+        final Type[] types = callBack.getClass().getGenericInterfaces();
+        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
+            return null;
+        }
+        final Type finalNeedType = MethodHandler(types).get(0);
+        Log.d(TAG, "-->:" + "Type:" + types[0]);
+        apiManager.postJson(url, jsonStr)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));

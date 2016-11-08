@@ -9,6 +9,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
+import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -36,7 +37,7 @@ public interface BaseApiService {
     @POST("{url}")
     Observable<ResponseBody> executePostBody(
             @Path("url") String url,
-            @Body Objects objects);
+            @Body Object object);
 
     @GET("{url}")
     Observable<ResponseBody> executeGet(
@@ -90,6 +91,12 @@ public interface BaseApiService {
     Observable<ResponseBody> postForm(
             @Path("url") String url,
             @FieldMap Map<String , Object> maps);
+
+    @FormUrlEncoded
+    @POST("{url}")
+    Observable<ResponseBody> postJson(
+            @Path("url") String url,
+            @Field("jsStr") String jsonStr);
 
 }
 
