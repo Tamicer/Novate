@@ -101,6 +101,49 @@ Retrofit requires at minimum Java 7 or Android 2.3.
         
         });
         
+# BODY #
+
+    ovate.body(url, uesrBean, new BaseSubscriber<ResponseBody>() {
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(ResponseBody responseBody) {
+
+            }
+        });
+
+#FORM#
+
+        novate.Form(url, new HashMap<String, Object>(), new BaseSubscriber<ResponseBody>() {
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(ResponseBody responseBody) {
+
+            }
+        });
+
+# JSON #
+        
+        
+          novate.json(url, jsonString, new BaseSubscriber<ResponseBody>() {
+            @Override
+            public void onError(Throwable e) {
+                
+            }
+
+            @Override
+            public void onNext(ResponseBody responseBody) {
+
+            }
+        });        
+        
 # UpLoad
 
  **upLoadImage**
