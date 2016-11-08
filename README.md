@@ -82,7 +82,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
                 .build();
                 
        
-# Get
+# GET
         
         novate.executeGet("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
@@ -91,7 +91,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
         });
         
         
-# Post        
+# POST        
         
         
         novate.executePost("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
@@ -152,6 +152,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
   
 # DownLoad   
      
+
 **downLoad for MaxFile**
 
 
@@ -161,6 +162,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
          ''''''''''''
       });
 
+
 **downLoad for minFile**   
 
 
@@ -169,26 +171,28 @@ Retrofit requires at minimum Java 7 or Android 2.3.
          ''''''''''''
       });
       
-   
+ 
+ 
    
 # Custom Api 
 
 
 如果默认的BaseApiService无法满足你的需求时，novate同样支持你自己的ApiService。
 
- **MyAPI**
+
+ **MyApi**
     
        
-     public interface MyAPI {
+     public interface MyApi {
 
-       @GET("url")
+      @GET("url")
       Observable<MyBean> getdata(@QueryMap Map<String, String> maps);
    
      }
      
  **Execute**
 
-     MyAPI myAPI = novate.create(MyAPI.class);
+     MyApi myApi = novate.create(MyApi.class);
 
      novate.call(myAPI.getdata(parameters),
                 new BaseSubscriber<MyBean>{
