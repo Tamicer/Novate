@@ -17,6 +17,7 @@ import com.tamic.novate.NovateResponse;
 import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.DownLoadCallBack;
 import com.tamic.novate.Novate;
+import com.tamic.novate.Throwable;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
@@ -155,7 +157,7 @@ public class ExempleActivity extends AppCompatActivity {
                 new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
-                super.onError(e);
+
                 Log.e("OkHttp", e.getMessage());
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -189,6 +191,11 @@ public class ExempleActivity extends AppCompatActivity {
                 .build();
 
         novate.get("v2/movie/top250", parameters, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
             @Override
             public void onNext(ResponseBody responseBody) {
                 try {
@@ -352,6 +359,11 @@ public class ExempleActivity extends AppCompatActivity {
 
         novate.upload(url, requestFile, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
             public void onNext(ResponseBody responseBody) {
 
             }
@@ -396,6 +408,44 @@ public class ExempleActivity extends AppCompatActivity {
                 btn_download.setText("DownLoad start");
             }
         });
+    }
+
+    void performUpLoadFile() {
+
+        String mPath = "you File path ";
+        String url = "";
+
+        File file = new File(mPath);
+
+        // 创建 RequestBody，用于封装 请求RequestBody
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("image", file.getName(), requestFile);
+
+        // 添加描述
+        String descriptionString = "hello, 这是文件描述";
+        RequestBody description =
+                RequestBody.create(
+                        MediaType.parse("multipart/form-data"), descriptionString);
+
+        // 执行
+
+        novate.uploadFlie(url, description,  body,new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+            @Override
+            public void onNext(ResponseBody responseBody) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+        });
+
     }
 
 }
