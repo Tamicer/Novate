@@ -102,6 +102,8 @@ Retrofit requires at minimum Java 7 or Android 2.3.
         
 # UpLoad
 
+ **upLoadImage**
+
     RequestBody requestFile =
                     RequestBody.create(MediaType.parse("image/jpg"), new File(you file path));
 
@@ -109,15 +111,64 @@ Retrofit requires at minimum Java 7 or Android 2.3.
       
         '''''''''''''''
       });
+      
+ **upLoadFile**  
+    
+         String mPath = "you File path ";
+        String url = "";
+
+        File file = new File(mPath);
+
+        // 创建 RequestBody，用于封装 请求RequestBody
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+         // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("image", file.getName(), requestFile);
+
+       // 添加描述
+        String descriptionString = "hello, 这是文件描述";
+        RequestBody description =
+                RequestBody.create(
+                        MediaType.parse("multipart/form-data"), descriptionString);
+
+        // 执行
+
+        novate.uploadFlie(url, description,  body,new BaseSubscriber<ResponseBody>(ExempleActivity.this) {.......
+         });
+        
+        
+    
+**upLoadFiles**  
+     
+     
+        Map<String, RequestBody> maps = new HashMap<>();
+        maps.put("file1", requestFile);
+        novate.uploadFlies(url, maps, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+           ......
+        } );
 
   
 # DownLoad   
      
+**downLoad for MaxFile**
+
+
    
       novate.download(downUrl, new DownLoadCallBack() {
       
          ''''''''''''
       });
+
+**downLoad for minFile**   
+
+
+     novate.downloadMin(downUrl, new DownLoadCallBack() {
+      
+         ''''''''''''
+      });
+      
    
    
 # Custom Api 
