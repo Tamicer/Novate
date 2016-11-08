@@ -1,1 +1,1 @@
-include ':exemple', ':novate'
+include ':exemple'
