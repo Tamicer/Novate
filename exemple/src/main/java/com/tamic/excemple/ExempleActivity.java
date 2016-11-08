@@ -1,5 +1,6 @@
 package com.tamic.excemple;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,10 +24,13 @@ import com.tamic.novate.Throwable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
@@ -46,6 +50,8 @@ public class ExempleActivity extends AppCompatActivity {
 
     private Button btn, btn_test, btn_get, btn_post, btn_download,
             btn_download_Min, btn_upload, btn_uploadfile, btn_myApi;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -425,10 +431,26 @@ public class ExempleActivity extends AppCompatActivity {
 
         String mPath = "you File path ";
         String url = "";
-        RequestBody requestFile =
-                RequestBody.create(MediaType.parse("image/jpg"), new File(mPath));
 
-        novate.upload(url, requestFile, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        File file = new File(mPath);
+
+        // 创建 RequestBody，用于封装 请求RequestBody
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+         // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("image", file.getName(), requestFile);
+
+       // 添加描述
+        String descriptionString = "hello, 这是文件描述";
+        RequestBody description =
+                RequestBody.create(
+                        MediaType.parse("multipart/form-data"), descriptionString);
+
+        // 执行
+
+        novate.uploadFlie(url, description,  body,new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -439,6 +461,22 @@ public class ExempleActivity extends AppCompatActivity {
 
             }
         });
+
+
+        Map<String, RequestBody> maps = new HashMap<>();
+        maps.put("file1", requestFile);
+        maps.put("file2", requestFile);
+        novate.uploadFlies(url, maps, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNext(ResponseBody responseBody) {
+
+            }
+        } );
     }
 
     /**
