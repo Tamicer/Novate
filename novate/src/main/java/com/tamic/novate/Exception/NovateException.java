@@ -4,7 +4,6 @@ import android.net.ParseException;
 import android.util.Log;
 
 import com.google.gson.JsonParseException;
-import com.tamic.novate.Throwable;
 
 import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONException;
