@@ -964,7 +964,7 @@ public final class Novate {
                 throw new IllegalStateException("retrofitBuilder required.");
             }
             /** set Context. */
-            mContext = context.getApplicationContext();
+            mContext = context;
             /**
              * Set a fixed API base URL.
              *
