@@ -7,7 +7,7 @@ import com.google.gson.JsonParseException;
 
 import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONException;
-
+import com.tamic.novate.Throwable;
 import java.net.ConnectException;
 
 import retrofit2.adapter.rxjava.HttpException;
