@@ -89,8 +89,6 @@ public final class Novate {
     private Map<String, Observable<ResponseBody>> downMaps = new HashMap<String, Observable<ResponseBody>>() {
     };
     private Observable.Transformer exceptTransformer = null;
-
-
     public static final String TAG = "Novate";
 
     /**
@@ -111,7 +109,6 @@ public final class Novate {
         this.validateEagerly = validateEagerly;
     }
 
-
     /**
      * create ApiService
      */
@@ -124,12 +121,10 @@ public final class Novate {
      * @param subscriber
      */
     public <T> T call(Observable<T> observable, Subscriber<T> subscriber) {
-        observable.compose(schedulersTransformer)
+        return (T) observable.compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
-        return null;
     }
-
 
     /**
      * Retroift execute get
@@ -146,12 +141,10 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        apiManager.executeGet(url, maps)
+        return (T) apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
-        return null;
-
     }
 
     /**
@@ -251,12 +244,10 @@ public final class Novate {
      * @return no parse data
      */
     public <T> T get(String url, Map<String, String> maps, BaseSubscriber<ResponseBody> subscriber) {
-
-        apiManager.executeGet(url, maps)
+        return (T) apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
-        return null;
     }
 
     /**
@@ -312,11 +303,11 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        apiManager.executePost(url, parameters)
+
+        return (T) apiManager.executePost(url, parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
-        return null;
     }
 
 
@@ -347,11 +338,11 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        apiManager.postForm(url, fields)
+
+        return (T) apiManager.postForm(url, fields)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
-        return null;
     }
 
 
@@ -382,11 +373,11 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        apiManager.executePostBody(url, body)
+
+        return (T) apiManager.executePostBody(url, body)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
-        return null;
     }
 
 
@@ -399,7 +390,6 @@ public final class Novate {
      * @param subscriber
      */
     public void json(String url, String jsonStr, Subscriber<ResponseBody> subscriber) {
-
         apiManager.postJson(url, Utils.createJson(jsonStr))
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
@@ -421,13 +411,10 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-
-
-        apiManager.postJson(url, Utils.createJson(jsonStr))
+        return (T) apiManager.postJson(url, Utils.createJson(jsonStr))
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
-        return null;
     }
 
     /**
@@ -443,11 +430,10 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        apiManager.executeDelete(url, maps)
+        return (T) apiManager.executeDelete(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
-        return null;
     }
 
     /**
@@ -464,17 +450,15 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        apiManager.executePut(url, maps)
+        return (T) apiManager.executePut(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
-        return null;
     }
 
 
     /**
      * Test
-     *
      * @param url        url
      * @param maps       maps
      * @param subscriber subscriber
@@ -482,17 +466,14 @@ public final class Novate {
      * @return
      */
     public <T> T test(String url, Map<String, String> maps, Subscriber<ResponseBody> subscriber) {
-
-        apiManager.getTest(url, maps)
+        return (T) apiManager.getTest(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
-        return null;
     }
 
     /**
      * upload
-     *
      * @param url
      * @param requestBody requestBody
      * @param subscriber  subscriber
@@ -500,11 +481,26 @@ public final class Novate {
      * @return
      */
     public <T> T upload(String url, RequestBody requestBody, Subscriber<ResponseBody> subscriber) {
-        apiManager.upLoadImage(url, requestBody)
+        return (T) apiManager.upLoadImage(url, requestBody)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
-        return null;
+    }
+
+    /**
+     * uploadImage
+     *
+     * @param url        url
+     * @param file       file
+     * @param subscriber
+     * @param <T>
+     * @return
+     */
+    public <T> T uploadImage(String url, File file, Subscriber<ResponseBody> subscriber) {
+        return (T) apiManager.upLoadImage(url, Utils.createImage(file))
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(subscriber);
     }
 
     /**
@@ -517,11 +513,10 @@ public final class Novate {
      * @return
      */
     public <T> T uploadFlie(String url, RequestBody requestBody, MultipartBody.Part file, Subscriber<ResponseBody> subscriber) {
-        apiManager.uploadFlie(url, requestBody, file)
+        return (T) apiManager.uploadFlie(url, requestBody, file)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
-        return null;
     }
 
     /**
@@ -533,11 +528,10 @@ public final class Novate {
      * @return
      */
     public <T> T uploadFlies(String url, Map<String, RequestBody> files, Subscriber<ResponseBody> subscriber) {
-        apiManager.uploadFiles(url, files)
+        return (T) apiManager.uploadFiles(url, files)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
-        return null;
     }
 
 
