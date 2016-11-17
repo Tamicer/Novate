@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +44,7 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.FieldMap;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -85,7 +85,6 @@ public final class Novate {
     private final List<CallAdapter.Factory> adapterFactories;
     private final Executor callbackExecutor;
     private final boolean validateEagerly;
-    private NovateSubscriber novateSubscriber;
     private Observable<ResponseBody> downObservable;
     private Map<String, Observable<ResponseBody>> downMaps = new HashMap<String, Observable<ResponseBody>>() {
     };
@@ -293,7 +292,7 @@ public final class Novate {
      *
      * }</pre>
      */
-    public void post(String url, Map<String, String> parameters, Subscriber<ResponseBody> subscriber) {
+    public void post(String url, @FieldMap(encoded = true) Map<String, String> parameters, Subscriber<ResponseBody> subscriber) {
         apiManager.executePost(url, parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
@@ -322,12 +321,13 @@ public final class Novate {
 
 
     /**
-     *  Post by Form
+     * Post by Form
+     *
      * @param url
      * @param subscriber
      */
-    public void Form(String url, Map<String , Object> objs, Subscriber<ResponseBody> subscriber) {
-        apiManager.postForm(url, objs)
+    public void form(String url, @FieldMap(encoded = true) Map<String, Object> fields, Subscriber<ResponseBody> subscriber) {
+        apiManager.postForm(url, fields)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -340,14 +340,14 @@ public final class Novate {
      * @return parsed data
      * you don't need to   parse ResponseBody
      */
-    public <T> T executeForm(final String url, final Map<String , Object> objs, final ResponseCallBack<T> callBack) {
+    public <T> T executeForm(final String url, final @FieldMap(encoded = true) Map<String, Object> fields, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
         if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
             return null;
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        apiManager.postForm(url, objs)
+        apiManager.postForm(url, fields)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
@@ -356,8 +356,9 @@ public final class Novate {
 
 
     /**
-     *  http Post by Body
-     *  you  need to parse ResponseBody
+     * http Post by Body
+     * you  need to parse ResponseBody
+     *
      * @param url
      * @param subscriber
      */
@@ -390,14 +391,16 @@ public final class Novate {
 
 
     /**
-     *  http Post by json
-     *  you  need to parse ResponseBody
+     * http Post by json
+     * you  need to parse ResponseBody
+     *
      * @param url
-     * @param jsonStr  Json String
+     * @param jsonStr    Json String
      * @param subscriber
      */
     public void json(String url, String jsonStr, Subscriber<ResponseBody> subscriber) {
-        apiManager.postJson(url, jsonStr)
+
+        apiManager.postJson(url, Utils.createJson(jsonStr))
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -405,8 +408,9 @@ public final class Novate {
 
     /**
      * http execute Post by Json
+     *
      * @param url
-     * @param jsonStr  Json String
+     * @param jsonStr Json String
      * @return parsed data
      * you don't need to   parse ResponseBody
      */
@@ -417,7 +421,9 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        apiManager.postJson(url, jsonStr)
+
+
+        apiManager.postJson(url, Utils.createJson(jsonStr))
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
@@ -643,6 +649,7 @@ public final class Novate {
         private String baseUrl;
         private Boolean isLog = false;
         private Boolean isCookie = false;
+        private Boolean isCache = true;
         private List<InputStream> certificateList;
         private HostnameVerifier hostnameVerifier;
         private CertificatePinner certificatePinner;
@@ -659,6 +666,8 @@ public final class Novate {
         private ConnectionPool connectionPool;
         private Converter.Factory converterFactory;
         private CallAdapter.Factory callAdapterFactory;
+        private Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR;
+        private Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR_OFFLINE;
 
         public Builder(Context context) {
             // Add the base url first. This prevents overriding its behavior but also
@@ -722,13 +731,36 @@ public final class Novate {
             return writeTimeout(timeout, TimeUnit.SECONDS);
         }
 
+        /**
+         * open default logcat
+         *
+         * @param isLog
+         * @return
+         */
         public Builder addLog(boolean isLog) {
             this.isLog = isLog;
             return this;
         }
 
+        /**
+         * open sync default Cookie
+         *
+         * @param isCookie
+         * @return
+         */
         public Builder addCookie(boolean isCookie) {
             this.isCookie = isCookie;
+            return this;
+        }
+
+        /**
+         * open default Cache
+         *
+         * @param isCache
+         * @return
+         */
+        public Builder addCache(boolean isCache) {
+            this.isCache = isCache;
             return this;
         }
 
@@ -911,15 +943,7 @@ public final class Novate {
          */
         public Builder addCache(Cache cache) {
             int maxStale = 60 * 60 * 24 * 3;
-            return addCacheAge(cache, maxStale);
-        }
-
-        /**
-         * @return
-         */
-        public Builder addCacheAge(Cache cache, final int cacheTime) {
-            addCache(cache, String.format("max-age=%d", cacheTime));
-            return this;
+            return addCache(cache, maxStale);
         }
 
         /**
@@ -927,20 +951,22 @@ public final class Novate {
          * @param cacheTime ms
          * @return
          */
-        public Builder addCacheStale(Cache cache, final int cacheTime) {
-            addCache(cache, String.format("max-stale=%d", cacheTime));
+        public Builder addCache(Cache cache, final int cacheTime) {
+            addCache(cache, String.format("max-age=%d", cacheTime));
             return this;
         }
 
         /**
          * @param cache
-         * @param cacheControlValue Cache-Control值
+         * @param cacheControlValue Cache-Control
          * @return
          */
-        public Builder addCache(Cache cache, final String cacheControlValue) {
-            Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new CaheInterceptor(mContext, cacheControlValue);
-            addInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR);
+        private Builder addCache(Cache cache, final String cacheControlValue) {
+            REWRITE_CACHE_CONTROL_INTERCEPTOR = new CacheInterceptor(mContext, cacheControlValue);
+            REWRITE_CACHE_CONTROL_INTERCEPTOR_OFFLINE = new CacheInterceptorOffline(mContext, cacheControlValue);
             addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR);
+            addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR_OFFLINE);
+            addInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR_OFFLINE);
             this.cache = cache;
             return this;
         }
@@ -1006,18 +1032,25 @@ public final class Novate {
                 httpCacheDirectory = new File(mContext.getCacheDir(), "Novate_Http_cache");
             }
 
-            try {
+            if (isCache) {
+                try {
+                    if (cache == null) {
+                        cache = new Cache(httpCacheDirectory, caheMaxSize);
+                    }
+
+                    addCache(cache);
+
+                } catch (Exception e) {
+                    Log.e("OKHttp", "Could not create http cache", e);
+                }
                 if (cache == null) {
                     cache = new Cache(httpCacheDirectory, caheMaxSize);
                 }
-            } catch (Exception e) {
-                Log.e("OKHttp", "Could not create http cache", e);
             }
 
-
-            okhttpBuilder.cache(cache);
-
-            addCache(cache);
+            if (cache != null) {
+                okhttpBuilder.cache(cache);
+            }
 
             /**
              * Sets the connection pool used to recycle HTTP and HTTPS connections.

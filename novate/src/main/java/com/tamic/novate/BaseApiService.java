@@ -29,19 +29,20 @@ import rx.Observable;
  * Created by Tamic on 2016-06-03.
  */
 public interface BaseApiService {
-    @POST("{url}")
+    @POST()
+    @FormUrlEncoded
     Observable<ResponseBody> executePost(
-            @Path("url") String url,
-            @QueryMap Map<String , String> maps);
+            @Url() String url,
+            @FieldMap Map<String , String> maps);
 
     @POST("{url}")
     Observable<ResponseBody> executePostBody(
             @Path("url") String url,
             @Body Object object);
 
-    @GET("{url}")
+    @GET()
     Observable<ResponseBody> executeGet(
-            @Path("url") String url,
+            @Url String url,
             @QueryMap Map<String, String> maps);
 
     @DELETE("{url}")
@@ -55,9 +56,9 @@ public interface BaseApiService {
             @QueryMap Map<String, String> maps);
 
     @Multipart
-    @POST("{url}")
+    @POST()
     Observable<ResponseBody> upLoadImage(
-            @Path("url") String url,
+            @Url() String url,
             @Part("image\"; filename=\"image.jpg") RequestBody requestBody);
 
     @Multipart
@@ -68,9 +69,9 @@ public interface BaseApiService {
             @Part("files") MultipartBody.Part file);
 
     @Multipart
-    @POST("{url}")
+    @POST()
     Observable<ResponseBody> uploadFiles(
-            @Path("url") String url,
+            @Url() String url,
             @PartMap() Map<String, RequestBody> maps);
 
     @Streaming
@@ -87,16 +88,16 @@ public interface BaseApiService {
                                     @QueryMap Map<String, String> maps);
 
     @FormUrlEncoded
-    @POST("{url}")
+    @POST()
     Observable<ResponseBody> postForm(
-            @Path("url") String url,
+            @Url() String url,
             @FieldMap Map<String , Object> maps);
 
-    @FormUrlEncoded
-    @POST("{url}")
+
+    @POST()
     Observable<ResponseBody> postJson(
-            @Path("url") String url,
-            @Field("jsStr") String jsonStr);
+            @Url() String url,
+            @Body RequestBody jsonBody);
 
 }
 
