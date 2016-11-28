@@ -36,18 +36,28 @@ public class NovateException {
             ex = new Throwable(e, ERROR.HTTP_ERROR);
             switch (httpException.code()) {
                 case UNAUTHORIZED:
+                    ex.setMessage("未授权的请求");
                 case FORBIDDEN:
+                    ex.setMessage("禁止访问");
                 case NOT_FOUND:
+                    ex.setMessage("服务器地址未找到");
                 case REQUEST_TIMEOUT:
+                    ex.setMessage("请求超时");
                 case GATEWAY_TIMEOUT:
+                    ex.setMessage("网关响应超时");
                 case INTERNAL_SERVER_ERROR:
+                    ex.setMessage("服务器出错");
                 case BAD_GATEWAY:
+                    ex.setMessage("无效的请求");
                 case SERVICE_UNAVAILABLE:
+                    ex.setMessage("服务器不可用");
                 case ACCESS_DENIED:
-                default:
                     ex.setMessage("网络错误");
+                default:
+                    ex.setMessage("地址已重定向");
                     break;
             }
+            ex.setCode(httpException.code());
             return ex;
         } else if (e instanceof ServerException) {
             ServerException resultException = (ServerException) e;

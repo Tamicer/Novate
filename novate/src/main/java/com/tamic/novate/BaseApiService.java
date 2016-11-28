@@ -45,15 +45,15 @@ public interface BaseApiService {
             @Url String url,
             @QueryMap Map<String, String> maps);
 
-    @DELETE("{url}")
+    @DELETE()
     Observable<ResponseBody> executeDelete(
-            @Path("url") String url,
+            @Url String url,
             @QueryMap Map<String, String> maps);
 
-    @PUT("{url}")
+    @PUT()
     Observable<ResponseBody> executePut(
-            @Path("url") String url,
-            @QueryMap Map<String, String> maps);
+            @Url String url,
+            @FieldMap Map<String , String> maps);
 
     @Multipart
     @POST()
@@ -85,7 +85,7 @@ public interface BaseApiService {
 
     @GET
     Observable<ResponseBody> getTest(@Url String fileUrl,
-                                    @QueryMap Map<String, String> maps);
+                                     @QueryMap Map<String, String> maps);
 
     @FormUrlEncoded
     @POST()

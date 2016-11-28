@@ -296,7 +296,7 @@ public final class Novate {
      * @return parsed data
      * you don't need to   parse ResponseBody
      */
-    public <T> T executePost(final String url, final Map<String, String> parameters, final ResponseCallBack<T> callBack) {
+    public <T> T executePost(final String url, @FieldMap(encoded = true) Map<String, String> parameters, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
         if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
             return null;
@@ -418,6 +418,22 @@ public final class Novate {
     }
 
     /**
+     * Retroift get
+     *
+     * @param url
+     * @param maps
+     * @param subscriber
+     * @param <T>
+     * @return no parse data
+     */
+    public <T> T delete(String url, Map<String, String> maps, BaseSubscriber<ResponseBody> subscriber) {
+        return (T) apiManager.executeDelete(url, maps)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(subscriber);
+    }
+
+    /**
      * Execute http by Delete
      *
      * @return parsed data
@@ -437,12 +453,28 @@ public final class Novate {
     }
 
     /**
+     * Retroift put
+     *
+     * @param url
+     * @param parameters
+     * @param subscriber
+     * @param <T>
+     * @return no parse data
+     */
+    public <T> T put(String url, final @FieldMap(encoded = true) Map<String, String> parameters, BaseSubscriber<ResponseBody> subscriber) {
+        return (T) apiManager.executeGet(url, parameters)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(subscriber);
+    }
+
+    /**
      * Execute  Http by Put
      *
      * @return parsed data
      * you don't need to parse ResponseBody
      */
-    public <T> T executePut(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
+    public <T> T executePut(final String url, final @FieldMap(encoded = true) Map<String, String> parameters, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
 
         if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
@@ -450,7 +482,7 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        return (T) apiManager.executePut(url, maps)
+        return (T) apiManager.executePut(url, parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
