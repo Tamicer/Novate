@@ -1,6 +1,5 @@
 package com.tamic.excemple;
 
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +9,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.tamic.excemple.model.IpResult;
 import com.tamic.excemple.model.MovieModel;
 import com.tamic.excemple.model.ResultModel;
 import com.tamic.excemple.model.SouguBean;
@@ -24,10 +22,8 @@ import com.tamic.novate.Throwable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -45,7 +41,7 @@ public class ExempleActivity extends AppCompatActivity {
 
     String baseUrl = "http://ip.taobao.com/";
     private Novate novate;
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, Object> parameters = new HashMap<String, Object>();
     private Map<String, String> headers = new HashMap<>();
 
     private Button btn, btn_test, btn_get, btn_post, btn_download,
@@ -252,7 +248,7 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performGet() {
 
-       Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("ip", "21.22.11.33");
         novate = new Novate.Builder(this)
                 .addHeader(headers)
@@ -484,12 +480,12 @@ public class ExempleActivity extends AppCompatActivity {
      * ex: apk , video...
      */
     private void performDown() {
-        String downUrl = "http://apk.hiapk.com/web/api.do?qt=8051&id=723";
+        String downUrl = "http://wifiapi02.51y5.net/wifiapi/rd.do?f=wk00003&b=gwanz02&rurl=http%3A%2F%2Fdl.lianwifi.com%2Fdownload%2Fandroid%2FWifiKey-3091-guanwang.apk";
         novate.download(downUrl, new DownLoadCallBack() {
 
             @Override
-            public void onStart() {
-                super.onStart();
+            public void onStart(String s) {
+                super.onStart(s);
                 Toast.makeText(ExempleActivity.this, "download is start", Toast.LENGTH_SHORT).show();
                 btn_download.setText("DownLoad cancel");
             }
@@ -500,22 +496,23 @@ public class ExempleActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onProgress(String key, long fileSizeDownloaded, long totalSize) {
+                super.onProgress(key, fileSizeDownloaded, totalSize);
+                Toast.makeText(ExempleActivity.this, "download:" + fileSizeDownloaded, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSucess(String key, String path, String name, long fileSize) {
+                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
+                btn_download.setText("DownLoad start");
+            }
+
+            @Override
             public void onCancel() {
                 super.onCancel();
                 btn_download.setText("DownLoad start");
             }
 
-            @Override
-            public void onProgress(long fileSizeDownloaded) {
-                super.onProgress(fileSizeDownloaded);
-
-            }
-
-            @Override
-            public void onSucess(String path, String name, long fileSize) {
-                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoad start");
-            }
         });
     }
 
@@ -529,8 +526,8 @@ public class ExempleActivity extends AppCompatActivity {
         novate.downloadMin(downUrl, new DownLoadCallBack() {
 
             @Override
-            public void onStart() {
-                super.onStart();
+            public void onStart(String s) {
+                super.onStart(s);
                 Toast.makeText(ExempleActivity.this, "download is start", Toast.LENGTH_SHORT).show();
                 btn_download.setText("DownLoadMin cancel");
             }
@@ -541,22 +538,17 @@ public class ExempleActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onSucess(String key, String path, String name, long fileSize) {
+                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
+                btn_download.setText("DownLoad start");
+            }
+
+            @Override
             public void onCancel() {
                 super.onCancel();
                 btn_download.setText("DownLoadMin start");
             }
 
-            @Override
-            public void onProgress(long fileSizeDownloaded) {
-                super.onProgress(fileSizeDownloaded);
-
-            }
-
-            @Override
-            public void onSucess(String path, String name, long fileSize) {
-                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoadMin start");
-            }
         });
     }
 
