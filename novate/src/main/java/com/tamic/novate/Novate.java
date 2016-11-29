@@ -127,13 +127,13 @@ public final class Novate {
     }
 
     /**
-     * Retroift execute get
+     * Novate execute get
      * <p>
      * return parsed data
      * <p>
      * you don't need to parse ResponseBody
      */
-    public <T> T executeGet(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
+    public <T> T executeGet(final String url, final Map<String, T> maps, final ResponseCallBack<T> callBack) {
 
         final Type[] types = callBack.getClass().getGenericInterfaces();
         if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
@@ -243,7 +243,7 @@ public final class Novate {
      * @param <T>
      * @return no parse data
      */
-    public <T> T get(String url, Map<String, String> maps, BaseSubscriber<ResponseBody> subscriber) {
+    public <T> T get(String url, Map<String, T> maps, BaseSubscriber<ResponseBody> subscriber) {
         return (T) apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
@@ -252,7 +252,7 @@ public final class Novate {
 
     /**
      * /**
-     * Retroift executePost
+     * Novate executePost
      *
      * @return no parse data
      * <p>
@@ -283,20 +283,20 @@ public final class Novate {
      *
      * }</pre>
      */
-    public void post(String url, @FieldMap(encoded = true) Map<String, String> parameters, Subscriber<ResponseBody> subscriber) {
-        apiManager.executePost(url, parameters)
+    public <T> T post(String url, @FieldMap(encoded = true) Map<String, T> parameters, Subscriber<ResponseBody> subscriber) {
+        return (T) apiManager.executePost(url, parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
     }
 
     /**
-     * Retroift executePost
+     * Novate executePost
      *
      * @return parsed data
      * you don't need to   parse ResponseBody
      */
-    public <T> T executePost(final String url, @FieldMap(encoded = true) Map<String, String> parameters, final ResponseCallBack<T> callBack) {
+    public <T> T executePost(final String url, @FieldMap(encoded = true) Map<String, Object> parameters, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
         if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
             return null;
@@ -312,13 +312,13 @@ public final class Novate {
 
 
     /**
-     * Post by Form
+     * Novate Post by Form
      *
      * @param url
      * @param subscriber
      */
-    public void form(String url, @FieldMap(encoded = true) Map<String, Object> fields, Subscriber<ResponseBody> subscriber) {
-        apiManager.postForm(url, fields)
+    public <T> T form(String url, @FieldMap(encoded = true) Map<String, Object> fields, Subscriber<ResponseBody> subscriber) {
+        return (T) apiManager.postForm(url, fields)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -326,7 +326,7 @@ public final class Novate {
 
 
     /**
-     * Retroift execute Post by Form
+     * Novate execute Post by Form
      *
      * @return parsed data
      * you don't need to   parse ResponseBody
@@ -418,7 +418,7 @@ public final class Novate {
     }
 
     /**
-     * Retroift get
+     * Novate delete
      *
      * @param url
      * @param maps
@@ -426,7 +426,7 @@ public final class Novate {
      * @param <T>
      * @return no parse data
      */
-    public <T> T delete(String url, Map<String, String> maps, BaseSubscriber<ResponseBody> subscriber) {
+    public <T> T delete(String url, Map<String, T> maps, BaseSubscriber<ResponseBody> subscriber) {
         return (T) apiManager.executeDelete(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
@@ -434,12 +434,12 @@ public final class Novate {
     }
 
     /**
-     * Execute http by Delete
+     * Novate Execute http by Delete
      *
      * @return parsed data
      * you don't need to   parse ResponseBody
      */
-    public <T> T executeDelete(final String url, final Map<String, String> maps, final ResponseCallBack<T> callBack) {
+    public <T> T executeDelete(final String url, final Map<String, T> maps, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
         if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
             return null;
@@ -453,7 +453,7 @@ public final class Novate {
     }
 
     /**
-     * Retroift put
+     * Novate put
      *
      * @param url
      * @param parameters
@@ -461,20 +461,20 @@ public final class Novate {
      * @param <T>
      * @return no parse data
      */
-    public <T> T put(String url, final @FieldMap(encoded = true) Map<String, String> parameters, BaseSubscriber<ResponseBody> subscriber) {
-        return (T) apiManager.executeGet(url, parameters)
+    public <T> T put(String url, final @FieldMap(encoded = true) Map<String, T> parameters, BaseSubscriber<ResponseBody> subscriber) {
+        return (T) apiManager.executePut(url, parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
     }
 
     /**
-     * Execute  Http by Put
+     * Novate Execute  Http by Put
      *
      * @return parsed data
      * you don't need to parse ResponseBody
      */
-    public <T> T executePut(final String url, final @FieldMap(encoded = true) Map<String, String> parameters, final ResponseCallBack<T> callBack) {
+    public <T> T executePut(final String url, final @FieldMap(encoded = true) Map<String, T> parameters, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
 
         if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
@@ -490,14 +490,15 @@ public final class Novate {
 
 
     /**
-     * Test
+     * Novate Test
+     *
      * @param url        url
      * @param maps       maps
      * @param subscriber subscriber
      * @param <T>        T
      * @return
      */
-    public <T> T test(String url, Map<String, String> maps, Subscriber<ResponseBody> subscriber) {
+    public <T> T test(String url, Map<String, T> maps, Subscriber<ResponseBody> subscriber) {
         return (T) apiManager.getTest(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
@@ -505,7 +506,8 @@ public final class Novate {
     }
 
     /**
-     * upload
+     * Novate upload
+     *
      * @param url
      * @param requestBody requestBody
      * @param subscriber  subscriber
@@ -536,7 +538,7 @@ public final class Novate {
     }
 
     /**
-     * upload Flie
+     * Novate upload Flie
      *
      * @param url
      * @param requestBody requestBody
@@ -552,7 +554,7 @@ public final class Novate {
     }
 
     /**
-     * upload Flies
+     * Novate upload Flies
      *
      * @param url
      * @param subscriber subscriber
@@ -568,6 +570,8 @@ public final class Novate {
 
 
     /**
+     * Novate download
+     *
      * @param url
      * @param callBack
      */
@@ -581,7 +585,7 @@ public final class Novate {
      * @param callBack
      */
     public void download(String url, String name, DownLoadCallBack callBack) {
-        download(url, null, name, callBack);
+        download(null, url, null, name, callBack);
     }
 
     /**
@@ -597,12 +601,23 @@ public final class Novate {
     /**
      * downloadMin
      *
+     * @param key
+     * @param url
+     * @param callBack
+     */
+    public void downloadMin(String key, String url, DownLoadCallBack callBack) {
+        downloadMin(key, url, null, callBack);
+    }
+
+    /**
+     * downloadMin
+     *
      * @param url
      * @param name
      * @param callBack
      */
-    public void downloadMin(String url, String name, DownLoadCallBack callBack) {
-        downloadMin(url, null, name, callBack);
+    public void downloadMin(String key, String url, String name, DownLoadCallBack callBack) {
+        downloadMin(key, url, null, name, callBack);
     }
 
     /**
@@ -613,7 +628,7 @@ public final class Novate {
      * @param name
      * @param callBack
      */
-    public void downloadMin(String url, String savePath, String name, DownLoadCallBack callBack) {
+    public void downloadMin(String key, String url, String savePath, String name, DownLoadCallBack callBack) {
 
         if (downMaps.get(url) == null) {
             downObservable = apiManager.downloadSmallFile(url);
@@ -621,24 +636,25 @@ public final class Novate {
         } else {
             downObservable = downMaps.get(url);
         }
-        executeDownload(savePath, name, callBack);
+        executeDownload(key, savePath, name, callBack);
     }
 
     /**
+     * @param url
+     * @param url
      * @param url
      * @param savePath
      * @param name
      * @param callBack
      */
-    public void download(String url, String savePath, String name, DownLoadCallBack callBack) {
-
+    public void download(String key, String url, String savePath, String name, DownLoadCallBack callBack) {
         if (downMaps.get(url) == null) {
             downObservable = apiManager.downloadFile(url);
             downMaps.put(url, downObservable);
         } else {
             downObservable = downMaps.get(url);
         }
-        executeDownload(savePath, name, callBack);
+        executeDownload(key, savePath, name, callBack);
     }
 
     /**
@@ -648,7 +664,7 @@ public final class Novate {
      * @param name
      * @param callBack
      */
-    private void executeDownload(String savePath, String name, DownLoadCallBack callBack) {
+    private void executeDownload(String key, String savePath, String name, DownLoadCallBack callBack) {
         if (NovateDownLoadManager.isDownLoading) {
             downObservable.unsubscribeOn(Schedulers.io());
             NovateDownLoadManager.isDownLoading = false;
@@ -658,7 +674,7 @@ public final class Novate {
         NovateDownLoadManager.isDownLoading = true;
         downObservable.compose(schedulersTransformerDown)
                 .compose(handleErrTransformer())
-                .subscribe(new DownSubscriber<ResponseBody>(savePath, name, callBack, mContext));
+                .subscribe(new DownSubscriber<ResponseBody>(key, savePath, name, callBack, mContext));
     }
 
     /**
@@ -865,16 +881,16 @@ public final class Novate {
         /**
          * Add Header for serialization and deserialization of objects.
          */
-        public Builder addHeader(Map<String, String> headers) {
-            okhttpBuilder.addInterceptor(new BaseInterceptor((Utils.checkNotNull(headers, "header == null"))));
+        public <T> Builder addHeader(Map<String, T> headers) {
+            okhttpBuilder.addInterceptor(new BaseInterceptor(Utils.checkNotNull(headers, "header == null")));
             return this;
         }
 
         /**
          * Add parameters for serialization and deserialization of objects.
          */
-        public Builder addParameters(Map<String, String> parameters) {
-            okhttpBuilder.addInterceptor(new BaseInterceptor((Utils.checkNotNull(parameters, "parameters == null"))));
+        public <T> Builder addParameters(Map<String, T> parameters) {
+            okhttpBuilder.addInterceptor(new BaseInterceptor(Utils.checkNotNull(parameters, "parameters == null")));
             return this;
         }
 

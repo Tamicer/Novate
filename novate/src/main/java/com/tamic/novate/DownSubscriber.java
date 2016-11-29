@@ -1,7 +1,11 @@
 package com.tamic.novate;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.TimeUtils;
+
+import okhttp3.internal.Util;
 
 /**
  * DownSubscriber
@@ -12,9 +16,11 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
     private Context context;
     private String path;
     private String name;
+    private String key;
 
-    public DownSubscriber(String path, String name, DownLoadCallBack callBack, Context context) {
+    public DownSubscriber(String key, String path, String name, DownLoadCallBack callBack, Context context) {
         super(context);
+        this.key = key;
         this.path = path;
         this.name = name;
         this.callBack = callBack;
@@ -25,7 +31,10 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
     public void onStart() {
         super.onStart();
         if (callBack != null) {
-            callBack.onStart();
+            if (TextUtils.isEmpty(key)) {
+                key = path + name + System.currentTimeMillis();
+            }
+            callBack.onStart(key);
         }
     }
 
@@ -47,7 +56,7 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
 
         Log.d(NovateDownLoadManager.TAG, "DownSubscriber:>>>> onNext");
 
-        NovateDownLoadManager.getInstance(callBack).writeResponseBodyToDisk(path, name, context, responseBody);
+        NovateDownLoadManager.getInstance(callBack).writeResponseBodyToDisk(key, path, name, context, responseBody);
 
     }
 }

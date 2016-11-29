@@ -56,7 +56,7 @@ public class NovateDownLoadManager {
         return sInstance;
     }
 
-    public boolean writeResponseBodyToDisk(String path, String name, Context context, ResponseBody body) {
+    public boolean writeResponseBodyToDisk(final String key, String path, String name, Context context, ResponseBody body) {
 
         Log.d(TAG, "contentType:>>>>" + body.contentType().toString());
 
@@ -80,7 +80,7 @@ public class NovateDownLoadManager {
         }
 
         if (path == null) {
-            path = context.getExternalFilesDir(null) + File.separator + name;
+            path = context.getExternalFilesDir(null) + File.separator +"DownLoads" + File.separator + name;
         }
         Log.d(TAG, "path:-->" + path);
         try {
@@ -116,7 +116,7 @@ public class NovateDownLoadManager {
                             handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    callBack.onProgress(finalFileSizeDownloaded);
+                                    callBack.onProgress(key, finalFileSizeDownloaded, fileSize);
                                 }
                             }, 200);
                         }
@@ -136,7 +136,7 @@ public class NovateDownLoadManager {
                         @Override
                         public void run() {
 
-                            callBack.onSucess(finalPath, finalName, fileSize);
+                            callBack.onSucess(key, finalPath, finalName, fileSize);
 
                         }
                     });

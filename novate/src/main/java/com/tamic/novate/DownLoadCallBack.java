@@ -5,7 +5,7 @@ package com.tamic.novate;
  */
 public abstract class DownLoadCallBack {
 
-    public void onStart(){}
+    public void onStart(String key){}
 
     public void onCancel(){}
 
@@ -17,12 +17,12 @@ public abstract class DownLoadCallBack {
      */
     abstract public void onError(Throwable e);
 
-    public void onProgress(long fileSizeDownloaded){}
+    public void onProgress(String key, long fileSizeDownloaded, long  totalSize ){}
 
     /**  Note : the Fun run UIThred
      * @param path
      * @param name
      * @param fileSize
      */
-    abstract public void onSucess(String path, String name, long fileSize);
+    abstract public void onSucess(String key, String path, String name, long fileSize);
 }

@@ -31,9 +31,10 @@ import rx.Observable;
 public interface BaseApiService {
     @POST()
     @FormUrlEncoded
-    Observable<ResponseBody> executePost(
+    @GET()
+    <T> Observable<ResponseBody> executePost(
             @Url() String url,
-            @FieldMap Map<String , String> maps);
+            @FieldMap Map<String, T> maps);
 
     @POST("{url}")
     Observable<ResponseBody> executePostBody(
@@ -41,19 +42,19 @@ public interface BaseApiService {
             @Body Object object);
 
     @GET()
-    Observable<ResponseBody> executeGet(
+    <T> Observable<ResponseBody> executeGet(
             @Url String url,
-            @QueryMap Map<String, String> maps);
+            @QueryMap Map<String, T> maps);
 
     @DELETE()
-    Observable<ResponseBody> executeDelete(
+    <T> Observable<ResponseBody> executeDelete(
             @Url String url,
-            @QueryMap Map<String, String> maps);
+            @QueryMap Map<String, T> maps);
 
     @PUT()
-    Observable<ResponseBody> executePut(
+    <T> Observable<ResponseBody> executePut(
             @Url String url,
-            @FieldMap Map<String , String> maps);
+            @FieldMap Map<String, T> maps);
 
     @Multipart
     @POST()
@@ -84,14 +85,14 @@ public interface BaseApiService {
 
 
     @GET
-    Observable<ResponseBody> getTest(@Url String fileUrl,
-                                     @QueryMap Map<String, String> maps);
+    <T> Observable<ResponseBody> getTest(@Url String fileUrl,
+                                         @QueryMap Map<String, T> maps);
 
     @FormUrlEncoded
     @POST()
-    Observable<ResponseBody> postForm(
+    <T> Observable<ResponseBody> postForm(
             @Url() String url,
-            @FieldMap Map<String , Object> maps);
+            @FieldMap Map<String, T> maps);
 
 
     @POST()

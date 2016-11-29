@@ -21,7 +21,7 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
 
     @Override
     final public void onError(java.lang.Throwable e) {
-        Log.e("Novate", e.getMessage());
+        Log.v("Novate", e.getMessage());
         if(e instanceof Throwable){
             Log.e("Novate", "--> e instanceof Throwable");
             onError((Throwable)e);
@@ -34,14 +34,14 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
     @Override
     public void onStart() {
         super.onStart();
-        Log.e("Novate", "-->http is start");
+        Log.v("Novate", "-->http is start");
         // todo some common as show loadding  and check netWork is NetworkAvailable
         // if  NetworkAvailable no !   must to call onCompleted
     }
 
     @Override
     public void onCompleted() {
-        Log.e("Novate", "-->http is Complete");
+        Log.v("Novate", "-->http is Complete");
         // todo some common as  dismiss loadding
     }
     public abstract void onError(Throwable e);
