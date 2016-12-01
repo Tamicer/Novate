@@ -31,10 +31,9 @@ import rx.Observable;
 public interface BaseApiService {
     @POST()
     @FormUrlEncoded
-    @GET()
     <T> Observable<ResponseBody> executePost(
             @Url() String url,
-            @FieldMap Map<String, T> maps);
+            @FieldMap Map<String, Object> maps);
 
     @POST("{url}")
     Observable<ResponseBody> executePostBody(
@@ -44,17 +43,17 @@ public interface BaseApiService {
     @GET()
     <T> Observable<ResponseBody> executeGet(
             @Url String url,
-            @QueryMap Map<String, T> maps);
+            @QueryMap Map<String, Object> maps);
 
     @DELETE()
     <T> Observable<ResponseBody> executeDelete(
             @Url String url,
-            @QueryMap Map<String, T> maps);
+            @QueryMap Map<String, Object> maps);
 
     @PUT()
     <T> Observable<ResponseBody> executePut(
             @Url String url,
-            @FieldMap Map<String, T> maps);
+            @FieldMap Map<String, Object> maps);
 
     @Multipart
     @POST()
@@ -86,13 +85,13 @@ public interface BaseApiService {
 
     @GET
     <T> Observable<ResponseBody> getTest(@Url String fileUrl,
-                                         @QueryMap Map<String, T> maps);
+                                         @QueryMap Map<String, Object> maps);
 
     @FormUrlEncoded
     @POST()
     <T> Observable<ResponseBody> postForm(
             @Url() String url,
-            @FieldMap Map<String, T> maps);
+            @FieldMap Map<String, Object> maps);
 
 
     @POST()

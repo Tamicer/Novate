@@ -133,7 +133,7 @@ public final class Novate {
      * <p>
      * you don't need to parse ResponseBody
      */
-    public <T> T executeGet(final String url, final Map<String, T> maps, final ResponseCallBack<T> callBack) {
+    public <T> T executeGet(final String url, final Map<String, Object> maps, final ResponseCallBack<T> callBack) {
 
         final Type[] types = callBack.getClass().getGenericInterfaces();
         if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
@@ -141,7 +141,7 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        return (T) apiManager.executeGet(url, maps)
+        return (T) apiManager.executeGet(url,  maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
@@ -243,7 +243,7 @@ public final class Novate {
      * @param <T>
      * @return no parse data
      */
-    public <T> T get(String url, Map<String, T> maps, BaseSubscriber<ResponseBody> subscriber) {
+    public <T> T get(String url, Map<String, Object> maps, BaseSubscriber<ResponseBody> subscriber) {
         return (T) apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
@@ -284,7 +284,7 @@ public final class Novate {
      * }</pre>
      */
     public <T> T post(String url, @FieldMap(encoded = true) Map<String, T> parameters, Subscriber<ResponseBody> subscriber) {
-        return (T) apiManager.executePost(url, parameters)
+        return (T) apiManager.executePost(url, (Map<String, Object>) parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -427,7 +427,7 @@ public final class Novate {
      * @return no parse data
      */
     public <T> T delete(String url, Map<String, T> maps, BaseSubscriber<ResponseBody> subscriber) {
-        return (T) apiManager.executeDelete(url, maps)
+        return (T) apiManager.executeDelete(url, (Map<String, Object>) maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -446,7 +446,7 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        return (T) apiManager.executeDelete(url, maps)
+        return (T) apiManager.executeDelete(url, (Map<String, Object>) maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
@@ -462,7 +462,7 @@ public final class Novate {
      * @return no parse data
      */
     public <T> T put(String url, final @FieldMap(encoded = true) Map<String, T> parameters, BaseSubscriber<ResponseBody> subscriber) {
-        return (T) apiManager.executePut(url, parameters)
+        return (T) apiManager.executePut(url, (Map<String, Object>) parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -482,7 +482,7 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        return (T) apiManager.executePut(url, parameters)
+        return (T) apiManager.executePut(url, (Map<String, Object>) parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
@@ -499,7 +499,7 @@ public final class Novate {
      * @return
      */
     public <T> T test(String url, Map<String, T> maps, Subscriber<ResponseBody> subscriber) {
-        return (T) apiManager.getTest(url, maps)
+        return (T) apiManager.getTest(url, (Map<String, Object>) maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
