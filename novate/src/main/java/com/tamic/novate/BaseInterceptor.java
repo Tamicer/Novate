@@ -1,6 +1,9 @@
 package com.tamic.novate;
 
+import android.text.TextUtils;
+
 import java.io.IOException;
+import java.lang.*;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,7 +32,7 @@ public class BaseInterceptor<T> implements Interceptor{
         if (headers != null && headers.size() > 0) {
             Set<String> keys = headers.keySet();
             for (String headerKey : keys) {
-                builder.addHeader(headerKey, (String) headers.get(headerKey)).build();
+                builder.addHeader(headerKey, headers.get(headerKey) == null? "": (String)headers.get(headerKey)).build();
             }
         }
         return chain.proceed(builder.build());
