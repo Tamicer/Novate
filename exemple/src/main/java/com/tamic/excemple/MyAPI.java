@@ -18,7 +18,7 @@ public interface MyAPI {
 
 
     @GET("app.php")
-    Observable<SouguBean> getSougu(@QueryMap Map<String, String> maps);
+    Observable<SouguBean> getSougu(@QueryMap Map<String, Object> maps);
 
     @GET("{url}")
     Observable<ResponseBody>getWeatherStr(@Path("url") String url,

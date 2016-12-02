@@ -49,7 +49,7 @@ public class ExempleActivity extends AppCompatActivity {
 
     String baseUrl = "http://ip.taobao.com/";
     private Novate novate;
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, Object> parameters = new HashMap<String, Object>();
     private Map<String, String> headers = new HashMap<>();
 
     private Button btn, btn_test, btn_get, btn_post, btn_download,
@@ -187,13 +187,6 @@ public class ExempleActivity extends AppCompatActivity {
                         Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
-
-                   /* @Override
-                    public void onError(Throwable e) {
-                        Log.e("OkHttp", e.getMessage());
-                        Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }*/
-
                     @Override
                     public void onNext(ResponseBody responseBody) {
                         try {
@@ -256,7 +249,7 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performGet() {
 
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("ip", "21.22.11.33");
         novate = new Novate.Builder(this)
                 .addHeader(headers)
@@ -265,18 +258,6 @@ public class ExempleActivity extends AppCompatActivity {
                 .baseUrl(baseUrl)
                 .addLog(true)
                 .build();
-       /*        parameters.clear();
-        parameters.put("m", "souguapp");
-        parameters.put("c", "appusers");
-        parameters.put("a", "network");
-
-        novate = new Novate.Builder(this)
-                //.addHeader(headers)
-                .connectTimeout(10)
-                .addCookie(false)
-                .baseUrl("http://lbs.sougu.net.cn/")
-                .addLog(true)
-                .build();*/
 
         /**
          * 如果不需要数据解析后返回 则调用novate.Get()
@@ -511,16 +492,16 @@ public class ExempleActivity extends AppCompatActivity {
         String downUrl = "http://apk.hiapk.com/web/api.do?qt=8051&id=723";
         novate.download(downUrl, new DownLoadCallBack() {
 
-            @Override
-            public void onStart() {
-                super.onStart();
-                Toast.makeText(ExempleActivity.this, "download is start", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoad cancel");
-            }
 
             @Override
             public void onError(Throwable e) {
 
+            }
+
+            @Override
+            public void onSucess(String key, String path, String name, long fileSize) {
+                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
+                btn_download.setText("DownLoad start");
             }
 
             @Override
@@ -529,17 +510,6 @@ public class ExempleActivity extends AppCompatActivity {
                 btn_download.setText("DownLoad start");
             }
 
-            @Override
-            public void onProgress(long fileSizeDownloaded) {
-                super.onProgress(fileSizeDownloaded);
-
-            }
-
-            @Override
-            public void onSucess(String path, String name, long fileSize) {
-                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoad start");
-            }
         });
     }
 
@@ -553,8 +523,8 @@ public class ExempleActivity extends AppCompatActivity {
         novate.downloadMin(downUrl, new DownLoadCallBack() {
 
             @Override
-            public void onStart() {
-                super.onStart();
+            public void onStart(String key) {
+                super.onStart(key);
                 Toast.makeText(ExempleActivity.this, "download is start", Toast.LENGTH_SHORT).show();
                 btn_download.setText("DownLoadMin cancel");
             }
@@ -565,22 +535,18 @@ public class ExempleActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onSucess(String key, String path, String name, long fileSize) {
+                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
+                btn_download.setText("DownLoadMin start");
+           }
+
+            @Override
             public void onCancel() {
                 super.onCancel();
                 btn_download.setText("DownLoadMin start");
             }
 
-            @Override
-            public void onProgress(long fileSizeDownloaded) {
-                super.onProgress(fileSizeDownloaded);
 
-            }
-
-            @Override
-            public void onSucess(String path, String name, long fileSize) {
-                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoadMin start");
-            }
         });
     }
 
