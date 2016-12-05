@@ -26,6 +26,7 @@ public class NovateException {
     private static final int SERVICE_UNAVAILABLE = 503;
     private static final int GATEWAY_TIMEOUT = 504;
     private static final int ACCESS_DENIED = 302;
+    private static final int HANDEL_ERRROR = 417;
 
     public static Throwable handleException(java.lang.Throwable e) {
 
@@ -53,8 +54,10 @@ public class NovateException {
                     ex.setMessage("服务器不可用");
                 case ACCESS_DENIED:
                     ex.setMessage("网络错误");
+                case HANDEL_ERRROR:
+                    ex.setMessage("接口处理失败");
                 default:
-                    ex.setMessage("地址已重定向");
+                    ex.setMessage(e.getMessage());
                     break;
             }
             ex.setCode(httpException.code());
@@ -62,7 +65,7 @@ public class NovateException {
         } else if (e instanceof ServerException) {
             ServerException resultException = (ServerException) e;
             ex = new Throwable(resultException, resultException.code);
-            ex.setMessage(resultException.message);
+            ex.setMessage(resultException.getMessage());
             return ex;
         } else if (e instanceof JsonParseException
                 || e instanceof JSONException

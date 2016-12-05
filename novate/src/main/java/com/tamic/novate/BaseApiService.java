@@ -1,28 +1,13 @@
 package com.tamic.novate;
 
 
-import java.util.Map;
-import java.util.Objects;
-
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import retrofit2.http.Body;
-import retrofit2.http.DELETE;
-import retrofit2.http.Field;
-import retrofit2.http.FieldMap;
-import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
-import retrofit2.http.Multipart;
-import retrofit2.http.POST;
-import retrofit2.http.PUT;
-import retrofit2.http.Part;
-import retrofit2.http.PartMap;
-import retrofit2.http.Path;
-import retrofit2.http.QueryMap;
-import retrofit2.http.Streaming;
-import retrofit2.http.Url;
+import retrofit2.http.*;
 import rx.Observable;
+
+import java.util.Map;
 
 /**
  * ApiService
@@ -70,11 +55,23 @@ public interface BaseApiService {
             @Part("description") RequestBody description,
             @Part("files") MultipartBody.Part file);
 
-    @Multipart
+
     @POST()
     Observable<ResponseBody> uploadFiles(
             @Url() String url,
-            @PartMap() Map<String, RequestBody> maps);
+            @Body Map<String, RequestBody> maps);
+
+    @POST()
+    Observable<ResponseBody> uploadFile(
+            @Url() String url,
+            @Body  RequestBody file);
+
+    @Multipart
+    @POST
+    Observable<ResponseBody> uploadFileWithPartMap(
+            @Url() String url,
+            @PartMap() Map<String, RequestBody> partMap,
+            @Part("file") MultipartBody.Part file);
 
     @Streaming
     @GET
@@ -97,9 +94,9 @@ public interface BaseApiService {
 
 
     @POST()
-    Observable<ResponseBody> postJson(
+    Observable<ResponseBody> postRequestBody(
             @Url() String url,
-            @Body RequestBody jsonBody);
+            @Body RequestBody Body);
 
 }
 

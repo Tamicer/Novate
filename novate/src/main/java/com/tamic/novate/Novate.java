@@ -45,6 +45,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.FieldMap;
+import retrofit2.http.Part;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -141,7 +142,7 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        return (T) apiManager.executeGet(url,  maps)
+        return (T) apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
@@ -283,7 +284,7 @@ public final class Novate {
      *
      * }</pre>
      */
-    public <T> T post(String url, @FieldMap(encoded = true) Map<String, T> parameters, Subscriber<ResponseBody> subscriber) {
+    public <T> T post(String url, @FieldMap(encoded = true) Map<String, Object> parameters, Subscriber<ResponseBody> subscriber) {
         return (T) apiManager.executePost(url, (Map<String, Object>) parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
@@ -390,7 +391,7 @@ public final class Novate {
      * @param subscriber
      */
     public void json(String url, String jsonStr, Subscriber<ResponseBody> subscriber) {
-        apiManager.postJson(url, Utils.createJson(jsonStr))
+        apiManager.postRequestBody(url, Utils.createJson(jsonStr))
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -411,7 +412,7 @@ public final class Novate {
         }
         final Type finalNeedType = MethodHandler(types).get(0);
         Log.d(TAG, "-->:" + "Type:" + types[0]);
-        return (T) apiManager.postJson(url, Utils.createJson(jsonStr))
+        return (T) apiManager.postRequestBody(url, Utils.createJson(jsonStr))
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
@@ -515,7 +516,7 @@ public final class Novate {
      * @return
      */
     public <T> T upload(String url, RequestBody requestBody, Subscriber<ResponseBody> subscriber) {
-        return (T) apiManager.upLoadImage(url, requestBody)
+        return (T) apiManager.postRequestBody(url, requestBody)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -541,13 +542,29 @@ public final class Novate {
      * Novate upload Flie
      *
      * @param url
-     * @param requestBody requestBody
-     * @param subscriber  subscriber
-     * @param <T>         T
+     * @param file       file
+     * @param subscriber subscriber
+     * @param <T>        T
      * @return
      */
-    public <T> T uploadFlie(String url, RequestBody requestBody, MultipartBody.Part file, Subscriber<ResponseBody> subscriber) {
-        return (T) apiManager.uploadFlie(url, requestBody, file)
+    public <T> T uploadFlie(String url, RequestBody file, Subscriber<ResponseBody> subscriber) {
+        return (T) apiManager.postRequestBody(url, file)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(subscriber);
+    }
+
+    /**
+     * Novate upload Flie
+     *
+     * @param url
+     * @param file       file
+     * @param subscriber subscriber
+     * @param <T>        T
+     * @return
+     */
+    public <T> T uploadFlie(String url, RequestBody description, MultipartBody.Part file, Subscriber<ResponseBody> subscriber) {
+        return (T) apiManager.uploadFlie(url, description, file)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -563,6 +580,24 @@ public final class Novate {
      */
     public <T> T uploadFlies(String url, Map<String, RequestBody> files, Subscriber<ResponseBody> subscriber) {
         return (T) apiManager.uploadFiles(url, files)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(subscriber);
+    }
+
+
+    /**
+     * Novate upload Flies WithPartMap
+     * @param url
+     * @param partMap
+     * @param file
+     * @param subscriber
+     * @param <T>
+     * @return
+     */
+    public <T> T uploadFileWithPartMap(String url, Map<String, RequestBody> partMap,
+                                       @Part("file") MultipartBody.Part file, Subscriber<ResponseBody> subscriber) {
+        return (T) apiManager.uploadFileWithPartMap(url, partMap, file)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
