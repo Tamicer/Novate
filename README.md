@@ -1,5 +1,6 @@
 # Novate
    a  safety client by Https for Android,  (Android线程安全http请求库)
+  
    
 ![](http://upload-images.jianshu.io/upload_images/2022038-6a900d93d8acb091.jpg)
 
@@ -55,7 +56,11 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 
 # 中文文档
 
-  基于Retrofit和RxJava封装的链式请求库，为何起名 Novate？
+  基于Retrofit和RxJava封装的链式网络库, 支持okhttp的调用分格式，又兼容Retrofit注解方式，并支持rxJava链式操作，
+  
+ 并于扩展，并能实现高速加载！
+  
+  为何起名 Novate？ 
   
   Novate的英文原意是用新事物代替
   我的目的是用新的东西来代替Retrofit的有些不易操作的地方，因此起名新奇的东西，所以结合了原来的Http用法习惯，又加入了Retrofit的特性，因此起名 ：Novate
