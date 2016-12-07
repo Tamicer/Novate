@@ -29,10 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * by Taimic copy from
@@ -50,6 +53,13 @@ public class FileUtil {
     public static final String MIME_TYPE_IMAGE = "image/*";
     public static final String MIME_TYPE_VIDEO = "video/*";
     public static final String MIME_TYPE_APP = "application/*";
+    private static final String DEFAULT_FILENAME = "novatedownfile";
+    /**content disposition */
+    private static final Pattern CONTENT_DISPOSITION_PATTERN = Pattern.compile(
+            "attachment;\\s*filename\\s*=\\s*(\"?)([^\"]*)\\1\\s*$", Pattern.CASE_INSENSITIVE);
+    /** content disposition 2 */
+    private static final Pattern CONTENT_DISPOSITION_PATTERN_2 = Pattern.compile(
+            "inline;\\s*filename\\s*=\\s*(\"?)([^\"]*)\\1\\s*$", Pattern.CASE_INSENSITIVE);
 
     public static final String HIDDEN_PREFIX = ".";
 
@@ -640,6 +650,141 @@ public class FileUtil {
         // Only return URIs that can be opened with ContentResolver
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         return intent;
+    }
+
+    /**
+     * 根据url获取文件名
+     */
+    public static String getFileNameWithURL(String url) {
+        String name = null;
+        if (!TextUtils.isEmpty(url)) {
+            String decodedUrl = Uri.decode(url);
+            if (!TextUtils.isEmpty(decodedUrl)) {
+                // 先获取extension
+                String extension = null;
+                int ext = decodedUrl.lastIndexOf(".");
+                if (ext != -1 && decodedUrl.length() - ext < 5) {
+                    extension = decodedUrl.substring(ext);
+                }
+                int query = decodedUrl.indexOf("?");
+                if (query > 0) {
+                    decodedUrl = decodedUrl.substring(0, query);
+                }
+                query = decodedUrl.indexOf("#");
+                if (query > 0) {
+                    decodedUrl = decodedUrl.substring(0, query);
+                }
+                if (!decodedUrl.endsWith("/")) {
+                    int index = decodedUrl.lastIndexOf("/") + 1;
+                    if (index > 0) {
+                        name = decodedUrl.substring(index);
+                    }
+                }
+                if (!TextUtils.isEmpty(extension) && !TextUtils.isEmpty(name) && !name.contains(".")) {
+                    name += extension;
+                }
+            }
+        }
+        return name;
+    }
+
+
+    /**
+     * 解码获取文件名
+     */
+    private static String decodeContentdisposition(String contentdisposition) {
+        String name = parseContentDispostion(contentdisposition);
+        if (TextUtils.isEmpty(name)) {
+            return name;
+        } else {
+            try {
+                byte[] bytesname = name.getBytes("utf-8");
+                if (isUTF8(bytesname, bytesname.length)) {
+                    return new String(bytesname, "utf-8");
+                } else if (isGBK(bytesname)) {
+                    return new String(bytesname, "GBK");
+                } else {
+                    return new String(bytesname, "gb2312");
+                }
+            } catch (UnsupportedEncodingException e) {
+                Log.d(TAG, "UnsupportedEncodingException");
+                return null;
+            }
+        }
+    }
+
+    /**
+     * 解析 content disposition 获取文件名
+     */
+    private static String parseContentDispostion(String disposition) {
+        try {
+            Matcher m = CONTENT_DISPOSITION_PATTERN.matcher(disposition);
+            if (m.find()) {
+                return m.group(2);
+            }
+            m = CONTENT_DISPOSITION_PATTERN_2.matcher(disposition);
+            if (m.find()) {
+                return m.group(2);
+            }
+        } catch (Exception ex) {
+            Log.d(TAG, "fail to parse content dispostion");
+        }
+        return null;
+    }
+
+    /**
+     * 判断是否utf8编码
+     */
+    private static boolean isUTF8(byte[] b, int aMaxCount) {
+        int lLen = b.length, lCharCount = 0;
+        for (int i = 0; i < lLen && lCharCount < aMaxCount; ++lCharCount) {
+            byte lByte = b[i++];
+            if (lByte >= 0) {
+                continue;
+            }
+            if (lByte < (byte) 0xc0 || lByte > (byte) 0xfd) {
+                return false;
+            }
+            int lCount = lByte > (byte) 0xfc ? 5 : lByte > (byte) 0xf8 ? 4 : lByte > (byte) 0xf0 ? 3
+                    : lByte > (byte) 0xe0 ? 2 : 1;
+            if (i + lCount > lLen) {
+                return false;
+            }
+            for (int j = 0; j < lCount; ++j, ++i) {
+                if (b[i] >= (byte) 0xc0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 是否GBK
+     */
+    private static boolean isGBK(byte[] bytesname) {
+        return true;
+    }
+
+    /**
+     * 根据content disposition生成文件名
+     */
+    public static String getFileName(String disposition, String url) {
+        String filename = decodeContentdisposition(disposition);
+        if (TextUtils.isEmpty(filename)) {
+            filename = getFileNameWithURL(url);
+        }
+        if (TextUtils.isEmpty(filename)) {
+            filename = DEFAULT_FILENAME;
+        }
+        return filename;
+    }
+
+    /**
+     * 根据content disposition生成文件名
+     */
+    public static String generateFileKey(String url, String name) {
+        return System.currentTimeMillis() + url + name;
     }
 
 }
