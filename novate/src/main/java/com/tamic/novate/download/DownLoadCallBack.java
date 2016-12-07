@@ -1,4 +1,6 @@
-package com.tamic.novate;
+package com.tamic.novate.download;
+
+import com.tamic.novate.Throwable;
 
 /**
  * Created by Tamic on 2016-08-02.

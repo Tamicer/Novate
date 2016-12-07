@@ -1,11 +1,12 @@
-package com.tamic.novate;
+package com.tamic.novate.download;
 
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.TimeUtils;
 
-import okhttp3.internal.Util;
+import com.tamic.novate.BaseSubscriber;
+import com.tamic.novate.Throwable;
+import com.tamic.novate.util.FileUtil;
 
 /**
  * DownSubscriber
@@ -31,9 +32,9 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
     public void onStart() {
         super.onStart();
         if (callBack != null) {
-            if (TextUtils.isEmpty(key)) {
-                key = path + name + System.currentTimeMillis();
-            }
+           /* if (TextUtils.isEmpty(key)) {
+                key = FileUtil.generateFileKey(path, name);
+            }*/
             callBack.onStart(key);
         }
     }
@@ -47,16 +48,14 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
 
     @Override
     public void onError(final Throwable e) {
-        Log.d( NovateDownLoadManager.TAG, "DownSubscriber:>>>> onError:" + e.getMessage());
+        Log.e(NovateDownLoadManager.TAG, "DownSubscriber:>>>> onError:" + e.getMessage());
         callBack.onError(e);
     }
 
     @Override
     public void onNext(ResponseBody responseBody) {
-
         Log.d(NovateDownLoadManager.TAG, "DownSubscriber:>>>> onNext");
-
-        NovateDownLoadManager.getInstance(callBack).writeResponseBodyToDisk(key, path, name, context, responseBody);
+        new NovateDownLoadManager(callBack).writeResponseBodyToDisk(key, path, name, context, responseBody);
 
     }
 }
