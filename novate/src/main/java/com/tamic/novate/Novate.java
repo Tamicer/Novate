@@ -10,6 +10,11 @@ import com.tamic.novate.Exception.ConfigLoader;
 import com.tamic.novate.Exception.FormatException;
 import com.tamic.novate.Exception.NovateException;
 import com.tamic.novate.Exception.ServerException;
+import com.tamic.novate.download.DownLoadCallBack;
+import com.tamic.novate.download.DownSubscriber;
+import com.tamic.novate.download.NovateDownLoadManager;
+import com.tamic.novate.request.NovateRequest;
+import com.tamic.novate.util.FileUtil;
 import com.tamic.novate.util.Utils;
 
 import java.io.File;
@@ -125,6 +130,18 @@ public final class Novate {
         return (T) observable.compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
+    }
+
+    /**
+     * @param subscriber
+     */
+    public <T> T execute(NovateRequest request, Subscriber<T> subscriber) {
+        return handleCall(request, subscriber);
+    }
+
+    private <T> T handleCall(NovateRequest request, Subscriber<T> subscriber) {
+        //todo dev
+     return null;
     }
 
     /**
@@ -611,7 +628,7 @@ public final class Novate {
      * @param callBack
      */
     public void download(String url, DownLoadCallBack callBack) {
-        download(url, null, callBack);
+        download(url, FileUtil.getFileNameWithURL(url), callBack);
     }
 
     /**
@@ -620,7 +637,7 @@ public final class Novate {
      * @param callBack
      */
     public void download(String url, String name, DownLoadCallBack callBack) {
-        download(null, url, null, name, callBack);
+        download(FileUtil.generateFileKey(url, name), url, null, name, callBack);
     }
 
     /**
@@ -630,7 +647,7 @@ public final class Novate {
      * @param callBack
      */
     public void downloadMin(String url, DownLoadCallBack callBack) {
-        downloadMin(url, null, callBack);
+        downloadMin(FileUtil.generateFileKey(url, FileUtil.getFileNameWithURL(url)), url, callBack);
     }
 
     /**
@@ -641,7 +658,7 @@ public final class Novate {
      * @param callBack
      */
     public void downloadMin(String key, String url, DownLoadCallBack callBack) {
-        downloadMin(key, url, null, callBack);
+        downloadMin(key, url, FileUtil.getFileNameWithURL(url), callBack);
     }
 
     /**
@@ -665,12 +682,12 @@ public final class Novate {
      */
     public void downloadMin(String key, String url, String savePath, String name, DownLoadCallBack callBack) {
 
-        if (downMaps.get(url) == null) {
+        if (downMaps.get(key) == null) {
             downObservable = apiManager.downloadSmallFile(url);
-            downMaps.put(url, downObservable);
         } else {
-            downObservable = downMaps.get(url);
+            downObservable = downMaps.get(key);
         }
+        downMaps.put(key, downObservable);
         executeDownload(key, savePath, name, callBack);
     }
 
@@ -683,12 +700,12 @@ public final class Novate {
      * @param callBack
      */
     public void download(String key, String url, String savePath, String name, DownLoadCallBack callBack) {
-        if (downMaps.get(url) == null) {
+        if (downMaps.get(key) == null) {
             downObservable = apiManager.downloadFile(url);
-            downMaps.put(url, downObservable);
         } else {
             downObservable = downMaps.get(url);
         }
+        downMaps.put(key, downObservable);
         executeDownload(key, savePath, name, callBack);
     }
 
@@ -700,16 +717,19 @@ public final class Novate {
      * @param callBack
      */
     private void executeDownload(String key, String savePath, String name, DownLoadCallBack callBack) {
-        if (NovateDownLoadManager.isDownLoading) {
-            downObservable.unsubscribeOn(Schedulers.io());
+        /*if (NovateDownLoadManager.isDownLoading) {
+            downMaps.get(key).unsubscribeOn(Schedulers.io());
             NovateDownLoadManager.isDownLoading = false;
             NovateDownLoadManager.isCancel = true;
             return;
+        }*/
+        //NovateDownLoadManager.isDownLoading = true;
+        if(downMaps.get(key)!= null) {
+            downMaps.get(key).compose(schedulersTransformerDown)
+                    .compose(handleErrTransformer())
+                    .subscribe(new DownSubscriber<ResponseBody>(key, savePath, name, callBack, mContext));
         }
-        NovateDownLoadManager.isDownLoading = true;
-        downObservable.compose(schedulersTransformerDown)
-                .compose(handleErrTransformer())
-                .subscribe(new DownSubscriber<ResponseBody>(key, savePath, name, callBack, mContext));
+
     }
 
     /**

@@ -108,8 +108,9 @@ public class NovateException {
             ex.setMessage(resultException.message);
             return ex;
         } else {
+
             ex = new Throwable(e, ERROR.UNKNOWN);
-            ex.setMessage("未知错误");
+            ex.setMessage(e.getLocalizedMessage());
             return ex;
         }
     }
