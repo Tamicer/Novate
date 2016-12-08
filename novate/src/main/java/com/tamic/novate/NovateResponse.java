@@ -3,8 +3,7 @@ package com.tamic.novate;
 
 import android.content.Context;
 
-import com.tamic.novate.Exception.ConfigLoader;
-import com.tamic.novate.util.FileUtil;
+import com.tamic.novate.config.ConfigLoader;
 
 /**
  * BaseResponse Data T

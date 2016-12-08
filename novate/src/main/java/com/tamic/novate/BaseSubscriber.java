@@ -3,7 +3,7 @@ package com.tamic.novate;
 import android.content.Context;
 import android.util.Log;
 
-import com.tamic.novate.Exception.NovateException;
+import com.tamic.novate.exception.NovateException;
 
 import rx.Subscriber;
 

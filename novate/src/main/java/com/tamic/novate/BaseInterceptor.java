@@ -1,13 +1,11 @@
 package com.tamic.novate;
 
-import android.text.TextUtils;
 
 import java.io.IOException;
 import java.lang.*;
 import java.util.Map;
 import java.util.Set;
 
-import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;

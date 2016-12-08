@@ -1,4 +1,4 @@
-package com.tamic.novate.Exception;
+package com.tamic.novate.config;
 
 import android.content.Context;
 import android.text.TextUtils;

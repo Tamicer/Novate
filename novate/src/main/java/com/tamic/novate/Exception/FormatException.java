@@ -1,4 +1,4 @@
-package com.tamic.novate.Exception;
+package com.tamic.novate.exception;
 
 /**
  * Created by  Tamic on 2016-11-04.

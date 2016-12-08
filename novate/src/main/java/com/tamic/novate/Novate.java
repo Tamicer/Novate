@@ -6,13 +6,15 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.tamic.novate.Exception.ConfigLoader;
-import com.tamic.novate.Exception.FormatException;
-import com.tamic.novate.Exception.NovateException;
-import com.tamic.novate.Exception.ServerException;
+import com.tamic.novate.cookie.NovateCookieManager;
+import com.tamic.novate.config.ConfigLoader;
+import com.tamic.novate.exception.FormatException;
+import com.tamic.novate.exception.NovateException;
+import com.tamic.novate.exception.ServerException;
+import com.tamic.novate.cache.CookieCacheImpl;
 import com.tamic.novate.download.DownLoadCallBack;
 import com.tamic.novate.download.DownSubscriber;
-import com.tamic.novate.download.NovateDownLoadManager;
+import com.tamic.novate.cookie.SharedPrefsCookiePersistor;
 import com.tamic.novate.request.NovateRequest;
 import com.tamic.novate.util.FileUtil;
 import com.tamic.novate.util.Utils;
@@ -755,7 +757,7 @@ public final class Novate {
         private Executor callbackExecutor;
         private boolean validateEagerly;
         private Context context;
-        private NovateCookieManger cookieManager;
+        private NovateCookieManager cookieManager;
         private Cache cache = null;
         private Proxy proxy;
         private File httpCacheDirectory;
@@ -986,7 +988,7 @@ public final class Novate {
          * <p/>
          * <p>If unset, {@linkplain NovateCookieManger#NO_COOKIES no cookies} will be accepted nor provided.
          */
-        public Builder cookieManager(NovateCookieManger cookie) {
+        public Builder cookieManager(NovateCookieManager cookie) {
             if (cookie == null) throw new NullPointerException("cookieManager == null");
             this.cookieManager = cookie;
             return this;
@@ -1173,10 +1175,12 @@ public final class Novate {
              * Sets the handler that can accept cookies from incoming HTTP responses and provides cookies to
              * outgoing HTTP requests.
              *
-             * <p>If unset, {@link Novate CookieManager#NO_COOKIES no cookies} will be accepted nor provided.
+             * <p>If unset, {@link Novate NovateCookieManager#NO_COOKIES no cookies} will be accepted nor provided.
              */
             if (isCookie && cookieManager == null) {
-                okhttpBuilder.cookieJar(new NovateCookieManger(context));
+                //okhttpBuilder.cookieJar(new NovateCookieManger(context));
+                okhttpBuilder.cookieJar(new NovateCookieManager(new CookieCacheImpl(), new SharedPrefsCookiePersistor(context)));
+
             }
 
             if (cookieManager != null) {

@@ -1,4 +1,4 @@
-package com.tamic.novate.Exception;
+package com.tamic.novate.exception;
 
 import android.net.ParseException;
 import android.util.Log;

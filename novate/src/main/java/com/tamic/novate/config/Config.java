@@ -1,4 +1,4 @@
-package com.tamic.novate.Exception;
+package com.tamic.novate.config;
 
 
 
