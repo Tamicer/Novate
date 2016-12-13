@@ -23,11 +23,11 @@
 
 **Eclipse:**
 
-    Download the laster JAR:( com.tamic.novate:novate:-1.1.0.aar)
+    Download the laster JAR:( com.tamic.novate:novate:-1.x.aar)
+    
+    copy to libs dirPath!
 
-    compile(name: 'com.tamic.novate:novate-1.1.0', ext: 'aar')
-
-**or Gradle**:
+**AS Gradle**:
    
 - root：
      
@@ -42,7 +42,7 @@
       
          dependencies {
             .....
-             compile 'com.tamic.novate:novate:x.x.x(laser version)'
+             compile 'com.tamic.novate:novate:1.x.x(laser version)'
          
          }
   
