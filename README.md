@@ -42,7 +42,7 @@
       
          dependencies {
             .....
-            compile 'com.tamic.novate:novate:1.2.0'
+             compile 'com.tamic.novate:novate:x.x.x(laser version)'
          
          }
   
