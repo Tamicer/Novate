@@ -9,15 +9,16 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.tamic.excemple.model.IpResult;
 import com.tamic.excemple.model.MovieModel;
 import com.tamic.excemple.model.ResultModel;
 import com.tamic.excemple.model.SouguBean;
 import com.tamic.novate.BaseApiService;
 import com.tamic.novate.NovateResponse;
 import com.tamic.novate.BaseSubscriber;
-import com.tamic.novate.DownLoadCallBack;
 import com.tamic.novate.Novate;
 import com.tamic.novate.Throwable;
+import com.tamic.novate.download.DownLoadCallBack;
 
 import java.io.File;
 import java.io.IOException;
@@ -308,7 +309,7 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performPost() {
 
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("ip", "21.22.11.33");
         novate = new Novate.Builder(this)
                 .connectTimeout(8)
