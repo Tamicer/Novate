@@ -8,9 +8,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.tamic.novate.cookie.NovateCookieManager;
 import com.tamic.novate.config.ConfigLoader;
-import com.tamic.novate.exception.FormatException;
-import com.tamic.novate.exception.NovateException;
-import com.tamic.novate.exception.ServerException;
 import com.tamic.novate.cache.CookieCacheImpl;
 import com.tamic.novate.download.DownLoadCallBack;
 import com.tamic.novate.download.DownSubscriber;
@@ -18,6 +15,7 @@ import com.tamic.novate.cookie.SharedPrefsCookiePersistor;
 import com.tamic.novate.request.NovateRequest;
 import com.tamic.novate.util.FileUtil;
 import com.tamic.novate.util.Utils;
+import com.tamic.novate.exception.*;
 
 import java.io.File;
 import java.io.InputStream;
@@ -986,7 +984,7 @@ public final class Novate {
          * Sets the handler that can accept cookies from incoming HTTP responses and provides cookies to
          * outgoing HTTP requests.
          * <p/>
-         * <p>If unset, {@linkplain NovateCookieManger#NO_COOKIES no cookies} will be accepted nor provided.
+         * <p>If unset, {@linkplain NovateCookieManager#NO_COOKIES no cookies} will be accepted nor provided.
          */
         public Builder cookieManager(NovateCookieManager cookie) {
             if (cookie == null) throw new NullPointerException("cookieManager == null");
@@ -1017,7 +1015,7 @@ public final class Novate {
          * Sets the handler that can accept cookies from incoming HTTP responses and provides cookies to
          * outgoing HTTP requests.
          * <p/>
-         * <p>If unset, {@linkplain NovateCookieManger#NO_COOKIES no cookies} will be accepted nor provided.
+         * <p>If unset, {@linkplain NovateCookieManager#NO_COOKIES no cookies} will be accepted nor provided.
          */
         public Builder addSSL(String[] hosts, int[] certificates) {
             if (hosts == null) throw new NullPointerException("hosts == null");
@@ -1292,7 +1290,7 @@ public final class Novate {
                             String msg =
                                     baseResponse.getMsg() != null ? baseResponse.getMsg() : baseResponse.getError() != null ? baseResponse.getError() : baseResponse.getMessage() != null ? baseResponse.getMessage() : "api未知异常";
 
-                            ServerException serverException = new ServerException(baseResponse.getCode(), msg);
+                            ServerException serverException = new com.tamic.novate.exception.ServerException(baseResponse.getCode(), msg);
                             callBack.onError(NovateException.handleException(serverException));
                         }
 

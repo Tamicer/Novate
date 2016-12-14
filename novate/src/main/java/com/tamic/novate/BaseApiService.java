@@ -31,13 +31,11 @@ public interface BaseApiService {
             @QueryMap Map<String, Object> maps);
 
     @DELETE()
-    @FormUrlEncoded
     <T> Observable<ResponseBody> executeDelete(
             @Url String url,
             @QueryMap Map<String, Object> maps);
 
     @PUT()
-    @FormUrlEncoded
     <T> Observable<ResponseBody> executePut(
             @Url String url,
             @FieldMap Map<String, Object> maps);
