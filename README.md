@@ -50,6 +50,8 @@ Snapshots of the development version are available in Sonatype's snapshots repos
 
 Retrofit requires at minimum Java 7 or Android 2.3.
 
+last vension: https://bintray.com/neglectedbyboss/maven/Novate
+
 
 --------------------------
 
@@ -297,6 +299,7 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 
 #Update Log   
 -----
+版本历史: https://bintray.com/neglectedbyboss/maven/Novate
 
 - **V1.2.7***: 优化相关下载代码。优化cookie同步时对某些网站不兼容问题。
 。`2016.12`
