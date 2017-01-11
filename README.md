@@ -1,9 +1,10 @@
-# Novate
-   a  safety client by Https for Android,  (Android线程安全http请求库)
-   
+
 ![](http://upload-images.jianshu.io/upload_images/2022038-6a900d93d8acb091.jpg)
 
-
+# Novate
+   a  safety client by Https for Android,  (Android网路库，基于Retrofit和RxJava打的的链式网络库, 支持okhttp的调用风格，又兼容Retrofit注解方式，并支持rxJava链式操作。方便扩展，并能实现高速加载)
+  
+   
 # Summary
 
 
@@ -22,11 +23,11 @@
 
 **Eclipse:**
 
-    Download the laster JAR:( com.tamic.novate:novate:-1.1.0.aar)
+    Download the laster JAR:( com.tamic.novate:novate:-1.x.aar)
+    
+    copy to libs dirPath!
 
-    compile(name: 'com.tamic.novate:novate-1.1.0', ext: 'aar')
-
-**or Gradle**:
+**AS Gradle**:
    
 - root：
      
@@ -41,7 +42,7 @@
       
          dependencies {
             .....
-            compile 'com.tamic.novate:novate:1.2.0'
+             compile 'com.tamic.novate:novate:1.x.x(laster version)'
          
          }
   
@@ -49,13 +50,19 @@ Snapshots of the development version are available in Sonatype's snapshots repos
 
 Retrofit requires at minimum Java 7 or Android 2.3.
 
+last vension: https://bintray.com/neglectedbyboss/maven/Novate
+
 
 --------------------------
 
 
 # 中文文档
 
-  基于Retrofit和RxJava封装的链式请求库，为何起名 Novate？
+  基于Retrofit和RxJava封装的链式网络库, 支持okhttp的调用分格式，又兼容Retrofit注解方式，并支持rxJava链式操作，
+  
+ 并于扩展，并能实现高速加载！
+  
+  为何起名 Novate？ 
   
   Novate的英文原意是用新事物代替
   我的目的是用新的东西来代替Retrofit的有些不易操作的地方，因此起名新奇的东西，所以结合了原来的Http用法习惯，又加入了Retrofit的特性，因此起名 ：Novate
@@ -244,18 +251,73 @@ Retrofit requires at minimum Java 7 or Android 2.3.
                 });
 
     }
-    
-#Update Log   
+ 
+
+
+
+
+#注意
+
+ 如果你觉得此框架的业务码和错误码定的太死，其实框架已提供定制化方案，比如可以在你的项目中Assets中修改config文件：
+
+如果想用自带的成功状态码0，不成功为非零的情况，可忽略一下配置。
+`
+  {
+  "isFormat": "false",
+  "sucessCode": [
+    "1",
+    "0",
+    "1001"
+  ],
+  "error": {
+    "1001": "网络异常"
+  }
+  }`
+
+
+如果不想对结果格式化检查，请将isFormat设置为：false
+
+将修改sucessCode的成功业务吗，请将你的成功的业务码加入到sucessCode节点中。
+
+**错误码**
+
+需要对错误码进行自定义翻译，请配置相关error信息，具体可配置成：
+
+                 `{
+               "isFormat": "false",
+                  "sucessCode": [
+                    "1",
+                 "0",
+                  "1001"
+                ],
+                "error": {
+                  "1001": "网络异常"，
+                  "1002": "加入你的异常信息"
+                         }
+                 }
+ 
+
+#Update Log   
 -----
+版本历史: https://bintray.com/neglectedbyboss/maven/Novate
 
+- **V1.2.7***: 优化相关下载代码。优化cookie同步时对某些网站不兼容问题。
+。`2016.12`
 
-  
-- **V1.2.0**:		增加对Response数据格式，业务码，错误码的配置功能。提供自定义功能。`2016.11`
-- **V 1.1.1** :更新对结果异常的判断分发出处理 `2016.10`
-- **V1.1.0:**	增加Response异常处理和容错处理。`2016.10`
-- **V 1.0.2** :   增加body方式，增加小文件下载，增加表单方式提交，并新增是否同步cookie接口 . `2016.9`
-- **V1.0.1:**	扩展下载接口，可以制定下载路径和文件名，包括修复下载抛异常问题。`2016.8`
-- **V 1.0 :**  完成基础的get, put, Post delete, upLoad, DownLoad功能 `2016.6`
+- **V1.2.6.x**: 优化相关下载代码，并提交遗漏的put和delete方法，并将Http默认结果码会调到错误结果码中，增加对参数的泛型支持
+。`2016.12`
+
+- **V1.2.5-bata**: 提供只对Response真实数据（T data）处理的功能，简化上层调用方式，但是不灵活，可选择使用，。`2016.11`
+
+- **V1.2.3**:		增加对缓存功能的配置开关，可选择的对api进行缓存。`2016.11`
+- **V1.2.2**:		解决对Response一些转换异常。`2016.11`
+- **V1.2.1**:		增加对json的提交的支持。`2016.11`
+- **V1.2.0**:		增加对Response数据结构格式，业务码，错误码的配置功能。提供自定义配置成功码和错误码功能。`2016.11`
+- **V 1.1.1** :   更新对返回结果异常的判断分发出处理 `2016.10`
+- **V1.1.0:**	  增加Response异常处理和容错处理。`2016.10`
+- **V 1.0.2** :  增加body提交方式，增加小文件下载，增加表单方式提交功能，并新增设置是否同步cookie接口 . `2016.9`
+- **V1.0.1:**	  扩展下载接口，可以制定下载路径和文件名，包括修复下载抛异常问题。`2016.8`
+- **V 1.0 :**    基于retrofit和Rxjava完成以泛型基础的get, put, Post delete, upLoad, downLoad功能 `2016.6`
   
   
    
