@@ -1,6 +1,5 @@
 package com.tamic.excemple;
 
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,33 +9,27 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.tamic.excemple.model.IpResult;
 import com.tamic.excemple.model.MovieModel;
 import com.tamic.excemple.model.ResultModel;
 import com.tamic.excemple.model.SouguBean;
 import com.tamic.novate.BaseApiService;
 import com.tamic.novate.NovateResponse;
 import com.tamic.novate.BaseSubscriber;
-import com.tamic.novate.DownLoadCallBack;
 import com.tamic.novate.Novate;
 import com.tamic.novate.Throwable;
+import com.tamic.novate.download.DownLoadCallBack;
 import com.tamic.novate.util.FileUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import retrofit2.http.PartMap;
 
 /**
  * Created by Tamic on 2016-06-15.
@@ -296,7 +289,7 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performPost() {
 
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("ip", "21.22.11.33");
         novate = new Novate.Builder(this)
                 .connectTimeout(8)
