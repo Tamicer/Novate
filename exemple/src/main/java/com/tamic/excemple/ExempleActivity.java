@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.tamic.excemple.model.IpResult;
 import com.tamic.excemple.model.MovieModel;
 import com.tamic.excemple.model.ResultModel;
 import com.tamic.excemple.model.SouguBean;
@@ -17,6 +16,7 @@ import com.tamic.novate.BaseApiService;
 import com.tamic.novate.NovateResponse;
 import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.Novate;
+import com.tamic.novate.RxApiManager;
 import com.tamic.novate.Throwable;
 import com.tamic.novate.download.DownLoadCallBack;
 
@@ -30,6 +30,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import rx.Subscription;
 
 /**
  * Created by Tamic on 2016-06-15.
@@ -172,20 +173,14 @@ public class ExempleActivity extends AppCompatActivity {
                 .addLog(true)
                 .build();
 
-        novate.test("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海", null,
+
+        Subscription subscription = novate.test("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海", null,
                 new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("OkHttp", e.getMessage());
                         Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-
-
-                   /* @Override
-                    public void onError(Throwable e) {
-                        Log.e("OkHttp", e.getMessage());
-                        Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }*/
 
                     @Override
                     public void onNext(ResponseBody responseBody) {
@@ -197,15 +192,32 @@ public class ExempleActivity extends AppCompatActivity {
                     }
                 });
 
+        RxApiManager.get().add("my", subscription);
+        //cancel   RxApiManager.get().cancel("my");
+
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        RxApiManager.get().cancel("my");
+    }
+
+    // http://www.dianpingmedia.com/framework/web/user/unauth/login
     private void perform() {
 
         parameters = new HashMap<>();
         /*start=0&count=5*/
         parameters.put("start", "0");
         parameters.put("count", "1");
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("mobileNumber", "18826412577");
+        parameters.put("loginPassword", "123456");
+
+
+
 
         novate = new Novate.Builder(this)
                 .addParameters(parameters)
