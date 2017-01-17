@@ -301,8 +301,13 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 -----
 版本历史: https://bintray.com/neglectedbyboss/maven/Novate
 
-- **V1.2.7***: 优化相关下载代码。优化cookie同步时对某些网站不兼容问题。
-。`2016.12`
+
+- **V1.2.9***: 强化取消请求API.`2017.1`。
+
+- **V1.2.8***: 修需数据被备份的安全漏洞。 `2017.1`
+
+- **V1.2.7***: 优化相关下载代码。优化cookie同步时对某些网站不兼容问题，`2016.12`。
+
 
 - **V1.2.6.x**: 优化相关下载代码，并提交遗漏的put和delete方法，并将Http默认结果码会调到错误结果码中，增加对参数的泛型支持
 。`2016.12`
