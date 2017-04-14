@@ -342,4 +342,4 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.   
-更多介绍：http://www.jianshu.com/p/d7734390895e
+更多介绍：https://tamicer.github.io/2016/08/10/novate10/
