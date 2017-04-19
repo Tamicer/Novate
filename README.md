@@ -90,8 +90,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
                 .build();
   
   
-  
-#更多APi
+#更多API
 
 ```
                  novate = new Novate.Builder(this)
