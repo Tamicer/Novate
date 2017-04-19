@@ -88,8 +88,28 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         Novate novate = new Novate.Builder(this)
                 .baseUrl(baseUrl)
                 .build();
-                
-       
+  
+  
+  
+#更多APi
+
+
+           novate = new Novate.Builder(this)
+                .addHeader(headers) //添加公共请求头
+                .addParameters(parameters)//公共参数
+                、.connectTimeout(10)  //连接时间 可以忽略
+                .addCookie(false)  //是否同步cooike 默认不同步
+                .addCache(true)  //是否缓存 默认缓存
+                .addCache(cache, cacheTime)   //自定义缓存
+                .baseUrl("Url") //base URL
+                .addLog(true) //是否开启log
+                .cookieManager(new NovateCookieManager()) // 自定义cooike
+                .addInterceptor() // 自定义Interceptor
+                .addNetworkInterceptor() // 自定义NetworkInterceptor
+                .proxy(proxy) //代理
+                .client(client)  //clent 默认不需要
+                .build(); 
+  
 # GET
         
         novate.executeGet("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
