@@ -96,10 +96,15 @@ public class NovateDownLoadManager {
                 name = name + fileSuffix;
             }
         }
-
+        // FIx bug:filepath error,    by username @NBInfo  with gitHub
         if (path == null) {
+            File filepath=new File(path = context.getExternalFilesDir(null) + File.separator +"DownLoads");
+            if (!filepath.exists()){
+                filepath.mkdirs();
+            }
             path = context.getExternalFilesDir(null) + File.separator +"DownLoads" + File.separator;
         }
+
         if (new File(path + name).exists()) {
             FileUtil.deleteFile(path);
         }
