@@ -26,6 +26,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import okhttp3.CacheControl;
 import okhttp3.Headers;
@@ -193,6 +194,15 @@ public final class NovateRequest {
             return this;
         }
 
+        /**
+         * Sets the header named {@code name} to {@code value}. If this request already has any headers
+         * with that name, they are all replaced.
+         */
+        public NovateRequest.Builder headers(String name, String value) {
+            headers.set(name, value);
+            return this;
+        }
+
         public NovateRequest.Builder removeHeader(String name) {
             headers.removeAll(name);
             return this;
@@ -201,8 +211,14 @@ public final class NovateRequest {
         /**
          * Removes all headers on this builder and adds {@code headers}.
          */
-        public NovateRequest.Builder headers(Headers headers) {
-            this.headers = headers.newBuilder();
+        public NovateRequest.Builder headers(Map<String, String> headers) {
+            if (headers != null && headers.size() > 0) {
+                Set<String> keys = headers.keySet();
+                for (String headerKey : keys) {
+                    this.headers.add(headerKey, headers.get(headerKey) == null? "": headers.get(headerKey));
+                }
+            }
+
             return this;
         }
 
