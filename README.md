@@ -321,7 +321,9 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 #Update Log   
 -----
 版本历史: https://bintray.com/neglectedbyboss/maven/Novate
+More： https://tamicer.github.io/2016/08/10/novate10/
 
+- **V1.3.0***: 修复下载API在某些机型上文件夹创建失败情况。.`2017.5`。
 
 - **V1.2.9***: 强化取消请求API.`2017.1`。
 
