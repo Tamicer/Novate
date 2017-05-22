@@ -16,7 +16,7 @@
 - The unity of the support to return the result
 - Support custom extensions API
 - Support the unified request access to the network flow control
-
+ 
 
 
 #dependencies
@@ -131,7 +131,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         
 # BODY #
 
-    ovate.body(url, Object, new BaseSubscriber<ResponseBody>() {
+     novate.body(url, Object, new BaseSubscriber<ResponseBody>() {
             @Override
             public void onError(Throwable e) {
 
@@ -145,7 +145,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 
 #FORM#
 
-        novate.Form(url, new HashMap<K-V>(), new BaseSubscriber<ResponseBody>() {
+        novate.form(url, new HashMap<K-V>(), new BaseSubscriber<ResponseBody>() {
             @Override
             public void onError(Throwable e) {
 
@@ -323,18 +323,17 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 #Update Log   
 -----
 版本历史: https://bintray.com/neglectedbyboss/maven/Novate
-More： https://tamicer.github.io/2016/08/10/novate10/
 
-- **V1.3.0***: 修复下载API在某些机型上文件夹创建失败情况。.`2017.5`。
+- **V1.3.0***: 修复下载API在某些机型上文件夹创建失败情况。`2017.5`。
 
 - **V1.2.9***: 强化取消请求API.`2017.1`。
 
-- **V1.2.8***: 修需数据被备份的安全漏洞。 `2017.1`
+- **V1.2.8***: 修复数据被备份的安全漏洞。 `2017.1`
 
 - **V1.2.7***: 优化相关下载代码。优化cookie同步时对某些网站不兼容问题，`2016.12`。
 
 
-- **V1.2.6.x**: 优化相关下载代码，并提交遗漏的put和delete方法，并将Http默认结果码会调到错误结果码中，增加对参数的泛型支持
+- **V1.2.6.x**: 优化相关下载代码，并提交遗漏的put和delete方法，并将Http默认结果码回调到错误结果码中，并增加对请求参数的泛型支持
 。`2016.12`
 
 - **V1.2.5-bata**: 提供只对Response真实数据（T data）处理的功能，简化上层调用方式，但是不灵活，可选择使用，。`2016.11`
