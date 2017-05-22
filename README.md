@@ -96,7 +96,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
                  novate = new Novate.Builder(this)
                 .addHeader(headers) //添加公共请求头
                 .addParameters(parameters)//公共参数
-                、.connectTimeout(10)  //连接时间 可以忽略
+                .connectTimeout(10)  //连接时间 可以忽略
                 .addCookie(false)  //是否同步cooike 默认不同步
                 .addCache(true)  //是否缓存 默认缓存
                 .addCache(cache, cacheTime)   //自定义缓存
@@ -113,7 +113,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
   
 # GET
         
-        novate.executeGet("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
+        novate.executeGet("pathUrl", parameters（k-v）, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
             .....
         
@@ -123,7 +123,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 # POST        
         
         
-        novate.executePost("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
+        novate.executePost("pathUrl", parameters（k-v）, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
            .............
         
@@ -131,7 +131,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         
 # BODY #
 
-    ovate.body(url, uesrBean, new BaseSubscriber<ResponseBody>() {
+    ovate.body(url, Object, new BaseSubscriber<ResponseBody>() {
             @Override
             public void onError(Throwable e) {
 
@@ -145,7 +145,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 
 #FORM#
 
-        novate.Form(url, new HashMap<String, Object>(), new BaseSubscriber<ResponseBody>() {
+        novate.Form(url, new HashMap<K-V>(), new BaseSubscriber<ResponseBody>() {
             @Override
             public void onError(Throwable e) {
 
@@ -176,7 +176,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 
  **upLoadImage**
 
-    RequestBody requestFile =
+     RequestBody requestFile =
                     RequestBody.create(MediaType.parse("image/jpg"), new File(you file path));
 
       novate.upload(url, requestFile, new BaseSubscriber<ResponseBody>{
@@ -186,10 +186,10 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
       
  **upLoadFile**  
     
-         String mPath = "you File path ";
+        String path = "you File path ";
         String url = "";
 
-        File file = new File(mPath);
+        File file = new File(path);
 
         // 创建 RequestBody，用于封装 请求RequestBody
         RequestBody requestFile =
@@ -215,9 +215,11 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 **upLoadFiles**  
      
      
-        Map<String, RequestBody> maps = new HashMap<>();
-        maps.put("file1", requestFile);
-        novate.uploadFlies(url, maps, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        Map<String, RequestBody> fileMaps = new HashMap<>();
+        maps.put("key1", requestFile1);
+        maps.put("key2", requestFile2);
+        
+        novate.uploadFlies(url, fileMaps, new BaseSubscriber<ResponseBody>(Context) {
            ......
         } );
 
