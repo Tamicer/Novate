@@ -279,11 +279,11 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 
 
 
-#注意
+# 注意
 
  如果你觉得此框架的业务码和错误码定的太死，其实框架已提供定制化方案，比如可以在你的项目中Assets中修改config文件：
 
-如果想用自带的成功状态码0，不成功为非零的情况，可忽略一下配置。
+如果想用自带的成功状态码0，不成功为非零的情况，可忽略下面的配置，无需改动。
 `
   {
   "isFormat": "false",
@@ -298,13 +298,13 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
   }`
 
 
-如果不想对结果格式化检查，请将isFormat设置为：false
+如果不想对结果格式化检查，请将`isFormat`设置为：`false`
 
-将修改sucessCode的成功业务吗，请将你的成功的业务码加入到sucessCode节点中。
+如果想修改sucessCode的成功业务码，请将你的成功的业务码加入到`sucessCode `节点中。
 
 **错误码**
 
-需要对错误码进行自定义翻译，请配置相关error信息，具体可配置成：
+需要对错误码进行自定义翻译，请配置相关`error`节点信息，具体可配置成：
 
                  `{
                "isFormat": "false",
@@ -320,6 +320,26 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
                  }
  
 
+
+ **统一网络和Loading**
+ 
+   继承Novate自带的的`BaseSubscriber<T>`,复写`onStart()`和`onCompleted()` 前者显示loading,后者结束loading.
+  `` 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.v("Novate", "-->http is start");
+        // todo some common as show loadding  and check netWork is NetworkAvailable
+        // if  NetworkAvailable no !   must to call onCompleted
+    }
+
+    @Override
+    public void onCompleted() {
+        Log.v("Novate", "-->http is Complete");
+        // todo some common as  dismiss loadding
+    }
+ ``
+ 
 #Update Log   
 -----
 版本历史: https://bintray.com/neglectedbyboss/maven/Novate
