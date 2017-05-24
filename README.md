@@ -324,7 +324,10 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
  **统一网络和Loading**
  
    继承Novate自带的的`BaseSubscriber<T>`,复写`onStart()`和`onCompleted()` 前者显示loading,后者结束loading.
-  `` 
+   
+   
+   
+  ``` 
     @Override
     public void onStart() {
         super.onStart();
@@ -338,7 +341,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         Log.v("Novate", "-->http is Complete");
         // todo some common as  dismiss loadding
     }
- ``
+ ```
  
 #Update Log   
 -----
