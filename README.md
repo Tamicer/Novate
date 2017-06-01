@@ -2,7 +2,7 @@
 ![](http://upload-images.jianshu.io/upload_images/2022038-6a900d93d8acb091.jpg)
 
 # Novate
-   a  safety client by Https for Android,  (Android网路库，基于Retrofit和RxJava打的的链式网络库, 支持okhttp的调用风格，又兼容Retrofit注解方式，并支持rxJava链式操作。方便扩展，并能实现高速加载)
+   a  safety client by Https for Android,  (Android网路库，基于Retrofit和RxJava打造的链式网络库, 支持okhttp的调用风格，又兼容Retrofit注解方式，并支持rxJava链式操作。方便扩展，并能实现高速加载)
   
    
 # Summary
@@ -58,14 +58,13 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 
 # 中文文档
 
-  基于Retrofit和RxJava封装的链式网络库, 支持okhttp的调用分格式，又兼容Retrofit注解方式，并支持rxJava链式操作，
-  
- 并于扩展，并能实现高速加载！
+  基于Retrofit和RxJava封装的链式网络库, 支持okhttp的调用分格，又兼容Retrofit注入方式，并支持rxJava调用的链式操作，
+  不仅支持开发者自己扩展，还能实现高速网络加载！
   
   为何起名 Novate？ 
   
-  Novate的英文原意是用新事物代替
-  我的目的是用新的东西来代替Retrofit的有些不易操作的地方，因此起名新奇的东西，所以结合了原来的Http用法习惯，又加入了Retrofit的特性，因此起名 ：Novate
+  Novate 的英文原意是用新事物代替
+  我的目的是用新的东西来代替Retrofit的有些不易操作的地方，因此起名新奇的东西，所以结合了原来的Http用法习惯，又加入了Retrofit的特性，因此起名 ：Novate，LOGO也是加速的意思，本框架提供了一种封装架构思路，如果不喜欢本设计思路的朋友可以直接拿源码修改扩展。
 
 功能
 ----
@@ -75,8 +74,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
    - 支持多种方式访问网络（get,put,post ,delete）
    - 支持Json字符串，表单提交
    - 支持文件下载和上传，并有进度
-   
-   - 支持请求头统一加入
+   - 支持请求头统一加入
    - 支持对返回结果的统一处理
    - 支持自定义的扩展API
    - 支持统一请求访问网络的流程控制
@@ -208,8 +206,8 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
       
  **upLoadFile**  
  
-     
-        File file = new File(path);
+     ```
+         File file = new File(path);
 
         // 创建 RequestBody，用于封装 请求RequestBody
         RequestBody requestFile = Utils.createFile(file);
@@ -225,6 +223,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         .......
          });
         
+        ```
         
     
 **upLoadFiles**  
