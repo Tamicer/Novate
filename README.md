@@ -75,6 +75,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
    - 支持多种方式访问网络（get,put,post ,delete）
    - 支持Json字符串，表单提交
    - 支持文件下载和上传，并有进度
+   
    - 支持请求头统一加入
    - 支持对返回结果的统一处理
    - 支持自定义的扩展API
@@ -184,36 +185,51 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         '''''''''''''''
       });
       
- **upLoadFile**  
-    
-        String path = "you File path ";
-        String url = "";
+      
+   带进度：
+   
+   
+       RequestBody requestFile = Utils.createFile(str);
 
+        NovateRequestBody novateRequestBody = Utils.createNovateRequestBody(requestFile, new UpLoadCallback() {
+            @Override
+            public void onProgress(Object tag, int progress, long speed, boolean done) {
+
+            }
+        });
+
+        novate.upload(url, novateRequestBody, new BaseSubscriber<ResponseBody>() {
+           '''''''''''''''
+           
+           
+        });
+      
+      
+      
+ **upLoadFile**  
+ 
+     
         File file = new File(path);
 
         // 创建 RequestBody，用于封装 请求RequestBody
-        RequestBody requestFile =
-                RequestBody.create(MediaType.parse("multipart/form-data"), file);
-
+        RequestBody requestFile = Utils.createFile(file);
          // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("image", file.getName(), requestFile);
 
-       // 添加描述
-        String descriptionString = "hello, 这是文件描述";
-        RequestBody description =
-                RequestBody.create(
-                        MediaType.parse("multipart/form-data"), descriptionString);
-
-        // 执行
-
-        novate.uploadFlie(url, description,  body,new BaseSubscriber<ResponseBody>(ExempleActivity.this) {.......
+       String descriptionString = "hello, 这是文件描述";
+        RequestBody description = Utils.createPartFromString(descriptionString);
+        
+        novate.uploadFlie(url, description,  body,new BaseSubscriber<ResponseBody>() {
+        
+        .......
          });
         
         
     
 **upLoadFiles**  
-     
+       
+      
      
         Map<String, RequestBody> fileMaps = new HashMap<>();
         maps.put("key1", requestFile1);
@@ -222,6 +238,23 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         novate.uploadFlies(url, fileMaps, new BaseSubscriber<ResponseBody>(Context) {
            ......
         } );
+        
+        
+   带进度：
+      
+        File file = new File(path);
+      
+        RequestBody requestFile =  Utils.createFile(file);
+
+        Map<String, RequestBody> maps = new HashMap<>();
+        
+        maps.put("file1", Utils.createNovateRequestBody(requestFile, callback));
+        maps.put("file2", Utils.createNovateRequestBody(requestFile, callback));
+
+        novate.uploadFlies(url, maps, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+            ......
+        } );
+
 
   
 # DownLoad   
