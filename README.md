@@ -92,7 +92,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 # 更多API
 
 ```
-                 novate = new Novate.Builder(this)
+         novate = new Novate.Builder(this)
                 .addHeader(headers) //添加公共请求头
                 .addParameters(parameters)//公共参数
                 .connectTimeout(10)  //连接时间 可以忽略
@@ -109,6 +109,9 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
                 .build(); 
                 
    ```
+   
+   
+   
   
 # GET
         
