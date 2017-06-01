@@ -4,6 +4,10 @@ import android.net.Uri;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
+import com.tamic.novate.Novate;
+import com.tamic.novate.download.UpLoadCallback;
+import com.tamic.novate.request.NovateRequestBody;
+
 import java.io.File;
 
 import okhttp3.MediaType;
@@ -93,5 +97,11 @@ public class Utils {
 
         // MultipartBody.Part is used to send also the actual file name
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+    }
+
+
+    @NonNull
+    public static NovateRequestBody createNovateRequestBody(RequestBody requestBody, UpLoadCallback callback) {
+        return new NovateRequestBody(requestBody, callback);
     }
 }
