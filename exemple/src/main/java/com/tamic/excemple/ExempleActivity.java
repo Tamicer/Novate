@@ -18,7 +18,10 @@ import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.Novate;
 import com.tamic.novate.Throwable;
 import com.tamic.novate.download.DownLoadCallBack;
+import com.tamic.novate.download.UpLoadCallback;
+import com.tamic.novate.request.NovateRequestBody;
 import com.tamic.novate.util.FileUtil;
+import com.tamic.novate.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +33,8 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+
+import static com.tamic.novate.util.Utils.MULTIPART_FORM_DATA;
 
 /**
  * Created by Tamic on 2016-06-15.
@@ -381,10 +386,16 @@ public class ExempleActivity extends AppCompatActivity {
         String url = "";
         String str = FileUtil.loadFromAssets(this, "novate.png");
 
-        RequestBody requestFile =
-                RequestBody.create(MediaType.parse("image/jpg"), str);
+        RequestBody requestFile = Utils.createFile(str);
 
-        novate.upload(url, requestFile, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        NovateRequestBody novateRequestBody = Utils.createNovateRequestBody(requestFile, new UpLoadCallback() {
+            @Override
+            public void onProgress(Object tag, int progress, long speed, boolean done) {
+
+            }
+        });
+
+        novate.upload(url, novateRequestBody, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -424,20 +435,19 @@ public class ExempleActivity extends AppCompatActivity {
         File file = new File(str);
 
         // 创建 RequestBody，用于封装 请求RequestBody
-        RequestBody requestFile =
-                RequestBody.create(MediaType.parse("image"), str);
+        RequestBody requestFile = Utils.createImage(file);
 
         // MultipartBody.Part is used to send also the actual file name
-        MultipartBody.Part body =
-                MultipartBody.Part.createFormData("multipart/form-data", "novate.png", requestFile);
+        MultipartBody.Part body = Utils.createPart(MULTIPART_FORM_DATA, file);
 
         // 添加描述
         String descriptionString = "hello, 这是文件描述";
-        RequestBody description =
-                RequestBody.create(
-                        MediaType.parse("multipart/form-data; charset=utf-8"), descriptionString);
+        RequestBody description = Utils.createPartFromString(descriptionString);
 
-        novate.uploadFlie(url, description,  body, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+              /*  RequestBody.create(
+                        MediaType.parse("multipart/form-data; charset=utf-8"), descriptionString);*/
+
+        novate.uploadFlie(url, description, body, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -454,16 +464,26 @@ public class ExempleActivity extends AppCompatActivity {
 
     private void performUpLoadFlies() {
 
-        String str = FileUtil.loadFromAssets(this, "novate.png");
+        String path = FileUtil.loadFromAssets(this, "novate.png");
         String url = "";
 
+        UpLoadCallback callback = new UpLoadCallback() {
+
+            @Override
+            public void onProgress(Object tag, int progress, long speed, boolean come) {
+
+            }
+        };
+
+        File file = new File(path);
         // 创建 RequestBody，用于封装 请求RequestBody
-        RequestBody requestFile =
-                RequestBody.create(MediaType.parse("image"), str);
+        RequestBody requestFile =  Utils.createFile(file);
 
         Map<String, RequestBody> maps = new HashMap<>();
-        maps.put("file1", requestFile);
-        maps.put("file2", requestFile);
+        //Tag可以不设置 批量时候用于区分对待
+        maps.put("file1", Utils.createNovateRequestBody(requestFile, callback).setTag("tag1"));
+        maps.put("file2", Utils.createNovateRequestBody(requestFile, callback).setTag("tag2"));
+
         novate.uploadFlies(url, maps, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
@@ -475,6 +495,7 @@ public class ExempleActivity extends AppCompatActivity {
 
             }
         } );
+
     }
 
     /**

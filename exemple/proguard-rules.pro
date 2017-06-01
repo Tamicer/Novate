@@ -15,3 +15,16 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep class retrofit2.** {*;}
+
+-dontwarn okhttp3**
+-keep  class okhttp3.**{*;}
+-dontwarn okio**
+-keep  class okio.**{*;}
+-keep  class rx.**{*;}
+
+
+-keep class com.tamic.novate.Novate.** {*;}
+
+
+
