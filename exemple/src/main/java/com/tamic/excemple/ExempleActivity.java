@@ -19,6 +19,10 @@ import com.tamic.novate.Novate;
 import com.tamic.novate.RxApiManager;
 import com.tamic.novate.Throwable;
 import com.tamic.novate.download.DownLoadCallBack;
+import com.tamic.novate.download.UpLoadCallback;
+import com.tamic.novate.request.NovateRequestBody;
+import com.tamic.novate.request.NovateRequest;
+import com.tamic.novate.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,6 +81,10 @@ public class ExempleActivity extends AppCompatActivity {
                 .addHeader(headers)//.addApiManager(ApiManager.class)
                 .addLog(true)
                 .build();
+
+
+
+
 
 
         BaseApiService api = novate.create(BaseApiService.class);
@@ -174,6 +182,32 @@ public class ExempleActivity extends AppCompatActivity {
                 .build();
 
 
+        NovateRequest request = new NovateRequest.Builder()
+                .tag("test")
+                .headers(headers)
+                .get()
+                .url("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海")
+                .build();
+
+        novate.execute(request, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+            @Override
+            public void onError(Throwable e) {
+                Log.e("OkHttp", e.getMessage());
+                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNext(ResponseBody responseBody) {
+                try {
+                    Toast.makeText(ExempleActivity.this, new String(responseBody.bytes()), Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+
         Subscription subscription = novate.test("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海", null,
                 new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
                     @Override
@@ -201,7 +235,7 @@ public class ExempleActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        RxApiManager.get().cancel("my");
+        //RxApiManager.get().cancel("my");
     }
 
     // http://www.dianpingmedia.com/framework/web/user/unauth/login
@@ -268,6 +302,7 @@ public class ExempleActivity extends AppCompatActivity {
                 //.addParameters(parameters)
                 .connectTimeout(5)
                 .baseUrl(baseUrl)
+                .addCache(true)
                 .addLog(true)
                 .build();
        /*        parameters.clear();
@@ -384,11 +419,12 @@ public class ExempleActivity extends AppCompatActivity {
 
         novate = new Novate.Builder(this)
                 .addHeader(headers)
-                .connectTimeout(10)
-                .addCookie(false)
+                .addParameters(parameters)
                 .baseUrl("http://lbs.sougu.net.cn/")
                 .addLog(true)
                 .build();
+
+
         MyAPI myAPI = novate.create(MyAPI.class);
 
         novate.call(myAPI.getSougu(parameters),
@@ -442,24 +478,31 @@ public class ExempleActivity extends AppCompatActivity {
         String url = "";
 
         File file = new File(mPath);
-
         // 创建 RequestBody，用于封装 请求RequestBody
-        RequestBody requestFile =
-                RequestBody.create(MediaType.parse("multipart/form-data"), file);
-
+        RequestBody requestFile = Utils.createFile(file);
          // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("image", file.getName(), requestFile);
 
        // 添加描述
         String descriptionString = "hello, 这是文件描述";
+
         RequestBody description =
-                RequestBody.create(
+                 RequestBody.create(
                         MediaType.parse("multipart/form-data"), descriptionString);
 
-        // 执行
+        NovateRequestBody requestBody = Utils.createNovateRequestBody(description, new UpLoadCallback() {
 
-        novate.uploadFlie(url, description,  body,new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+            @Override
+            public void onProgress(Object tag, int progress, long speed, boolean done) {
+
+            }
+        });
+
+
+
+        // 执行
+        novate.uploadFlie(url, requestBody,  body, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -472,9 +515,33 @@ public class ExempleActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    /**
+     * upload
+     */
+    private void performUpLoadFlies(){
+
+        UpLoadCallback callback = new UpLoadCallback() {
+
+            @Override
+            public void onProgress(Object tag, int progress, long speed, boolean done) {
+
+            }
+        };
+
+        String path = "you File path ";
+        String url = "";
+
+        File file = new File(path);
+        // 创建 RequestBody，用于封装 请求RequestBody
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
         Map<String, RequestBody> maps = new HashMap<>();
-        maps.put("file1", requestFile);
-        maps.put("file2", requestFile);
+        maps.put("file1", Utils.createNovateRequestBody(requestFile, callback).setTag("tag1"));
+        maps.put("file2", Utils.createNovateRequestBody(requestFile, callback).setTag("tag2"));
+
         novate.uploadFlies(url, maps, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
@@ -486,6 +553,8 @@ public class ExempleActivity extends AppCompatActivity {
 
             }
         } );
+
+
     }
 
     /**
@@ -564,5 +633,7 @@ public class ExempleActivity extends AppCompatActivity {
 
         });
     }
+
+
 
 }
