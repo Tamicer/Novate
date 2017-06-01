@@ -16,7 +16,7 @@
 - The unity of the support to return the result
 - Support custom extensions API
 - Support the unified request access to the network flow control
-
+ 
 
 
 #dependencies
@@ -74,12 +74,12 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
    - 支持离线缓存
    - 支持多种方式访问网络（get,put,post ,delete）
    - 支持Json字符串，表单提交
-   - 支持文件下载和上传
-   - 支持请求头统一加入
+   - 支持文件下载和上传，并有进度
+   - 支持请求头统一加入
    - 支持对返回结果的统一处理
    - 支持自定义的扩展API
    - 支持统一请求访问网络的流程控制
-   
+   
    请求网络无需关心是否在主线程和非UI线程，操作UI直接可在回调处理, 保留了HttpClient的编码习惯，又加入了Builder模式编程！
    
 用法
@@ -88,11 +88,32 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         Novate novate = new Novate.Builder(this)
                 .baseUrl(baseUrl)
                 .build();
+  
+  
+#更多API
+
+```
+                 novate = new Novate.Builder(this)
+                .addHeader(headers) //添加公共请求头
+                .addParameters(parameters)//公共参数
+                .connectTimeout(10)  //连接时间 可以忽略
+                .addCookie(false)  //是否同步cooike 默认不同步
+                .addCache(true)  //是否缓存 默认缓存
+                .addCache(cache, cacheTime)   //自定义缓存
+                .baseUrl("Url") //base URL
+                .addLog(true) //是否开启log
+                .cookieManager(new NovateCookieManager()) // 自定义cooike
+                .addInterceptor() // 自定义Interceptor
+                .addNetworkInterceptor() // 自定义NetworkInterceptor
+                .proxy(proxy) //代理
+                .client(client)  //clent 默认不需要
+                .build(); 
                 
-       
+   ```
+  
 # GET
         
-        novate.executeGet("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
+        novate.executeGet("pathUrl", parameters（k-v）, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
             .....
         
@@ -102,7 +123,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 # POST        
         
         
-        novate.executePost("pathUrl", parameters, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
+        novate.executePost("pathUrl", parameters（k-v）, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
            .............
         
@@ -110,7 +131,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         
 # BODY #
 
-    ovate.body(url, uesrBean, new BaseSubscriber<ResponseBody>() {
+     novate.body(url, Object, new BaseSubscriber<ResponseBody>() {
             @Override
             public void onError(Throwable e) {
 
@@ -124,7 +145,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 
 #FORM#
 
-        novate.Form(url, new HashMap<String, Object>(), new BaseSubscriber<ResponseBody>() {
+        novate.form(url, new HashMap<K-V>(), new BaseSubscriber<ResponseBody>() {
             @Override
             public void onError(Throwable e) {
 
@@ -155,7 +176,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 
  **upLoadImage**
 
-    RequestBody requestFile =
+     RequestBody requestFile =
                     RequestBody.create(MediaType.parse("image/jpg"), new File(you file path));
 
       novate.upload(url, requestFile, new BaseSubscriber<ResponseBody>{
@@ -165,10 +186,10 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
       
  **upLoadFile**  
     
-         String mPath = "you File path ";
+        String path = "you File path ";
         String url = "";
 
-        File file = new File(mPath);
+        File file = new File(path);
 
         // 创建 RequestBody，用于封装 请求RequestBody
         RequestBody requestFile =
@@ -194,9 +215,11 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 **upLoadFiles**  
      
      
-        Map<String, RequestBody> maps = new HashMap<>();
-        maps.put("file1", requestFile);
-        novate.uploadFlies(url, maps, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        Map<String, RequestBody> fileMaps = new HashMap<>();
+        maps.put("key1", requestFile1);
+        maps.put("key2", requestFile2);
+        
+        novate.uploadFlies(url, fileMaps, new BaseSubscriber<ResponseBody>(Context) {
            ......
         } );
 
@@ -256,11 +279,11 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 
 
 
-#注意
+# 注意
 
  如果你觉得此框架的业务码和错误码定的太死，其实框架已提供定制化方案，比如可以在你的项目中Assets中修改config文件：
 
-如果想用自带的成功状态码0，不成功为非零的情况，可忽略一下配置。
+如果想用自带的成功状态码0，不成功为非零的情况，可忽略下面的配置，无需改动。
 `
   {
   "isFormat": "false",
@@ -275,13 +298,13 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
   }`
 
 
-如果不想对结果格式化检查，请将isFormat设置为：false
+如果不想对结果格式化检查，请将`isFormat`设置为：`false`
 
-将修改sucessCode的成功业务吗，请将你的成功的业务码加入到sucessCode节点中。
+如果想修改sucessCode的成功业务码，请将你的成功的业务码加入到`sucessCode `节点中。
 
 **错误码**
 
-需要对错误码进行自定义翻译，请配置相关error信息，具体可配置成：
+需要对错误码进行自定义翻译，请配置相关`error`节点信息，具体可配置成：
 
                  `{
                "isFormat": "false",
@@ -297,14 +320,47 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
                  }
  
 
+
+ **统一网络和Loading**
+ 
+   继承Novate自带的的`BaseSubscriber<T>`,复写`onStart()`和`onCompleted()` 前者显示loading,后者结束loading.
+   
+   
+   
+  ``` 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.v("Novate", "-->http is start");
+        // todo some common as show loadding  and check netWork is NetworkAvailable
+        // if  NetworkAvailable no !   must to call onCompleted
+    }
+
+    @Override
+    public void onCompleted() {
+        Log.v("Novate", "-->http is Complete");
+        // todo some common as  dismiss loadding
+    }
+ ```
+ 
 #Update Log   
 -----
 版本历史: https://bintray.com/neglectedbyboss/maven/Novate
 
-- **V1.2.7***: 优化相关下载代码。优化cookie同步时对某些网站不兼容问题。
-。`2016.12`
 
-- **V1.2.6.x**: 优化相关下载代码，并提交遗漏的put和delete方法，并将Http默认结果码会调到错误结果码中，增加对参数的泛型支持
+- **V1.3.1**: 提供文件上传进度功能。`2017.6`。
+
+
+- **V1.3.0**: 修复下载API在某些机型上文件夹创建失败情况。`2017.5`。
+
+- **V1.2.9***: 强化取消请求API.`2017.1`。
+
+- **V1.2.8***: 修复数据被备份的安全漏洞。 `2017.1`
+
+- **V1.2.7***: 优化相关下载代码。优化cookie同步时对某些网站不兼容问题，`2016.12`。
+
+
+- **V1.2.6.x**: 优化相关下载代码，并提交遗漏的put和delete方法，并将Http默认结果码回调到错误结果码中，并增加对请求参数的泛型支持
 。`2016.12`
 
 - **V1.2.5-bata**: 提供只对Response真实数据（T data）处理的功能，简化上层调用方式，但是不灵活，可选择使用，。`2016.11`
@@ -337,4 +393,4 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.   
-更多介绍：http://www.jianshu.com/p/d7734390895e
+更多介绍：https://tamicer.github.io/2016/08/10/novate10/
