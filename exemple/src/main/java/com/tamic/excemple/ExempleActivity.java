@@ -178,7 +178,7 @@ public class ExempleActivity extends AppCompatActivity {
                 .build();
 
         novate.test("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海", null,
-                new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+                new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("OkHttp", e.getMessage());
@@ -213,7 +213,7 @@ public class ExempleActivity extends AppCompatActivity {
                 .addLog(true)
                 .build();
 
-        novate.get("v2/movie/top250", parameters, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        novate.get("v2/movie/top250", parameters, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -311,12 +311,15 @@ public class ExempleActivity extends AppCompatActivity {
          * 如果需要解析后返回 则调用novate.executeGet()
          * 参考 performGet()中的方式
          */
-        novate.post("service/getIpInfo.php", parameters, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        novate.post("service/getIpInfo.php", parameters, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
 
             @Override
             public void onError(Throwable e) {
-                Log.e("OkHttp", e.getMessage());
-                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                if (e.getMessage() != null) {
+                    Log.e("OkHttp", e.getMessage());
+                    Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
             }
 
             @Override
@@ -359,7 +362,7 @@ public class ExempleActivity extends AppCompatActivity {
         MyAPI myAPI = novate.create(MyAPI.class);
 
         novate.call(myAPI.getSougu(parameters),
-                new BaseSubscriber<SouguBean>(ExempleActivity.this) {
+                new MyBaseSubscriber<SouguBean>(ExempleActivity.this) {
 
 
                     @Override
@@ -395,7 +398,7 @@ public class ExempleActivity extends AppCompatActivity {
             }
         });
 
-        novate.upload(url, novateRequestBody, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        novate.upload(url, novateRequestBody, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -438,16 +441,19 @@ public class ExempleActivity extends AppCompatActivity {
         RequestBody requestFile = Utils.createImage(file);
 
         // MultipartBody.Part is used to send also the actual file name
-        MultipartBody.Part body = Utils.createPart(MULTIPART_FORM_DATA, file);
+        MultipartBody.Part body  =
+                MultipartBody.Part.createFormData("image", file.getName(), requestFile);
 
         // 添加描述
         String descriptionString = "hello, 这是文件描述";
+
+
         RequestBody description = Utils.createPartFromString(descriptionString);
 
               /*  RequestBody.create(
                         MediaType.parse("multipart/form-data; charset=utf-8"), descriptionString);*/
 
-        novate.uploadFlie(url, description, body, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        novate.uploadFlie(url, description, body, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -481,10 +487,10 @@ public class ExempleActivity extends AppCompatActivity {
 
         Map<String, RequestBody> maps = new HashMap<>();
         //Tag可以不设置 批量时候用于区分对待
-        maps.put("file1", Utils.createNovateRequestBody(requestFile, callback).setTag("tag1"));
-        maps.put("file2", Utils.createNovateRequestBody(requestFile, callback).setTag("tag2"));
+        maps.put("file1", Utils.createNovateRequestBody(requestFile, callback));
+        maps.put("file2", Utils.createNovateRequestBody(requestFile, callback));
 
-        novate.uploadFlies(url, maps, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        novate.uploadFlies(url, maps, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -524,6 +530,10 @@ public class ExempleActivity extends AppCompatActivity {
                 btn_download.setText("DownLoad start");
             }
 
+            @Override
+            public void onProgress(String key, long fileSizeDownloaded, long totalSize) {
+                super.onProgress(key, fileSizeDownloaded, totalSize);
+            }
         });
     }
 
@@ -560,7 +570,10 @@ public class ExempleActivity extends AppCompatActivity {
                 btn_download.setText("DownLoadMin start");
             }
 
-
+            @Override
+            public void onProgress(String key, long fileSizeDownloaded, long totalSize) {
+                super.onProgress(key, fileSizeDownloaded, totalSize);
+            }
         });
     }
 
