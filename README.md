@@ -74,12 +74,12 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
    - 支持离线缓存
    - 支持多种方式访问网络（get,put,post ,delete）
    - 支持Json字符串，表单提交
-   - 支持文件下载和上传
-   - 支持请求头统一加入
+   - 支持文件下载和上传，并有进度
+   - 支持请求头统一加入
    - 支持对返回结果的统一处理
    - 支持自定义的扩展API
    - 支持统一请求访问网络的流程控制
-   
+   
    请求网络无需关心是否在主线程和非UI线程，操作UI直接可在回调处理, 保留了HttpClient的编码习惯，又加入了Builder模式编程！
    
 用法
@@ -347,7 +347,11 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 -----
 版本历史: https://bintray.com/neglectedbyboss/maven/Novate
 
-- **V1.3.0***: 修复下载API在某些机型上文件夹创建失败情况。`2017.5`。
+
+- **V1.3.1**: 提供文件上传进度功能。`2017.6`。
+
+
+- **V1.3.0**: 修复下载API在某些机型上文件夹创建失败情况。`2017.5`。
 
 - **V1.2.9***: 强化取消请求API.`2017.1`。
 
