@@ -25,7 +25,13 @@ import com.google.gson.JsonParseException;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONException;
 import com.tamic.novate.Throwable;
+import com.tamic.novate.config.ConfigLoader;
+
 import java.net.ConnectException;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 import retrofit2.adapter.rxjava.HttpException;
 
@@ -49,10 +55,12 @@ public class NovateException {
 
         Log.e("Novate", e.getMessage());
         Throwable ex;
-        if (e instanceof HttpException) {
+
+        if (!(e instanceof ServerException) && e instanceof HttpException) {
             HttpException httpException = (HttpException) e;
             ex = new Throwable(e, ERROR.HTTP_ERROR);
             switch (httpException.code()) {
+
                 case UNAUTHORIZED:
                     ex.setMessage("未授权的请求");
                 case FORBIDDEN:
@@ -73,8 +81,18 @@ public class NovateException {
                     ex.setMessage("网络错误");
                 case HANDEL_ERRROR:
                     ex.setMessage("接口处理失败");
+
                 default:
-                    ex.setMessage(e.getMessage());
+                    if (e.getMessage() != null ) {
+                        ex.setMessage(e.getMessage());
+                        break;
+                    }
+
+                    if (e.getLocalizedMessage() != null) {
+                        ex.setMessage(e.getLocalizedMessage());
+                        break;
+                    }
+                    ex.setMessage("未知错误");
                     break;
             }
             ex.setCode(httpException.code());
@@ -82,6 +100,11 @@ public class NovateException {
         } else if (e instanceof ServerException) {
             ServerException resultException = (ServerException) e;
             ex = new Throwable(resultException, resultException.code);
+            HashMap<String, String> errorConfigs = ConfigLoader.getErrorConfig();
+            if (errorConfigs != null && errorConfigs.containsKey(String.valueOf(resultException.code))) {
+                ex.setMessage(errorConfigs.get(String.valueOf(resultException.code)));
+                return ex;
+            }
             ex.setMessage(resultException.getMessage());
             return ex;
         } else if (e instanceof JsonParseException
@@ -99,11 +122,18 @@ public class NovateException {
             ex.setMessage("证书验证失败");
             return ex;
         } else if (e instanceof java.security.cert.CertPathValidatorException) {
+            Log.e("Novate", e.getMessage());
             ex = new Throwable(e, ERROR.SSL_NOT_FOUND);
             ex.setMessage("证书路径没找到");
+
             return ex;
-        }
-        else if (e instanceof ConnectTimeoutException){
+        } else if (e instanceof SSLPeerUnverifiedException) {
+            Log.e("Novate", e.getMessage());
+            ex = new Throwable(e, ERROR.SSL_NOT_FOUND);
+            ex.setMessage("无有效的SSL证书");
+            return ex;
+
+        } else if (e instanceof ConnectTimeoutException){
             ex = new Throwable(e, ERROR.TIMEOUT_ERROR);
             ex.setMessage("连接超时");
             return ex;
@@ -121,13 +151,17 @@ public class NovateException {
             return ex;
         } else if (e instanceof FormatException) {
             FormatException resultException = (FormatException) e;
-            ex = new Throwable(resultException, resultException.code);
+            ex = new Throwable(e, resultException.code);
             ex.setMessage(resultException.message);
             return ex;
+        } else if (e instanceof UnknownHostException){
+            Log.e("Novate", e.getMessage());
+            ex = new Throwable(e, NOT_FOUND);
+            ex.setMessage("服务器地址未找到,请检查网络或Url");
+            return ex;
         } else {
-
+            Log.e("Novate", e.getMessage());
             ex = new Throwable(e, ERROR.UNKNOWN);
-            ex.setMessage(e.getLocalizedMessage());
             return ex;
         }
     }

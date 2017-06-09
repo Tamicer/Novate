@@ -112,6 +112,8 @@ public final class Novate {
     private Map<String, Observable<ResponseBody>> downMaps = new HashMap<String, Observable<ResponseBody>>() {
     };
     private Observable.Transformer exceptTransformer = null;
+
+
     public static final String TAG = "Novate";
 
     /**
@@ -1092,6 +1094,7 @@ public final class Novate {
          * OkHttpClient} will be created and used.
          */
         public Novate build() {
+
             if (baseUrl == null) {
                 throw new IllegalStateException("Base URL required.");
             }
@@ -1105,6 +1108,8 @@ public final class Novate {
             }
             /** set Context. */
             mContext = context;
+
+            //ConfigLoader.loadConfig(mContext);
             /**
              * Set a fixed API base URL.
              *
@@ -1131,6 +1136,9 @@ public final class Novate {
             if (isLog) {
                 okhttpBuilder.addNetworkInterceptor(
                         new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS));
+
+                okhttpBuilder.addNetworkInterceptor(
+                        new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
             }
 
             if (sslSocketFactory != null) {
@@ -1281,7 +1289,8 @@ public final class Novate {
             try {
                 byte[] bytes = responseBody.bytes();
                 String jsStr = new String(bytes);
-                Log.d("OkHttp", "ResponseBody:" + jsStr);
+
+                Log.d("Novate", "ResponseBody:" + jsStr);
                 if (callBack != null) {
                     try {
                         /**
@@ -1307,7 +1316,7 @@ public final class Novate {
                             String msg =
                                     baseResponse.getMsg() != null ? baseResponse.getMsg() : baseResponse.getError() != null ? baseResponse.getError() : baseResponse.getMessage() != null ? baseResponse.getMessage() : "api未知异常";
 
-                            ServerException serverException = new com.tamic.novate.exception.ServerException(baseResponse.getCode(), msg);
+                            ServerException serverException = new ServerException(baseResponse.getCode(), msg);
                             callBack.onError(NovateException.handleException(serverException));
                         }
 

@@ -30,7 +30,7 @@ import rx.Subscriber;
  */
 public abstract class BaseSubscriber<T> extends Subscriber<T> {
 
-    private Context context;
+    protected Context context;
 
     public BaseSubscriber(Context context) {
         this.context = context;
@@ -38,7 +38,13 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
 
     @Override
     final public void onError(java.lang.Throwable e) {
-        Log.v("Novate", e.getMessage());
+
+        if (e != null && e.getMessage() != null){
+            Log.v("Novate", e.getMessage());
+        } else {
+            Log.v("Novate", "Throwable  || Message == Null");
+        }
+
         if(e instanceof Throwable){
             Log.e("Novate", "--> e instanceof Throwable");
             onError((Throwable)e);

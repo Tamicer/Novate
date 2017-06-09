@@ -31,4 +31,6 @@ public class ServerException extends RuntimeException {
         this.code = code;
         this.message = message;
     }
+
+
 }
