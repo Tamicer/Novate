@@ -34,7 +34,6 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
-import static com.tamic.novate.util.Utils.MULTIPART_FORM_DATA;
 
 /**
  * Created by Tamic on 2016-06-15.
@@ -72,6 +71,29 @@ public class ExempleActivity extends AppCompatActivity {
 
         parameters.put("ip", "21.22.11.33");
         headers.put("Accept", "application/json");
+
+
+      /*
+         如果想修改默认配置 可以参考下面格式，请修改assets的文件copy到你的项目中
+         isFormat是否对后端数据进行格式化校验
+
+         sucessCode:成功状态码，可以加多个。
+
+         error：非成功状态码，可以支持多个配置
+
+
+        {
+            "isFormat": "false",
+                "sucessCode": [
+                    "0",
+                    "1001"
+            ],
+            "error": {
+                    "23": "网络异常2",
+                    "24": "网络异常2",
+                    "25": "网络异常3"
+        }
+        }*/
 
         novate = new Novate.Builder(this)
                 //.addParameters(parameters)
