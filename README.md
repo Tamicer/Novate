@@ -387,12 +387,12 @@ Q&A
   
 2 Q: 为什么 我退出或杀进程 cookie就无效了？
  
- A： 由于有些机型在退出时候novate实例被回收了，请在application判断是存在novate真实实例 ，如果请重新初始化。或者建议用BaseActivity的context去初始化novate
-  
-3 Q: 为什么出现数据为空错误和API异常？
+ A： 由于有些机型在退出时候novate实例被回收了，请在application判断是存在novate真实实例 ，如重不存在请重新新初始化。本人建议用BaseActivity的context去初始化novate。因为退出再起启动application的oncreat()不会被触发，导致novate无法初始化。
+ 
+3 Q: 为什么出现后端返回数据为空错误和API异常？
 
  
- A：由于Novate自动的异常驱动会捕获开发上层的异常，为了防止app闪退有一定的容错，遇到错误时请先检查业务上层的任何实例是否初始化过，不然被novate处理
+ A：由于Novate自动的异常驱动会捕获开发上层的异常，为了防止app闪退有一定的容错帮助，遇到错误时请先检查业务上层的代码中国任何实例是否初始化过，不然就会被novate处理，提示以上错误。
   
 4 Q 我不想使用系统限制的数据格式，怎么办？
  
