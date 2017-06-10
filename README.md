@@ -382,24 +382,29 @@ Q&A
 ---
  
 1 Q：为什么服务器改变了数据，本地测试接口数据还是以前的旧数据？
-  A： 在开发测试阶段，联调频繁的API时候，请将缓存关闭
+  
+  A： 在开发测试阶段，联调频繁的API时候，请将缓存关闭
   
 2 Q: 为什么 我退出或杀进程 cookie就无效了？
-  A： 由于有些机型在退出时候novate实例被回收了，请在application判断是存在novate真实实例 ，如果请重新初始化。或者建议用BaseActivity的context去初始化novate
+ 
+ A： 由于有些机型在退出时候novate实例被回收了，请在application判断是存在novate真实实例 ，如果请重新初始化。或者建议用BaseActivity的context去初始化novate
   
 3 Q: 为什么出现数据为空错误和API异常？
 
-  A：由于Novate自动的异常驱动会捕获开发上层的异常，为了防止app闪退有一定的容错，遇到错误时请先检查业务上层的任何实例是否初始化过，不然被novate处理
+ 
+ A：由于Novate自动的异常驱动会捕获开发上层的异常，为了防止app闪退有一定的容错，遇到错误时请先检查业务上层的任何实例是否初始化过，不然被novate处理
   
 4 Q 我不想使用系统限制的数据格式，怎么办？
-  A：请将你业务下的Assets中修改config.json文件中`isFormat`设置为false。
+ 
+ A：请将你业务下的Assets中修改config.json文件中`isFormat`设置为false。
   
 5 Q:我想Novate默认的成功码，因为我的后端返回的100是成功的，怎么办？
-  A:请将将你业务下的Assets中修改config.json文件中`sucessCode`加入自己的成功码，即可，也可以支持多个
+  
+  A:请将你业务工程下下的Assets中修改config.json 文件中`sucessCode`节点加入自己的成功码即可，也可以支持加入多个。
 
   
-5 Q:我想Novate默认的错误码，怎么办？
-  A:请将将你业务下的Assets中修改config.json文件中`error`加入自己的结果码已经msg信息
+5 Q:我不想用Novate默认的错误码，怎么办？
+  A:请将你业务工程下的Assets中修改config.json文件中`error`加入自己的结果码和msg信息。
 
  
 Update Log   
