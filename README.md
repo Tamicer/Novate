@@ -58,20 +58,21 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
 
 # 中文文档
 
-  基于Retrofit和RxJava封装的链式网络库, 支持okhttp的调用分格，又兼容Retrofit注入方式，并支持rxJava调用的链式操作，
-  不仅支持开发者自己扩展，还能实现高速网络加载！
+  基于Retrofit和RxJava封装的链式网络库, 支持okhttp的调用分格，又兼容Retrofit注入方式，并支持RxJava调用的链式操作，
+  不仅支持开发者自己扩展，还沿用Okhttp的高效的网络加载！最重要的novate自带的异常驱动机制，帮开发者解决了绝大部分的异常
+  错误处理，减少API或者业务代码出错的导致崩溃概率。
   
   为何起名 Novate？ 
   
   Novate 的英文原意是用新事物代替
-  我的目的是用新的东西来代替Retrofit的有些不易操作的地方，因此起名新奇的东西，所以结合了原来的Http用法习惯，又加入了Retrofit的特性，因此起名 ：Novate，LOGO也是加速的意思，本框架提供了一种封装架构思路，如果不喜欢本设计思路的朋友可以直接拿源码修改扩展。
+  目的是用新的东西来代替Retrofit的有些不易操作的地方，因此起名新奇的东西，所以结合了原来的Http用法习惯，又加入了Retrofit的特性，因此起名 ：Novate，LOGO也是加速的意思，本框架提供了一种封装架构思路，如果不喜欢本设计思路的朋友可以直接拿源码修改扩展。
 
 功能
 ----
  
    - 加入基础API，减少Api冗余
    - 支持离线缓存
-   - 支持多种方式访问网络（get,put,post ,delete）
+   - 支持多种方式访问网络（get, put, post, delete）
    - 支持Json字符串，表单提交
    - 支持文件下载和上传，并有进度
    - 支持请求头统一加入
