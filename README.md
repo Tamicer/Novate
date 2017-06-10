@@ -131,7 +131,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
         
         });
         
-# BODY #
+# BODY
 
      novate.body(url, Object, new BaseSubscriber<ResponseBody>() {
             @Override
