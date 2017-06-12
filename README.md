@@ -41,8 +41,7 @@
      
       
          dependencies {
-            .....
-             compile 'com.tamic.novate:novate:1.x.x(laster version)'
+             compile 'com.tamic.novate:novate:1.3.2'
          
          }
   
@@ -50,7 +49,7 @@ Snapshots of the development version are available in Sonatype's snapshots repos
 
 Retrofit requires at minimum Java 7 or Android 2.3.
 
-last vension: https://bintray.com/neglectedbyboss/maven/Novate
+Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本点击去查询
 
 
 --------------------------
@@ -102,8 +101,8 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
                 .addCache(cache, cacheTime)   //自定义缓存
                 .baseUrl("Url") //base URL
                 .addLog(true) //是否开启log
-                .cookieManager(new NovateCookieManager()) // 自定义cooike
-                .addInterceptor() // 自定义Interceptor
+                .cookieManager(new NovateCookieManager()) // 自定义cooike，可以忽略
+                .addInterceptor() // 自定义Interceptor
                 .addNetworkInterceptor() // 自定义NetworkInterceptor
                 .proxy(proxy) //代理
                 .client(client)  //clent 默认不需要
@@ -146,7 +145,7 @@ last vension: https://bintray.com/neglectedbyboss/maven/Novate
             }
         });
 
-#FORM#
+# FORM
 
         novate.form(url, new HashMap<K-V>(), new BaseSubscriber<ResponseBody>() {
             @Override
@@ -445,7 +444,7 @@ Update Log  
 #License
 --------
 
-    Copyright 2013 Square, Inc.
+    Copyright 2016 Tamic, Inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
