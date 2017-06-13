@@ -141,7 +141,7 @@ public class MimeType {
             return null;
         }
         for (String type: mMimeTypeList) {
-            if (mediaType.contains(mediaType)){
+            if (mediaType.contains(type)){
                 return "."+ type;
             }
         }
