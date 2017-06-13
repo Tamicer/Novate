@@ -1,5 +1,11 @@
 package com.tamic.novate.download;
 
+import android.text.TextUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Created by Tamic on 2017-06-13.
  */
@@ -55,7 +61,7 @@ public class MimeType {
     /** flv */
     public static final String FLV = "flv";
     /** apk */
-    public static final String APK = "apk";
+    public static final String APK = "application/vnd.android.package-archive";
     /** mp3 */
     public static final String MP3 = "mp3";
     /** wma */
@@ -76,4 +82,77 @@ public class MimeType {
     public static final String CAB = "cab";
     /** 7z */
     public static final String Z7 = "7z";
+
+    private static MimeType sInstance;
+    private List<String> mMimeTypeList;
+
+    private MimeType() {
+        mMimeTypeList = new ArrayList<>();
+        loadList();
+    }
+
+    private void loadList() {
+
+        mMimeTypeList.add(TXT);
+        mMimeTypeList.add(HTML);
+        mMimeTypeList.add(APK);
+
+        mMimeTypeList.add(GIF);
+        mMimeTypeList.add(MPG);
+        mMimeTypeList.add(JPG);
+        mMimeTypeList.add(JPEG);
+        mMimeTypeList.add(PNG);
+        mMimeTypeList.add(BMP);
+
+        mMimeTypeList.add(WMV);
+        mMimeTypeList.add(RM);
+        mMimeTypeList.add(FLV);
+        mMimeTypeList.add(MP3);
+        mMimeTypeList.add(MKV);
+        mMimeTypeList.add(AVI);
+        mMimeTypeList.add(MP4);
+        mMimeTypeList.add(MPEG);
+        mMimeTypeList.add(WAV);
+        mMimeTypeList.add(WMA);
+        mMimeTypeList.add(ThreeGP);
+
+        mMimeTypeList.add(RMVB);
+
+        mMimeTypeList.add(RAR);
+        mMimeTypeList.add(ZIP);
+        mMimeTypeList.add(Z7);
+        mMimeTypeList.add(GZIP);
+        mMimeTypeList.add(BZ2);
+        mMimeTypeList.add(CAB);
+        mMimeTypeList.add(GZ);
+
+        mMimeTypeList.add(PDF);
+        mMimeTypeList.add(DOC);
+        mMimeTypeList.add(DOCX);
+        mMimeTypeList.add(XLS);
+        mMimeTypeList.add(XLSX);
+        mMimeTypeList.add(PPT);
+        mMimeTypeList.add(PPTX);
+
+    }
+
+    public String getSuffix(String mediaType) {
+        if (TextUtils.isEmpty(mediaType)) {
+            return null;
+        }
+        for (String type: mMimeTypeList) {
+            if (mediaType.contains(mediaType)){
+                return "."+ type;
+            }
+        }
+        return null;
+    }
+
+    public static MimeType getInstance() {
+        if (sInstance == null) {
+            sInstance = new MimeType();
+        }
+        return sInstance;
+    }
+
 }

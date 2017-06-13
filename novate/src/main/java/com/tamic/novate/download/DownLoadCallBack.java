@@ -36,7 +36,7 @@ public abstract class DownLoadCallBack {
      */
     abstract public void onError(Throwable e);
 
-    public void onProgress(String key, long fileSizeDownloaded, long  totalSize ){}
+    public void onProgress(String key, int progress, long fileSizeDownloaded, long  totalSize ){}
 
     /**  Note : the Fun run UIThred
      * @param path

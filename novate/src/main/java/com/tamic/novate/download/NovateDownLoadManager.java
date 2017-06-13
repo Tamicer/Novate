@@ -44,24 +44,7 @@ public class NovateDownLoadManager {
 
     public static final String TAG = "Novate:DownLoadManager";
 
-    private static String APK_CONTENTTYPE = "application/vnd.android.package-archive";
-
-    private static String PNG_CONTENTTYPE = "image/png";
-
-    private static String JPG_CONTENTTYPE = "image/jpg";
-
-    private static String JPEG_CONTENTTYPE = "image/jpeg";
-
-    private static String AUDIO_CONTENTTYPE = "audio/x-wav";
-
-    private static String MP3_CONTENTTYPE = "audio/x-wav";
-
-    private static String PDF_CONTENTTYPE = "application/pdf";
-
-
-
-
-    private static String fileSuffix = "";
+    private static String fileSuffix = ".tmpl";
 
     private static String defPath = "";
 
@@ -92,30 +75,13 @@ public class NovateDownLoadManager {
 
     public boolean writeResponseBodyToDisk(final String key, String path, String name, Context context, ResponseBody body) {
         String type = body.contentType().toString();
+
+
         if (!TextUtils.isEmpty(type)) {
             Log.d(TAG, "contentType:>>>>" + body.contentType().toString());
-            if (type.contains(APK_CONTENTTYPE)) {
-                fileSuffix = ".apk";
-            } else if (type.contains(PNG_CONTENTTYPE)) {
-                fileSuffix = ".png";
-            } else if (type.contains(JPG_CONTENTTYPE) || type.contains(JPEG_CONTENTTYPE)) {
-                fileSuffix = ".jpg";
-            } else if (type.contains(AUDIO_CONTENTTYPE)){
-                fileSuffix = ".wav";
-            } else if (type.contains(AUDIO_CONTENTTYPE)){
-                fileSuffix = ".wav";
-            } else if (type.contains(PDF_CONTENTTYPE)) {
-                fileSuffix = ".pdf";
-            } else  if (type.contains(MimeType.HTML)){
-                fileSuffix = ".html";
-            } else  if (type.contains(MimeType.MP3)){
-                fileSuffix = ".mp3";
-            } else if(type.contains(MimeType.DOC)) {
-                fileSuffix = ".doc";
-            } else if(type.contains(MimeType.ZIP)) {
-                fileSuffix = ".zip";
+            if (!TextUtils.isEmpty(MimeType.getInstance().getSuffix(type))){
+                fileSuffix = MimeType.getInstance().getSuffix(type);
             }
-
         }
 
         if (!TextUtils.isEmpty(name)) {
@@ -125,7 +91,7 @@ public class NovateDownLoadManager {
         }
         // FIx bug:filepath error,    by username @NBInfo  with gitHub
         if (path == null) {
-            File filepath=new File(path = context.getExternalFilesDir(null) + File.separator +"DownLoads");
+            File filepath = new File(path = context.getExternalFilesDir(null) + File.separator +"DownLoads");
             if (!filepath.exists()){
                 filepath.mkdirs();
             }
@@ -163,7 +129,6 @@ public class NovateDownLoadManager {
                     fileSizeDownloaded += read;
                     Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
                     final int progress = (int) (fileSizeDownloaded * 100 / fileSize);
-
                     Log.d(TAG, "file download progress : " + progress);
                     if (updateCount == 0 || progress >= updateCount) {
                         updateCount += 1;
@@ -173,7 +138,7 @@ public class NovateDownLoadManager {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    callBack.onProgress(key, finalFileSizeDownloaded, fileSize);
+                                    callBack.onProgress(key, progress, finalFileSizeDownloaded, fileSize);
                                 }
                             });
                         }
