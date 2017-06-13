@@ -29,10 +29,12 @@ import com.tamic.novate.cache.CookieCacheImpl;
 import com.tamic.novate.download.DownLoadCallBack;
 import com.tamic.novate.download.DownSubscriber;
 import com.tamic.novate.cookie.SharedPrefsCookiePersistor;
+import com.tamic.novate.exception.FormatException;
+import com.tamic.novate.exception.NovateException;
+import com.tamic.novate.exception.ServerException;
 import com.tamic.novate.request.NovateRequest;
 import com.tamic.novate.util.FileUtil;
 import com.tamic.novate.util.Utils;
-import com.tamic.novate.exception.*;
 
 import java.io.File;
 import java.io.InputStream;
