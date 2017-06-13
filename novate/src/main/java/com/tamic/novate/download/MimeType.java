@@ -3,10 +3,10 @@ package com.tamic.novate.download;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
+ *  More Type :http://tools.jb51.net/table/http_content_type
  * Created by Tamic on 2017-06-13.
  */
 
@@ -82,6 +82,9 @@ public class MimeType {
     public static final String CAB = "cab";
     /** 7z */
     public static final String Z7 = "7z";
+    /** 7z */
+    public static final String JSON = "json";
+
 
     private static MimeType sInstance;
     private List<String> mMimeTypeList;
@@ -117,6 +120,8 @@ public class MimeType {
         mMimeTypeList.add(ThreeGP);
 
         mMimeTypeList.add(RMVB);
+
+        mMimeTypeList.add(JSON);
 
         mMimeTypeList.add(RAR);
         mMimeTypeList.add(ZIP);
