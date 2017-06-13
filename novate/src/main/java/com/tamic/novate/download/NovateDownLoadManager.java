@@ -50,6 +50,17 @@ public class NovateDownLoadManager {
 
     private static String JPG_CONTENTTYPE = "image/jpg";
 
+    private static String JPEG_CONTENTTYPE = "image/jpeg";
+
+    private static String AUDIO_CONTENTTYPE = "audio/x-wav";
+
+    private static String MP3_CONTENTTYPE = "audio/x-wav";
+
+    private static String PDF_CONTENTTYPE = "application/pdf";
+
+
+
+
     private static String fileSuffix = "";
 
     private static String defPath = "";
@@ -80,15 +91,31 @@ public class NovateDownLoadManager {
     }
 
     public boolean writeResponseBodyToDisk(final String key, String path, String name, Context context, ResponseBody body) {
-
-        Log.d(TAG, "contentType:>>>>" + body.contentType().toString());
         String type = body.contentType().toString();
-        if (type.contains(APK_CONTENTTYPE)) {
-            fileSuffix = ".apk";
-        } else if (type.contains(PNG_CONTENTTYPE)) {
-            fileSuffix = ".png";
-        } else if (type.contains(JPG_CONTENTTYPE)) {
-            fileSuffix = ".jpg";
+        if (!TextUtils.isEmpty(type)) {
+            Log.d(TAG, "contentType:>>>>" + body.contentType().toString());
+            if (type.contains(APK_CONTENTTYPE)) {
+                fileSuffix = ".apk";
+            } else if (type.contains(PNG_CONTENTTYPE)) {
+                fileSuffix = ".png";
+            } else if (type.contains(JPG_CONTENTTYPE) || type.contains(JPEG_CONTENTTYPE)) {
+                fileSuffix = ".jpg";
+            } else if (type.contains(AUDIO_CONTENTTYPE)){
+                fileSuffix = ".wav";
+            } else if (type.contains(AUDIO_CONTENTTYPE)){
+                fileSuffix = ".wav";
+            } else if (type.contains(PDF_CONTENTTYPE)) {
+                fileSuffix = ".pdf";
+            } else  if (type.contains(MimeType.HTML)){
+                fileSuffix = ".html";
+            } else  if (type.contains(MimeType.MP3)){
+                fileSuffix = ".mp3";
+            } else if(type.contains(MimeType.DOC)) {
+                fileSuffix = ".doc";
+            } else if(type.contains(MimeType.ZIP)) {
+                fileSuffix = ".zip";
+            }
+
         }
 
         if (!TextUtils.isEmpty(name)) {
@@ -136,9 +163,10 @@ public class NovateDownLoadManager {
                     fileSizeDownloaded += read;
                     Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
                     final int progress = (int) (fileSizeDownloaded * 100 / fileSize);
+
                     Log.d(TAG, "file download progress : " + progress);
                     if (updateCount == 0 || progress >= updateCount) {
-                        updateCount += 1;//每次增长10%
+                        updateCount += 1;
                         if (callBack != null) {
                             handler = new Handler(Looper.getMainLooper());
                             final long finalFileSizeDownloaded = fileSizeDownloaded;
@@ -150,6 +178,23 @@ public class NovateDownLoadManager {
                             });
                         }
                     }
+
+                   /* // 通知上层
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - mLastRefreshTime >= REFRESH_INTEVAL) {
+
+                        mLastRefreshTime = currentTime;
+                        if (callBack != null) {
+                            handler = new Handler(Looper.getMainLooper());
+                            final long finalFileSizeDownloaded = fileSizeDownloaded;
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    callBack.onProgress(key, finalFileSizeDownloaded, fileSize);
+                                }
+                            });
+                        }
+                    }*/
                 }
               /*  while (true) {
                     int read = inputStream.read(fileReader);
