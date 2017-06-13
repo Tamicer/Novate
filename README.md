@@ -71,9 +71,9 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
  
    - 加入基础API，减少Api冗余
    - 支持离线缓存
-   - 支持多种方式访问网络（get, put, post, delete）
+   - 支持多种方式访问网络（get, put, post, delete）
    - 支持Json字符串，表单提交
-   - 支持文件下载和上传，并有进度
+   - 支持文件下载和上传，并有进度
    - 支持请求头统一加入
    - 支持对返回结果的统一处理
    - 支持自定义的扩展API
