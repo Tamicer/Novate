@@ -143,23 +143,6 @@ public class NovateDownLoadManager {
                             });
                         }
                     }
-
-                   /* // 通知上层
-                    long currentTime = System.currentTimeMillis();
-                    if (currentTime - mLastRefreshTime >= REFRESH_INTEVAL) {
-
-                        mLastRefreshTime = currentTime;
-                        if (callBack != null) {
-                            handler = new Handler(Looper.getMainLooper());
-                            final long finalFileSizeDownloaded = fileSizeDownloaded;
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    callBack.onProgress(key, finalFileSizeDownloaded, fileSize);
-                                }
-                            });
-                        }
-                    }*/
                 }
               /*  while (true) {
                     int read = inputStream.read(fileReader);
