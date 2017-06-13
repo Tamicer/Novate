@@ -18,10 +18,13 @@
 package com.tamic.novate.download;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.Throwable;
+import com.tamic.novate.util.Utils;
 
 /**
  * DownSubscriber
@@ -64,7 +67,19 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
     @Override
     public void onError(final Throwable e) {
         Log.e(NovateDownLoadManager.TAG, "DownSubscriber:>>>> onError:" + e.getMessage());
-        callBack.onError(e);
+        if (callBack != null) {
+            final Throwable throwable =  new Throwable(e, -100, e.getMessage());
+            if (Utils.checkMain()) {
+                callBack.onError(throwable);
+            } else {
+                 new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBack.onError(throwable);
+                    }
+                });
+            }
+        }
     }
 
     @Override

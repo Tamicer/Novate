@@ -19,6 +19,7 @@ package com.tamic.novate;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -703,12 +704,17 @@ public final class Novate {
      */
     public void downloadMin(String key, String url, String savePath, String name, DownLoadCallBack callBack) {
 
+        if(TextUtils.isEmpty(key)) {
+            key = FileUtil.generateFileKey(url, FileUtil.getFileNameWithURL(url));
+        }
+
         if (downMaps.get(key) == null) {
             downObservable = apiManager.downloadSmallFile(url);
         } else {
             downObservable = downMaps.get(key);
         }
         downMaps.put(key, downObservable);
+
         executeDownload(key, savePath, name, callBack);
     }
 
@@ -721,6 +727,9 @@ public final class Novate {
      * @param callBack
      */
     public void download(String key, String url, String savePath, String name, DownLoadCallBack callBack) {
+        if(TextUtils.isEmpty(key)) {
+            key = FileUtil.generateFileKey(url, FileUtil.getFileNameWithURL(url));
+        }
         if (downMaps.get(key) == null) {
             downObservable = apiManager.downloadFile(url);
         } else {

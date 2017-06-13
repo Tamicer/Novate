@@ -31,6 +31,12 @@ public class Throwable extends Exception {
         this.code = code;
     }
 
+    public Throwable(java.lang.Throwable throwable, int code, String message) {
+        super(throwable);
+        this.code = code;
+        this.message = message;
+    }
+
     public void setCode(int code) {
         this.code = code;
     }
