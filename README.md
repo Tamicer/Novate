@@ -41,8 +41,7 @@
      
       
          dependencies {
-             compile 'com.tamic.novate:novate:1.3.2'
-         
+             compile 'com.tamic.novate:novate:1.3.3'
          }
   
 Snapshots of the development version are available in Sonatype's snapshots repository.
