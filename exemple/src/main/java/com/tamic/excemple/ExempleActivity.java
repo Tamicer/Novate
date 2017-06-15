@@ -2,6 +2,7 @@ package com.tamic.excemple;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -10,24 +11,27 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tamic.excemple.model.MovieModel;
+import com.tamic.excemple.model.MusicBookCategory;
 import com.tamic.excemple.model.ResultModel;
 import com.tamic.excemple.model.SouguBean;
-import com.tamic.novate.BaseApiService;
 import com.tamic.novate.NovateResponse;
 import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.Novate;
 import com.tamic.novate.RxApiManager;
 import com.tamic.novate.Throwable;
+import com.tamic.novate.callback.RxFileCallBack;
+import com.tamic.novate.callback.RxListCallback;
 import com.tamic.novate.download.DownLoadCallBack;
 import com.tamic.novate.download.UpLoadCallback;
 import com.tamic.novate.request.NovateRequestBody;
-import com.tamic.novate.request.NovateRequest;
+import com.tamic.novate.util.FileUtil;
 import com.tamic.novate.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.MediaType;
@@ -78,16 +82,13 @@ public class ExempleActivity extends AppCompatActivity {
                 .connectTimeout(20)
                 .writeTimeout(15)
                 .baseUrl(baseUrl)
-                .addHeader(headers)//.addApiManager(ApiManager.class)
+                .addHeader(headers)
                 .addLog(true)
                 .build();
 
 
 
 
-
-
-        BaseApiService api = novate.create(BaseApiService.class);
 
         btn_test.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,34 +183,8 @@ public class ExempleActivity extends AppCompatActivity {
                 .build();
 
 
-        NovateRequest request = new NovateRequest.Builder()
-                .tag("test")
-                .headers(headers)
-                .get()
-                .url("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海")
-                .build();
-
-        novate.execute(request, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
-            @Override
-            public void onError(Throwable e) {
-                Log.e("OkHttp", e.getMessage());
-                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNext(ResponseBody responseBody) {
-                try {
-                    Toast.makeText(ExempleActivity.this, new String(responseBody.bytes()), Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-
-
         Subscription subscription = novate.test("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海", null,
-                new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+                new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("OkHttp", e.getMessage());
@@ -226,7 +201,7 @@ public class ExempleActivity extends AppCompatActivity {
                     }
                 });
 
-        RxApiManager.get().add("my", subscription);
+        RxApiManager.get().add("test", subscription);
         //cancel   RxApiManager.get().cancel("my");
 
     }
@@ -261,7 +236,7 @@ public class ExempleActivity extends AppCompatActivity {
                 .addLog(true)
                 .build();
 
-        novate.get("v2/movie/top250", parameters, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        novate.get("v2/movie/top250", parameters, new BaseSubscriber<ResponseBody>() {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -294,7 +269,7 @@ public class ExempleActivity extends AppCompatActivity {
      * performGet
      */
     private void performGet() {
-
+       
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("ip", "21.22.11.33");
         novate = new Novate.Builder(this)
@@ -302,27 +277,17 @@ public class ExempleActivity extends AppCompatActivity {
                 //.addParameters(parameters)
                 .connectTimeout(5)
                 .baseUrl(baseUrl)
-                .addCache(true)
+                .addCache(false)
                 .addLog(true)
                 .build();
-       /*        parameters.clear();
-        parameters.put("m", "souguapp");
-        parameters.put("c", "appusers");
-        parameters.put("a", "network");
 
-        novate = new Novate.Builder(this)
-                //.addHeader(headers)
-                .connectTimeout(10)
-                .addCookie(false)
-                .baseUrl("http://lbs.sougu.net.cn/")
-                .addLog(true)
-                .build();*/
+
 
         /**
          * 如果不需要数据解析后返回 则调用novate.Get()
          * 参考 performPost()中的方式
          */
-        novate.executeGet("service/getIpInfo.php", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
+       novate.executeGet("service/getIpInfo.php", parameters, new Novate.ResponseCallBack<ResultModel>() {
             @Override
             public void onStart() {
 
@@ -342,12 +307,16 @@ public class ExempleActivity extends AppCompatActivity {
 
             @Override
             public void onSuccee(NovateResponse<ResultModel> response) {
-                Toast.makeText(ExempleActivity.this, response.getData().toString(), Toast.LENGTH_SHORT).show();
+
             }
 
 
-        });
+            @Override
+            public void onsuccess(int code, String msg, ResultModel  response, String originalResponse) {
+                Toast.makeText(ExempleActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
+            }
 
+        });
 
     }
 
@@ -374,17 +343,14 @@ public class ExempleActivity extends AppCompatActivity {
          * 如果需要解析后返回 则调用novate.executeGet()
          * 参考 performGet()中的方式
          */
-        novate.post("service/getIpInfo.php", parameters, new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
-/*
-            @Override
-            public void onNext(IpResult ipResult) {
-
-            }*/
-
+        novate.get("service/getIpInfo.php", parameters, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
             public void onError(Throwable e) {
-                Log.e("OkHttp", e.getMessage());
-                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                if (!TextUtils.isEmpty(e.getMessage())) {
+                    Log.e("OkHttp", e.getMessage());
+                    Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
             }
 
             @Override
@@ -393,11 +359,19 @@ public class ExempleActivity extends AppCompatActivity {
                 try {
                     String jstr = new String(responseBody.bytes());
 
+                    if (jstr.trim().isEmpty()) {
+                        return;
+                    }
+
                     Type type = new TypeToken<NovateResponse<ResultModel>>() {
                     }.getType();
 
                     NovateResponse<ResultModel> response = new Gson().fromJson(jstr, type);
-                    Toast.makeText(ExempleActivity.this, response.getData().toString(), Toast.LENGTH_SHORT).show();
+
+                    if (response.getData() != null) {
+                        Toast.makeText(ExempleActivity.this,    response.getData().toString(), Toast.LENGTH_SHORT).show();
+                    }
+                    Toast.makeText(ExempleActivity.this, jstr , Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -428,7 +402,7 @@ public class ExempleActivity extends AppCompatActivity {
         MyAPI myAPI = novate.create(MyAPI.class);
 
         novate.call(myAPI.getSougu(parameters),
-                new BaseSubscriber<SouguBean>(ExempleActivity.this) {
+                new MyBaseSubscriber<SouguBean>(ExempleActivity.this) {
 
 
                     @Override
@@ -578,8 +552,8 @@ public class ExempleActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onProgress(String key, long fileSizeDownloaded, long totalSize) {
-                super.onProgress(key, fileSizeDownloaded, totalSize);
+            public void onProgress(String key, int progress, long fileSizeDownloaded, long totalSize) {
+                super.onProgress(key, progress, fileSizeDownloaded, totalSize);
                 Toast.makeText(ExempleActivity.this, "download:" + fileSizeDownloaded, Toast.LENGTH_SHORT).show();
             }
 
@@ -623,6 +597,11 @@ public class ExempleActivity extends AppCompatActivity {
             public void onSucess(String key, String path, String name, long fileSize) {
                 Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
                 btn_download.setText("DownLoad start");
+            }
+
+            @Override
+            public void onProgress(String key, int presss, long fileSizeDownloaded, long totalSize) {
+                super.onProgress(key, presss, fileSizeDownloaded, totalSize);
             }
 
             @Override

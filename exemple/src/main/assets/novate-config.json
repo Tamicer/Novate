@@ -1,9 +1,9 @@
 {
-  "isFormat": "false",
+  "isFormat": "true",
   "sucessCode": [
     "1",
     "0",
-    "1001"
+    "100"
   ],
   "error": {
   }
