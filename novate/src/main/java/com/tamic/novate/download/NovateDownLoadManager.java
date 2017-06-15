@@ -82,7 +82,13 @@ public class NovateDownLoadManager {
         }
         Log.v(TAG,  "Key:-->" + key);
 
-        String type = body.contentType().toString();
+        String type ="";
+        if (body.contentType() != null) {
+            type = body.contentType().toString();
+        } else {
+            Log.d(TAG, "MediaType-->,无法获取");
+        }
+
         if (!TextUtils.isEmpty(type)) {
             Log.d(TAG, "contentType:>>>>" + body.contentType().toString());
             if (!TextUtils.isEmpty(MimeType.getInstance().getSuffix(type))){
