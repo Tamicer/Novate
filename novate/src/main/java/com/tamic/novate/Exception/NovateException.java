@@ -162,6 +162,7 @@ public class NovateException {
         } else {
             Log.e("Novate", e.getMessage());
             ex = new Throwable(e, ERROR.UNKNOWN);
+            ex.setMessage(e.getMessage());
             return ex;
         }
     }
