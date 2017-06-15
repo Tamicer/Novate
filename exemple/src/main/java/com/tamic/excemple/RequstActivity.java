@@ -49,11 +49,11 @@ public class RequstActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_requst);
         // UI referen
-        btn_get = (Button) findViewById(R.id.bt_get);
+        btn_get = (Button) findViewById(R.id.get_Entity);
         btn_getSting = (Button) findViewById(R.id.get_String);
-        btn_bitmap = (Button) findViewById(R.id.bt_get);
-        btn_file = (Button) findViewById(R.id.bt_post);
-        btn_getList = (Button) findViewById(R.id.bt_download);
+        btn_bitmap = (Button) findViewById(R.id.get_Bitmap);
+        btn_file = (Button) findViewById(R.id.get_File);
+        btn_getList = (Button) findViewById(R.id.get_ListEntity);
 
 
         parameters.put("ip", "21.22.11.33");

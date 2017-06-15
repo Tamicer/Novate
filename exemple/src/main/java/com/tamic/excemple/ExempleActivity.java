@@ -1,5 +1,6 @@
 package com.tamic.excemple;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,7 +12,6 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tamic.excemple.model.MovieModel;
-import com.tamic.excemple.model.MusicBookCategory;
 import com.tamic.excemple.model.ResultModel;
 import com.tamic.excemple.model.SouguBean;
 import com.tamic.novate.NovateResponse;
@@ -19,19 +19,15 @@ import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.Novate;
 import com.tamic.novate.RxApiManager;
 import com.tamic.novate.Throwable;
-import com.tamic.novate.callback.RxFileCallBack;
-import com.tamic.novate.callback.RxListCallback;
 import com.tamic.novate.download.DownLoadCallBack;
 import com.tamic.novate.download.UpLoadCallback;
 import com.tamic.novate.request.NovateRequestBody;
-import com.tamic.novate.util.FileUtil;
 import com.tamic.novate.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import okhttp3.MediaType;
@@ -55,7 +51,7 @@ public class ExempleActivity extends AppCompatActivity {
     private Map<String, String> headers = new HashMap<>();
 
     private Button btn, btn_test, btn_get, btn_post, btn_download,
-            btn_download_Min, btn_upload, btn_uploadfile, btn_myApi;
+            btn_download_Min, btn_upload, btn_uploadfile, btn_myApi, btn_more;
 
 
 
@@ -73,6 +69,7 @@ public class ExempleActivity extends AppCompatActivity {
         btn_download_Min = (Button) findViewById(R.id.bt_download_min);
         btn_uploadfile = (Button) findViewById(R.id.bt_uploadflie);
         btn_myApi = (Button) findViewById(R.id.bt_my_api);
+        btn_more = (Button) findViewById(R.id.bt_more);
 
         parameters.put("ip", "21.22.11.33");
         headers.put("Accept", "application/json");
@@ -159,6 +156,13 @@ public class ExempleActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 performUpLoadFlie();
+            }
+        });
+
+        btn_more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ExempleActivity.this, RequstActivity.class));
             }
         });
     }
@@ -537,7 +541,7 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performDown() {
         String downUrl = "http://wifiapi02.51y5.net/wifiapi/rd.do?f=wk00003&b=gwanz02&rurl=http%3A%2F%2Fdl.lianwifi.com%2Fdownload%2Fandroid%2FWifiKey-3091-guanwang.apk";
-        novate.download(downUrl, new DownLoadCallBack() {
+        novate.download(downUrl, "test.mei",  new DownLoadCallBack() {
 
             @Override
             public void onStart(String s) {
@@ -548,13 +552,15 @@ public class ExempleActivity extends AppCompatActivity {
 
             @Override
             public void onError(Throwable e) {
-
+                Toast.makeText(ExempleActivity.this,  "onError:" + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onProgress(String key, int progress, long fileSizeDownloaded, long totalSize) {
                 super.onProgress(key, progress, fileSizeDownloaded, totalSize);
-                Toast.makeText(ExempleActivity.this, "download:" + fileSizeDownloaded, Toast.LENGTH_SHORT).show();
+                Log.v("test", fileSizeDownloaded+"");
+                Toast.makeText(ExempleActivity.this, "progress: " + progress + "   download: " + fileSizeDownloaded, Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
@@ -578,19 +584,20 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performDownMin() {
 
-        String downUrl = "http://img06.tooopen.com/images/20161022/tooopen_sy_182719487645.jpg";
+        String downUrl = "https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png";
         novate.downloadMin(downUrl, new DownLoadCallBack() {
 
             @Override
             public void onStart(String s) {
                 super.onStart(s);
+                Toast.makeText(ExempleActivity.this, s + " ； download is start", Toast.LENGTH_SHORT).show();
                 Toast.makeText(ExempleActivity.this, "download is start", Toast.LENGTH_SHORT).show();
                 btn_download.setText("DownLoadMin cancel");
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Toast.makeText(ExempleActivity.this,  "onError:" + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -599,9 +606,11 @@ public class ExempleActivity extends AppCompatActivity {
                 btn_download.setText("DownLoad start");
             }
 
+
             @Override
-            public void onProgress(String key, int presss, long fileSizeDownloaded, long totalSize) {
-                super.onProgress(key, presss, fileSizeDownloaded, totalSize);
+            public void onProgress(String key, int progress, long fileSizeDownloaded, long totalSize) {
+                super.onProgress(key, progress, fileSizeDownloaded, totalSize);
+                Toast.makeText(ExempleActivity.this, "progress: " + progress + "  download: " + fileSizeDownloaded, Toast.LENGTH_SHORT).show();
             }
 
             @Override
