@@ -4,11 +4,14 @@ import android.net.Uri;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.tamic.novate.Novate;
 import com.tamic.novate.download.UpLoadCallback;
 import com.tamic.novate.request.NovateRequestBody;
 
 import java.io.File;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -103,5 +106,14 @@ public class Utils {
     @NonNull
     public static NovateRequestBody createNovateRequestBody(RequestBody requestBody, UpLoadCallback callback) {
         return new NovateRequestBody(requestBody, callback);
+    }
+
+
+
+    public static <T> List<T> jsonToList(String json, Class<T> clazz) {
+        if (null == json) {
+            return null;
+        }
+        return new Gson().fromJson(json, new TypeToken<T>(){}.getType());
     }
 }

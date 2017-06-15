@@ -1,9 +1,13 @@
 package com.tamic.novate.util;
 
+import android.util.Log;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * copy http://qussay.com/2013/09/28/handling-java-generic-types-with-reflection
@@ -117,6 +121,10 @@ public class ReflectionUtil {
         }
 
         return ((ParameterizedType) superclassType).getActualTypeArguments();
+    }
+
+    public static Type[] getParameterizedTypeswithInterfaces(Object object) {
+        return object.getClass().getGenericInterfaces();
     }
 
     /**
@@ -234,5 +242,175 @@ public class ReflectionUtil {
             return null;
         }
         return Enum.valueOf((Class<Enum>) clazz, name);
+    }
+
+
+    /**
+     * get T classz
+     *
+     * @param types
+     * @return Type[]
+     */
+    public static List<Type> methodHandler(Type[] types) {
+        List<Type> needtypes = new ArrayList<>();
+        for (Type paramType : types) {
+            System.out.println("  " + paramType);
+            // if Type is T
+            if (paramType instanceof ParameterizedType) {
+                Type[] parentypes = ((ParameterizedType) paramType).getActualTypeArguments();
+                for (Type childtype : parentypes) {
+                    needtypes.add(childtype);
+                    if (childtype instanceof ParameterizedType) {
+                        Type[] childtypes = ((ParameterizedType) childtype).getActualTypeArguments();
+                        for (Type type : childtypes) {
+                            needtypes.add(type);
+                        }
+                    }
+                }
+            }
+        }
+        return needtypes;
+    }
+
+
+    /**
+     * Extracts the enum constant of the specified enum class with the
+     * specified name. The name must match exactly an identifier used
+     * to declare an enum constant in the given class.
+     *
+     * @param types the {@code Class} object of the enum type from which
+     *              to return a constant.
+     * @return the enum constant of the specified enum type with the
+     * specified name.
+     * @throws IllegalArgumentException if the specified enum type has
+     *                                  no constant with the specified name, or the specified
+     *                                  class object does not represent an enum type.
+     * @see {@link Enum#valueOf(Class, String)}
+     */
+    private static Type methodHandler2(Type[] types) {
+        List<Type> needtypes = new ArrayList<>();
+        Type needParentType = null;
+
+        for (Type paramType : types) {
+            System.out.println("  " + paramType);
+            // if Type is T
+            if (paramType instanceof ParameterizedType) {
+                Type[] parentypes = ((ParameterizedType) paramType).getActualTypeArguments();
+                for (Type childtype : parentypes) {
+                    needtypes.add(childtype);
+                    needParentType = childtype;
+                    if (childtype instanceof ParameterizedType) {
+                        Type[] childtypes = ((ParameterizedType) childtype).getActualTypeArguments();
+                        for (Type type : childtypes) {
+                            needParentType = type;
+                        }
+                    }
+                }
+            }
+        }
+        return needParentType;
+    }
+
+
+    /**
+     * @param clazz @param clazz the {@code Class} object whose declared methods to be
+     *              checked for the wanted method name.
+     * @return @return the enum constant of the specified enum type with the
+     * specified name.
+     */
+    public static Type getClassType(Class<?> clazz) {
+
+        return getClassType(((ParameterizedType) clazz.getGenericSuperclass()).getActualTypeArguments());
+    }
+
+
+    /**
+     *     /**
+     * Extracts the enum constant of the specified enum class with the
+     * specified name. The name must match exactly an identifier used
+     * to declare an enum constant in the given class.
+     *
+     * @param  types the {@code Class} object of the enum type from which
+     *              to return a constant.
+     * @return the enum constant of the specified enum type with the
+     * specified name.
+     * @throws IllegalArgumentException if the specified enum type has
+     *                                  no constant with the specified name, or the specified
+     *                                  class object does not represent an enum type.
+     * @see {@link Enum#valueOf(Class, String)}
+     */
+
+    /**
+     * @param clazz @param clazz the {@code Class} object whose declared methods to be
+     *              checked for the wanted method name.
+     * @return @return the enum constant of the specified enum type with the
+     * specified name.
+     */
+    public static List<Type> getClassTypes(Class<?> clazz) {
+
+        return getClassTypes(((ParameterizedType) clazz.getGenericSuperclass()).getActualTypeArguments());
+    }
+
+
+    public static List<Type> getClassTypes(Type[] types) {
+        List<Type> needtypes = new ArrayList<>();
+        for (Type paramType : types) {
+            System.out.println("  " + paramType);
+            // if Type is T
+            if (paramType instanceof ParameterizedType) {
+                Type[] parentypes = ((ParameterizedType) paramType).getActualTypeArguments();
+                for (Type childtype : parentypes) {
+                    needtypes.add(childtype);
+                    if (childtype instanceof ParameterizedType) {
+                        Type[] childtypes = ((ParameterizedType) childtype).getActualTypeArguments();
+                        for (Type type : childtypes) {
+                            needtypes.add(type);
+                        }
+                    }
+                }
+            }
+        }
+        return needtypes;
+    }
+
+
+    /**
+     * /**
+     * Extracts the enum constant of the specified enum class with the
+     * specified name. The name must match exactly an identifier used
+     * to declare an enum constant in the given class.
+     *
+     * @param types the {@code Class} object of the enum type from which
+     *              to return a constant.
+     * @return the enum constant of the specified enum type with the
+     * specified name.
+     * @throws IllegalArgumentException if the specified enum type has
+     *                                  no constant with the specified name, or the specified
+     *                                  class object does not represent an enum type.
+     * @see {@link Enum#valueOf(Class, String)}
+     */
+
+    public static Type getClassType(Type[] types) {
+        List<Type> needtypes = new ArrayList<>();
+        Type needParentType = null;
+
+        for (Type paramType : types) {
+            System.out.println("  " + paramType);
+            // if Type is T
+            if (paramType instanceof ParameterizedType) {
+                Type[] parentypes = ((ParameterizedType) paramType).getActualTypeArguments();
+                for (Type childtype : parentypes) {
+                    needtypes.add(childtype);
+                    needParentType = childtype;
+                    if (childtype instanceof ParameterizedType) {
+                        Type[] childtypes = ((ParameterizedType) childtype).getActualTypeArguments();
+                        for (Type type : childtypes) {
+                            needParentType = type;
+                        }
+                    }
+                }
+            }
+        }
+        return needParentType;
     }
 }

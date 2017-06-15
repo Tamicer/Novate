@@ -36,6 +36,9 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
         this.context = context;
     }
 
+    public BaseSubscriber() {
+    }
+
     @Override
     final public void onError(java.lang.Throwable e) {
 
@@ -52,6 +55,7 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
             Log.e("Novate", "e !instanceof Throwable");
             onError(new Throwable(e, NovateException.ERROR.UNKNOWN));
         }
+        onCompleted();
     }
 
     @Override

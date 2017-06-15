@@ -82,7 +82,7 @@ public class RxApiManager implements RxActionManager<Object> {
             return;
         }
         if (!maps.get(tag).isUnsubscribed()) {
-            maps.get(tag).isUnsubscribed();
+            maps.get(tag).unsubscribe();
             maps.remove(tag);
         }
     }

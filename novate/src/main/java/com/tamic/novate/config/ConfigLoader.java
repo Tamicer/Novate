@@ -47,7 +47,9 @@ public class ConfigLoader {
 
     public static boolean isFormat(Context context) {
         loadConfig(context);
-        return TextUtils.equals(config.getIsFormat(), "ture");
+        return TextUtils.equals(config.getIsFormat(), "true");
+
+
     }
 
     public static HashMap<String, String> getErrorConfig() {

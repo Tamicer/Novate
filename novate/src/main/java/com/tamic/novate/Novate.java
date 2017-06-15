@@ -23,6 +23,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.tamic.novate.callback.ResponseCallback;
 import com.tamic.novate.cookie.NovateCookieManager;
 import com.tamic.novate.config.ConfigLoader;
 import com.tamic.novate.cache.CookieCacheImpl;
@@ -31,12 +32,14 @@ import com.tamic.novate.download.DownSubscriber;
 import com.tamic.novate.cookie.SharedPrefsCookiePersistor;
 import com.tamic.novate.request.NovateRequest;
 import com.tamic.novate.util.FileUtil;
+import com.tamic.novate.util.ReflectionUtil;
 import com.tamic.novate.util.Utils;
 import com.tamic.novate.exception.*;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.Proxy;
 import java.util.ArrayList;
@@ -145,7 +148,7 @@ public final class Novate {
     /**
      * @param subscriber
      */
-    public <T> T call(Observable<T> observable, Subscriber<T> subscriber) {
+    public <T> T call(Observable<T> observable, BaseSubscriber<T> subscriber) {
         return (T) observable.compose(schedulersTransformer)
                 .compose(handleErrTransformer())
                 .subscribe(subscriber);
@@ -154,11 +157,11 @@ public final class Novate {
     /**
      * @param subscriber
      */
-    public <T> T execute(NovateRequest request, Subscriber<T> subscriber) {
+    public <T> T execute(NovateRequest request,  BaseSubscriber<T> subscriber) {
         return handleCall(request, subscriber);
     }
 
-    private <T> T handleCall(NovateRequest request, Subscriber<T> subscriber) {
+    private <T> T handleCall(NovateRequest request,  BaseSubscriber<T> subscriber) {
         //todo dev
      return null;
     }
@@ -171,50 +174,145 @@ public final class Novate {
      * you don't need to parse ResponseBody
      */
     public <T> T executeGet(final String url, final Map<String, Object> maps, final ResponseCallBack<T> callBack) {
-
-        final Type[] types = callBack.getClass().getGenericInterfaces();
-        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
-            return null;
-        }
-        final Type finalNeedType = MethodHandler(types).get(0);
-        Log.d(TAG, "-->:" + "Type:" + types[0]);
         return (T) apiManager.executeGet(url, maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
-                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+                .subscribe(new NovateSubscriber<T>(mContext, callBack));
+    }
+
+
+    /**
+     * Novate execute get request
+     * @param url path or url
+     * @param maps parameters  maps
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Subscription
+     */
+    public <T> T rxGet(final String url, final Map<String, Object> maps, ResponseCallback<T, ResponseBody> callBack) {
+        return rxGet(url, url, maps, callBack);
+    }
+
+
+    /**
+     * Novate execute get request
+     * @param tag request tag
+     * @param url path or url
+     * @param maps parameters  maps
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Subscription
+     */
+    public <T> T rxGet(String tag, final String url, final Map<String, Object> maps, ResponseCallback<T, ResponseBody> callBack) {
+        return (T) apiManager.executeGet(url, maps)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new RxSubscriber<T, ResponseBody>(tag, callBack));
     }
 
     /**
-     * MethodHandler
+     * Novate execute post request
+     * @param url path or url
+     * @param maps parameters  maps
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Subscription
      */
-    private List<Type> MethodHandler(Type[] types) {
-        Log.d(TAG, "types size: " + types.length);
-        List<Type> needtypes = new ArrayList<>();
-        Type needParentType = null;
-
-        for (Type paramType : types) {
-            System.out.println("  " + paramType);
-            // if Type is T
-            if (paramType instanceof ParameterizedType) {
-                Type[] parentypes = ((ParameterizedType) paramType).getActualTypeArguments();
-                Log.d(TAG, "TypeArgument: ");
-                for (Type childtype : parentypes) {
-                    Log.d(TAG, "childtype:" + childtype);
-                    needtypes.add(childtype);
-                    //needParentType = childtype;
-                    if (childtype instanceof ParameterizedType) {
-                        Type[] childtypes = ((ParameterizedType) childtype).getActualTypeArguments();
-                        for (Type type : childtypes) {
-                            needtypes.add(type);
-                            //needChildType = type;
-                            Log.d(TAG, "type:" + childtype);
-                        }
-                    }
-                }
-            }
-        }
-        return needtypes;
+    public <T> T rxPost(final String url, @FieldMap(encoded = true) Map<String, Object> maps, ResponseCallback<T, ResponseBody> callBack) {
+        return rxPost(url, url, maps, callBack);
     }
+
+    /**
+     * Novate execute Post request
+     * @param tag request tag
+     * @param url path or url
+     * @param maps parameters  maps
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Subscription
+     */
+    public <T> T rxPost(String tag, final String url, @FieldMap(encoded = true) Map<String, Object> maps, ResponseCallback<T, ResponseBody> callBack) {
+        return (T) apiManager.executePost(url, maps)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new RxSubscriber<T, ResponseBody>(tag, callBack));
+    }
+
+
+    /**
+     * Novate execute Put request
+     * @param url path or url
+     * @param maps parameters  maps
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Subscription
+     */
+    public <T> T rxPut(final String url, final @FieldMap(encoded = true) Map<String, T>  maps, ResponseCallback<T, ResponseBody> callBack) {
+        return rxPut(url, url, maps, callBack);
+    }
+
+
+    /**
+     * Novate execute Put request
+     * @param tag request tag
+     * @param url path or url
+     * @param maps parameters  maps
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Subscription
+     */
+    public <T> T rxPut(String tag, final String url, final @FieldMap(encoded = true) Map<String, T>  maps, ResponseCallback<T, ResponseBody> callBack) {
+        return (T) apiManager.executePut(url, (Map<String, Object>) maps)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new RxSubscriber<T, ResponseBody>(tag, callBack));
+    }
+
+    /**
+     * Novate execute Delete request
+     * @param url path or url
+     * @param maps parameters  maps
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Subscription
+     */
+    public <T> T rxDelete(final String url, final Map<String, T> maps, ResponseCallback<T, ResponseBody> callBack) {
+        return rxDelete(url, url, maps, callBack);
+    }
+
+
+    /**
+     * Novate execute Delete request
+     * @param tag request tag
+     * @param url path or url
+     * @param maps parameters  maps
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Subscription
+     */
+    public <T> T rxDelete(String tag, final String url, final Map<String, T> maps, ResponseCallback<T, ResponseBody> callBack) {
+        return (T) apiManager.executeDelete(url, (Map<String, Object>) maps)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new RxSubscriber<T, ResponseBody>(tag, callBack));
+    }
+
+
+    /**
+     * Novate execute get
+     * <p>
+     * return parsed data
+     * <p>
+     * you don't need to parse ResponseBody
+     */
+    public <T> T executeGet(Class<T> entityClass, final String url, final Map<String, Object> maps, final ResponseCallBack<T> callBack) {
+        return (T) apiManager.executeGet(url, maps)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new NovateSubscriber<T>(mContext,callBack));
+    }
+
+
 
     final Observable.Transformer schedulersTransformer = new Observable.Transformer() {
         @Override
@@ -320,7 +418,7 @@ public final class Novate {
      *
      * }</pre>
      */
-    public <T> T post(String url, @FieldMap(encoded = true) Map<String, Object> parameters, Subscriber<ResponseBody> subscriber) {
+    public <T> T post(String url, @FieldMap(encoded = true) Map<String, Object> parameters, BaseSubscriber<ResponseBody> subscriber) {
         return (T) apiManager.executePost(url, (Map<String, Object>) parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
@@ -334,17 +432,11 @@ public final class Novate {
      * you don't need to   parse ResponseBody
      */
     public <T> T executePost(final String url, @FieldMap(encoded = true) Map<String, Object> parameters, final ResponseCallBack<T> callBack) {
-        final Type[] types = callBack.getClass().getGenericInterfaces();
-        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
-            return null;
-        }
-        final Type finalNeedType = MethodHandler(types).get(0);
-        Log.d(TAG, "-->:" + "Type:" + types[0]);
 
         return (T) apiManager.executePost(url, parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
-                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+                .subscribe(new NovateSubscriber<T>(mContext, callBack));
     }
 
 
@@ -369,17 +461,10 @@ public final class Novate {
      * you don't need to   parse ResponseBody
      */
     public <T> T executeForm(final String url, final @FieldMap(encoded = true) Map<String, Object> fields, final ResponseCallBack<T> callBack) {
-        final Type[] types = callBack.getClass().getGenericInterfaces();
-        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
-            return null;
-        }
-        final Type finalNeedType = MethodHandler(types).get(0);
-        Log.d(TAG, "-->:" + "Type:" + types[0]);
-
         return (T) apiManager.postForm(url, fields)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
-                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+                .subscribe(new NovateSubscriber<T>(mContext, callBack));
     }
 
 
@@ -405,16 +490,10 @@ public final class Novate {
      */
     public <T> T executeBody(final String url, final Object body, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
-        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
-            return null;
-        }
-        final Type finalNeedType = MethodHandler(types).get(0);
-        Log.d(TAG, "-->:" + "Type:" + types[0]);
-
-        return (T) apiManager.executePostBody(url, body)
+            return (T) apiManager.executePostBody(url, body)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
-                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+                .subscribe(new NovateSubscriber<T>(mContext, callBack));
     }
 
 
@@ -442,16 +521,10 @@ public final class Novate {
      * you don't need to   parse ResponseBody
      */
     public <T> T executeJson(final String url, final String jsonStr, final ResponseCallBack<T> callBack) {
-        final Type[] types = callBack.getClass().getGenericInterfaces();
-        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
-            return null;
-        }
-        final Type finalNeedType = MethodHandler(types).get(0);
-        Log.d(TAG, "-->:" + "Type:" + types[0]);
-        return (T) apiManager.postRequestBody(url, Utils.createJson(jsonStr))
+            return (T) apiManager.postRequestBody(url, Utils.createJson(jsonStr))
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
-                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+                .subscribe(new NovateSubscriber<T>(mContext, callBack));
     }
 
     /**
@@ -478,15 +551,11 @@ public final class Novate {
      */
     public <T> T executeDelete(final String url, final Map<String, T> maps, final ResponseCallBack<T> callBack) {
         final Type[] types = callBack.getClass().getGenericInterfaces();
-        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
-            return null;
-        }
-        final Type finalNeedType = MethodHandler(types).get(0);
-        Log.d(TAG, "-->:" + "Type:" + types[0]);
+
         return (T) apiManager.executeDelete(url, (Map<String, Object>) maps)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
-                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+                .subscribe(new NovateSubscriber<T>(mContext, callBack));
     }
 
     /**
@@ -512,17 +581,11 @@ public final class Novate {
      * you don't need to parse ResponseBody
      */
     public <T> T executePut(final String url, final @FieldMap(encoded = true) Map<String, T> parameters, final ResponseCallBack<T> callBack) {
-        final Type[] types = callBack.getClass().getGenericInterfaces();
 
-        if (MethodHandler(types) == null || MethodHandler(types).size() == 0) {
-            return null;
-        }
-        final Type finalNeedType = MethodHandler(types).get(0);
-        Log.d(TAG, "-->:" + "Type:" + types[0]);
         return (T) apiManager.executePut(url, (Map<String, Object>) parameters)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())
-                .subscribe(new NovateSubscriber<T>(mContext, finalNeedType, callBack));
+                .subscribe(new NovateSubscriber<T>(mContext, callBack));
     }
 
 
@@ -710,9 +773,9 @@ public final class Novate {
         executeDownload(key, savePath, name, callBack);
     }
 
+
     /**
-     * @param url
-     * @param url
+     * @param key
      * @param url
      * @param savePath
      * @param name
@@ -730,7 +793,7 @@ public final class Novate {
 
     /**
      * executeDownload
-     *
+     * @param key
      * @param savePath
      * @param name
      * @param callBack
@@ -1241,6 +1304,7 @@ public final class Novate {
     }
 
 
+
     /**
      * NovateSubscriber
      *
@@ -1252,16 +1316,20 @@ public final class Novate {
 
         private Type finalNeedType;
 
-        public NovateSubscriber(Context context, Type finalNeedType, ResponseCallBack<T> callBack) {
-            super(context);
+        public NovateSubscriber(Context context, ResponseCallBack callBack) {
             this.callBack = callBack;
-
-            this.finalNeedType = finalNeedType;
         }
 
         @Override
         public void onStart() {
             super.onStart();
+
+            Type[] types = ReflectionUtil.getParameterizedTypeswithInterfaces(callBack);
+            if (ReflectionUtil.methodHandler(types) == null || ReflectionUtil.methodHandler(types).size() == 0) {
+                Log.e(TAG, "callBack<T> 中T不合法: -->" + finalNeedType);
+                throw new NullPointerException("callBack<T> 中T不合法");
+            }
+            finalNeedType = ReflectionUtil.methodHandler(types).get(0);
             // todo some common as show loadding  and check netWork is NetworkAvailable
             if (callBack != null) {
                 callBack.onStart();
@@ -1289,32 +1357,82 @@ public final class Novate {
             try {
                 byte[] bytes = responseBody.bytes();
                 String jsStr = new String(bytes);
-
-                Log.d("Novate", "ResponseBody:" + jsStr);
+                Log.d("Novate", "ResponseBody:" + jsStr.trim());
+                if (!ConfigLoader.isFormat(mContext)) {
+                    callBack.onsuccess(0, "", null, jsStr);
+                    return;
+                }
                 if (callBack != null) {
+
                     try {
+
                         /**
                          * if need parse baseRespone<T> use ParentType, if parse T use childType . defult parse baseRespone<T>
                          *
                          *  callBack.onSuccee((T) JSON.parseArray(jsStr, (Class<Object>) finalNeedType));
                          *  Type finalNeedType = needChildType;
                          */
+                        int code = 1;
+                        String msg = "";
+                        String dataStr ="";
+                        T dataResponse= null;
+                        try {
+                            JSONObject jsonObject = new JSONObject(jsStr.trim());
+                            code = jsonObject.optInt("code");
+                            msg = jsonObject.optString("msg");
+                            dataStr = jsonObject.opt("data").toString();
 
-                        NovateResponse<T> baseResponse = null;
+                            if (dataStr.charAt(0) == '{') {
+                                dataStr = jsonObject.optJSONObject("data").toString();
+                                if (dataStr.isEmpty())  {
+                                    dataStr = jsonObject.optJSONObject("result").toString();
+                                }
+                                dataResponse = (T) new Gson().fromJson(dataStr, ReflectionUtil.newInstance(finalNeedType).getClass());
+                                if (ConfigLoader.isFormat(mContext) && dataResponse == null) {
+                                    Log.e(TAG, "dataResponse 无法解析为:" + finalNeedType);
+                                    throw new FormatException();
+                                }
 
-                        if (new Gson().fromJson(jsStr, finalNeedType) == null) {
-                            throw new NullPointerException();
+                            } else if (dataStr.charAt(0) == '[') {
+                                Log.e(TAG, "data为数对象无法转换: --- " + finalNeedType);
+                                //dataStr = jsonObject.optJSONArray("data").toString();
+                                //dataResponse = (T) new Gson().fromJson(dataStr, finalNeedType);
+                                //dataResponse = (T) new Gson().fromJson(dataStr,  ReflectionUtil.newInstance(finalNeedType).getClass());
+                                throw new ClassCastException();
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e(TAG, e.getLocalizedMessage());
+                            if (callBack != null) {
+                                callBack.onError(NovateException.handleException(e));
+                            }
                         }
-                        baseResponse = new Gson().fromJson(jsStr, finalNeedType);
-                        if (ConfigLoader.isFormat(mContext) && baseResponse.getData() == null & baseResponse.getResult() == null) {
+
+                        NovateResponse<T> baseResponse = new NovateResponse<>();
+                        baseResponse.setCode(code);
+                        baseResponse.setMessage(msg);
+
+                        if(dataResponse != null) {
+                            baseResponse.setData(dataResponse);
+                        }
+
+                        if (!baseResponse.isOk(context) && dataResponse == null) {
+                            throw new NullPointerException("Response data解析失败！");
+                        }
+
+                        if (ConfigLoader.isFormat(mContext) && dataResponse == null) {
+                            Log.e(TAG, "dataResponse 无法解析为:" + finalNeedType);
                             throw new FormatException();
                         }
+                        baseResponse.setData(dataResponse);
 
                         if (baseResponse.isOk(mContext)) {
-                            callBack.onSuccee((T) new Gson().fromJson(jsStr, finalNeedType));
+                            callBack.onsuccess(code, msg, dataResponse, jsStr);
+                            callBack.onSuccee(baseResponse);
+
                         } else {
-                            String msg =
-                                    baseResponse.getMsg() != null ? baseResponse.getMsg() : baseResponse.getError() != null ? baseResponse.getError() : baseResponse.getMessage() != null ? baseResponse.getMessage() : "api未知异常";
+                            msg = baseResponse.getMsg() != null ? baseResponse.getMsg() : baseResponse.getError() != null ? baseResponse.getError() : baseResponse.getMessage() != null ? baseResponse.getMessage() : "api未知异常";
 
                             ServerException serverException = new ServerException(baseResponse.getCode(), msg);
                             callBack.onError(NovateException.handleException(serverException));
@@ -1322,8 +1440,9 @@ public final class Novate {
 
                     } catch (Exception e) {
                         e.printStackTrace();
+                        Log.e(TAG, e.getLocalizedMessage().toString());
                         if (callBack != null) {
-                            callBack.onError(NovateException.handleException(new FormatException()));
+                            callBack.onError(NovateException.handleException(new NullPointerException("Response 解析失败！")));
                         }
                     }
                 }
@@ -1337,9 +1456,11 @@ public final class Novate {
         }
     }
 
-    /**
+   /**
      * ResponseCallBack <T> Support your custom data model
+    * 兼容1.3.3.2以下版本 更高以上版本已过时
      */
+   @Deprecated
     public interface ResponseCallBack<T> {
 
         public void onStart();
@@ -1348,7 +1469,10 @@ public final class Novate {
 
         public abstract void onError(Throwable e);
 
-        public abstract void onSuccee(T response);
+        @Deprecated
+        public abstract void onSuccee(NovateResponse<T> response);
+
+        public void onsuccess(int code, String msg, T response, String originalResponse);
 
     }
 }
