@@ -5,6 +5,9 @@ package com.tamic.novate.callback;
 
 import android.util.Log;
 
+import java.io.File;
+
+import okhttp3.Call;
 import okhttp3.ResponseBody;
 
 /**
@@ -21,4 +24,11 @@ public abstract class RxStringCallback extends ResponseCallback<String, Response
         Log.d("Novate", responseString);
         return responseString;
     }
+
+    @Override
+    public void onNext(Object tag, Call call, String response) {
+      onNext(tag, response);
+    }
+
+    public abstract void onNext(Object tag, String response);
 }

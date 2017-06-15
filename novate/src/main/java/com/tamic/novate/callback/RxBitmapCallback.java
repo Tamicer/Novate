@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 
+import okhttp3.Call;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -32,14 +33,21 @@ import okhttp3.ResponseBody;
  * Created by Tamic on 2017-05-02.
  * ink :https://github.com/Tamicer/Novate
  */
-public abstract class RxBitmapCallback extends ResponseCallback<Bitmap, InputStream> {
+public abstract class RxBitmapCallback extends ResponseCallback<Bitmap, ResponseBody> {
     @Override
     public Bitmap onHandleResponse(ResponseBody response) throws IOException {
-        return transform(response.byteStream(), Bitmap.class);
+        return transform(response, Bitmap.class);
     }
 
     @Override
-    public Bitmap transform(InputStream response, Class classOfT) {
-        return BitmapFactory.decodeStream(response);
+    public Bitmap transform(ResponseBody response, Class classOfT) {
+        return BitmapFactory.decodeStream(response.byteStream());
     }
+
+    @Override
+    public void onNext(Object tag, Call call, Bitmap response) {
+        onNext(tag, response);
+    }
+
+    public abstract void onNext(Object tag, Bitmap response);
 }
