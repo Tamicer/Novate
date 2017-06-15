@@ -38,9 +38,10 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
 
     @Override
     final public void onError(java.lang.Throwable e) {
-
+        String
         if (e != null && e.getMessage() != null){
             Log.v("Novate", e.getMessage());
+
         } else {
             Log.v("Novate", "Throwable  || Message == Null");
         }
@@ -50,7 +51,7 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
             onError((Throwable)e);
         } else {
             Log.e("Novate", "e !instanceof Throwable");
-            onError(new Throwable(e, NovateException.ERROR.UNKNOWN));
+            onError(NovateException.handleException(e));
         }
     }
 

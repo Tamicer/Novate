@@ -24,6 +24,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.tamic.novate.Throwable;
+import com.tamic.novate.exception.FormatException;
+import com.tamic.novate.exception.NovateException;
 import com.tamic.novate.util.FileUtil;
 import com.tamic.novate.util.Utils;
 
@@ -218,13 +220,14 @@ public class NovateDownLoadManager {
         if (callBack == null) {
             return;
         }
+
         if (Utils.checkMain()) {
-            callBack.onError(new Throwable(e, 100));
+            callBack.onError(NovateException.handleException(e));
         } else {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    callBack.onError(new Throwable(e, 100));
+                    callBack.onError(NovateException.handleException(e));
                 }
             });
         }
