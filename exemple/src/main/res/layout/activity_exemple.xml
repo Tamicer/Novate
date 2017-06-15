@@ -72,6 +72,11 @@
         android:layout_height="wrap_content"
         android:text="Execute you Api"
         />
-
+    <Button
+        android:id="@+id/bt_more"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="more"
+        />
 
 </LinearLayout>

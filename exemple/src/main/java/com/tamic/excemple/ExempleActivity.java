@@ -1,5 +1,6 @@
 package com.tamic.excemple;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,7 +51,7 @@ public class ExempleActivity extends AppCompatActivity {
     private Map<String, String> headers = new HashMap<>();
 
     private Button btn, btn_test, btn_get, btn_post, btn_download,
-            btn_download_Min, btn_upload, btn_uploadfile, btn_myApi;
+            btn_download_Min, btn_upload, btn_uploadfile, btn_myApi, btn_more;
 
 
 
@@ -68,6 +69,7 @@ public class ExempleActivity extends AppCompatActivity {
         btn_download_Min = (Button) findViewById(R.id.bt_download_min);
         btn_uploadfile = (Button) findViewById(R.id.bt_uploadflie);
         btn_myApi = (Button) findViewById(R.id.bt_my_api);
+        btn_more = (Button) findViewById(R.id.bt_more);
 
         parameters.put("ip", "21.22.11.33");
         headers.put("Accept", "application/json");
@@ -178,6 +180,13 @@ public class ExempleActivity extends AppCompatActivity {
                 performUpLoadFlie();
             }
         });
+
+        btn_more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ExempleActivity.this, RequstActivity.class));
+            }
+        });
     }
 
 
@@ -283,7 +292,7 @@ public class ExempleActivity extends AppCompatActivity {
          * 如果不需要数据解析后返回 则调用novate.Get()
          * 参考 performPost()中的方式
          */
-        novate.executeGet("service/getIpInfo.php", parameters, new Novate.ResponseCallBack<NovateResponse<ResultModel>>() {
+        novate.executeGet("service/getIpInfo.php", parameters, new Novate.ResponseCallBack<ResultModel>() {
             @Override
             public void onStart() {
 
@@ -305,6 +314,14 @@ public class ExempleActivity extends AppCompatActivity {
             public void onSuccee(NovateResponse<ResultModel> response) {
                 Toast.makeText(ExempleActivity.this, response.getData().toString(), Toast.LENGTH_SHORT).show();
             }
+
+
+            @Override
+            public void onsuccess(int code, String msg, ResultModel response, String originalResponse) {
+
+            }
+
+
 
 
         });
@@ -553,8 +570,8 @@ public class ExempleActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onProgress(String key, long fileSizeDownloaded, long totalSize) {
-                super.onProgress(key, fileSizeDownloaded, totalSize);
+            public void onProgress(String key, int progress, long fileSizeDownloaded, long totalSize) {
+                super.onProgress(key, progress, fileSizeDownloaded, totalSize);
             }
         });
     }
@@ -592,10 +609,7 @@ public class ExempleActivity extends AppCompatActivity {
                 btn_download.setText("DownLoadMin start");
             }
 
-            @Override
-            public void onProgress(String key, long fileSizeDownloaded, long totalSize) {
-                super.onProgress(key, fileSizeDownloaded, totalSize);
-            }
+
         });
     }
 
