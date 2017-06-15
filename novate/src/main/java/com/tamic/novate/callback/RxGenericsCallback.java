@@ -18,6 +18,7 @@
 package com.tamic.novate.callback;
 
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -86,19 +87,29 @@ public abstract class RxGenericsCallback<T, E> extends ResponseCallback<T, E> {
             jsonObject = new JSONObject(response);
             code = jsonObject.optInt("code");
             msg = jsonObject.optString("msg");
+            if (TextUtils.isEmpty(msg)) {
+                msg = jsonObject.optString("error");
+            }
+
+            if(TextUtils.isEmpty(msg)) {
+                msg = jsonObject.optString("message");
+            }
+
             dataStr = jsonObject.opt("data").toString();
+            if (TextUtils.isEmpty(dataStr)) {
+                dataStr = jsonObject.optJSONObject("result").toString();
+            }
+
             if (dataStr.charAt(0) == '{') {
-                dataStr = jsonObject.optJSONObject("data").toString();
-                if (dataStr.isEmpty()) {
-                    dataStr = jsonObject.optJSONObject("result").toString();
-                }
                 dataResponse = (T) new Gson().fromJson(dataStr, classOfT);
             } else if (dataStr.charAt(0) == '[') {
                 dataStr = jsonObject.optJSONArray("data").toString();
+                if (TextUtils.isEmpty(dataStr)) {
+                    dataStr = jsonObject.optJSONObject("result").toString();
+                }
                  Type collectionType = new TypeToken<List<T>>() {
                 }.getType();
                 dataResponse = (T) new Gson().fromJson(dataStr,collectionType);
-                //dataResponse = (T) new Gson().fromJson(dataStr,  ReflectionUtil.newInstance(finalNeedType).getClass());
             }
         } catch (Exception e) {
             e.printStackTrace();

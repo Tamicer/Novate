@@ -17,6 +17,7 @@
  */
 package com.tamic.novate.callback;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -54,94 +55,6 @@ public abstract class RxListCallback<T> extends RxGenericsCallback<T, ResponseBo
         this.collectionType =  type;
     }
 
-    private String jsStr1 = "{\n" +
-            "    \"data\": [\n" +
-            "            {\n" +
-            "                \"id\": 15,\n" +
-            "                \"createDate\": 1496286231000,\n" +
-            "                \"modifyDate\": 1496291243000,\n" +
-            "                \"order\": 1,\n" +
-            "                \"name\": \"推荐1\",\n" +
-            "                \"treePath\": \",13,\",\n" +
-            "                \"grade\": 1\n" +
-            "            },\n" +
-            "            {\n" +
-            "                \"id\": 18,\n" +
-            "                \"createDate\": 1496291263000,\n" +
-            "                \"modifyDate\": 1496291263000,\n" +
-            "                \"order\": 2,\n" +
-            "                \"name\": \"新手2\",\n" +
-            "                \"treePath\": \",13,\",\n" +
-            "                \"grade\": 1\n" +
-            "            },\n" +
-            "            {\n" +
-            "                \"id\": 19,\n" +
-            "                \"createDate\": 1496291284000,\n" +
-            "                \"modifyDate\": 1496291284000,\n" +
-            "                \"order\": 3,\n" +
-            "                \"name\": \"联系3\",\n" +
-            "                \"treePath\": \",13,\",\n" +
-            "                \"grade\": 1\n" +
-            "            },\n" +
-            "            {\n" +
-            "                \"id\": 20,\n" +
-            "                \"createDate\": 1496291300000,\n" +
-            "                \"modifyDate\": 1496291300000,\n" +
-            "                \"order\": 4,\n" +
-            "                \"name\": \"热门4\",\n" +
-            "                \"treePath\": \",13,\",\n" +
-            "                \"grade\": 1\n" +
-            "            }\n" +
-            "        ],\n" +
-            "    \"code\": 100,\n" +
-            "    \"message\": \"success\"\n" +
-            "}";
-
-    private String jsStr2 = "{\n" +
-            "    \"data\": {\n" +
-            "        \"musicBookCategoryList\": [\n" +
-            "            {\n" +
-            "                \"id\": 15,\n" +
-            "                \"createDate\": 1496286231000,\n" +
-            "                \"modifyDate\": 1496291243000,\n" +
-            "                \"order\": 1,\n" +
-            "                \"name\": \"推荐1\",\n" +
-            "                \"treePath\": \",13,\",\n" +
-            "                \"grade\": 1\n" +
-            "            },\n" +
-            "            {\n" +
-            "                \"id\": 18,\n" +
-            "                \"createDate\": 1496291263000,\n" +
-            "                \"modifyDate\": 1496291263000,\n" +
-            "                \"order\": 2,\n" +
-            "                \"name\": \"新手2\",\n" +
-            "                \"treePath\": \",13,\",\n" +
-            "                \"grade\": 1\n" +
-            "            },\n" +
-            "            {\n" +
-            "                \"id\": 19,\n" +
-            "                \"createDate\": 1496291284000,\n" +
-            "                \"modifyDate\": 1496291284000,\n" +
-            "                \"order\": 3,\n" +
-            "                \"name\": \"联系3\",\n" +
-            "                \"treePath\": \",13,\",\n" +
-            "                \"grade\": 1\n" +
-            "            },\n" +
-            "            {\n" +
-            "                \"id\": 20,\n" +
-            "                \"createDate\": 1496291300000,\n" +
-            "                \"modifyDate\": 1496291300000,\n" +
-            "                \"order\": 4,\n" +
-            "                \"name\": \"热门4\",\n" +
-            "                \"treePath\": \",13,\",\n" +
-            "                \"grade\": 1\n" +
-            "            }\n" +
-            "        ]\n" +
-            "    },\n" +
-            "    \"code\": 100,\n" +
-            "    \"message\": \"success\"\n" +
-            "}";
-
     @Override
     public T onHandleResponse(ResponseBody response) throws Exception {
         if (collectionType == null) {
@@ -149,7 +62,7 @@ public abstract class RxListCallback<T> extends RxGenericsCallback<T, ResponseBo
         }
         String jstring = new String(response.bytes());
         Log.d("Novate", jstring);
-        return transform(jsStr1, null);
+        return transform(jstring, null);
     }
 
 
@@ -160,15 +73,14 @@ public abstract class RxListCallback<T> extends RxGenericsCallback<T, ResponseBo
             jsonObject = new JSONObject(response);
             code = jsonObject.optInt("code");
             msg = jsonObject.optString("msg");
-            /*if (dataStr.charAt(0) == '{') {
-                dataStr = jsonObject.optJSONObject("data").toString();
-                if (dataStr.isEmpty()) {
-                    dataStr = jsonObject.optJSONObject("result").toString();
-                }
-                dataResponse = (T) new Gson().fromJson(dataStr, classOfT);
-            } else if (dataStr.charAt(0) == '[') {
+            if (TextUtils.isEmpty(msg)) {
+                msg = jsonObject.optString("error");
+            }
 
-            }*/
+            if(TextUtils.isEmpty(msg)) {
+                msg = jsonObject.optString("message");
+            }
+
             dataStr = jsonObject.optJSONArray("data").toString();
             if (dataStr.isEmpty()) {
                 dataStr = jsonObject.optJSONArray("result").toString();

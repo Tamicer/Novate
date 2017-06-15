@@ -74,8 +74,20 @@ public class NovateDownLoadManager {
     }
 
     public boolean writeResponseBodyToDisk(final String key, String path, String name, Context context, ResponseBody body) {
-        String type = body.contentType().toString();
 
+        if (body == null) {
+            Log.e(TAG,  key + " : ResponseBody is null");
+            finalonError(new NullPointerException("the "+ key + " ResponseBody is null"));
+            return false;
+        }
+        Log.v(TAG,  "Key:-->" + key);
+
+        String type ="";
+        if (body.contentType() != null) {
+            type = body.contentType().toString();
+        } else {
+            Log.d(TAG, "MediaType-->,无法获取");
+        }
 
         if (!TextUtils.isEmpty(type)) {
             Log.d(TAG, "contentType:>>>>" + body.contentType().toString());

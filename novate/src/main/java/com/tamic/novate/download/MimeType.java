@@ -82,8 +82,10 @@ public class MimeType {
     public static final String CAB = "cab";
     /** 7z */
     public static final String Z7 = "7z";
-    /** 7z */
+    /** json */
     public static final String JSON = "json";
+    /** xml */
+    public static final String XML = "xml";
 
 
     private static MimeType sInstance;
@@ -98,6 +100,7 @@ public class MimeType {
 
         mMimeTypeList.add(TXT);
         mMimeTypeList.add(HTML);
+        mMimeTypeList.add(XML);
         mMimeTypeList.add(APK);
 
         mMimeTypeList.add(GIF);
