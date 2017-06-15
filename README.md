@@ -43,13 +43,29 @@
          dependencies {
              compile 'com.tamic.novate:novate:1.3.3'
          }
-  
+         
+         
+        
 Snapshots of the development version are available in Sonatype's snapshots repository.
 
 Retrofit requires at minimum Java 7 or Android 2.3.
 
 Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本点击去查询
 
+**加入权限**
+```
+<uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+    ```
+    
+ **混淆**   
+ 
+     -keep class com.tamic.novate.** {*;}
 
 --------------------------
 
