@@ -38,7 +38,6 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
 
     @Override
     final public void onError(java.lang.Throwable e) {
-        String
         if (e != null && e.getMessage() != null){
             Log.v("Novate", e.getMessage());
 
