@@ -53,6 +53,8 @@ Retrofit requires at minimum Java 7 or Android 2.3.
 Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本点击去查询
 
 **加入权限**
+
+
 ```
 <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -61,9 +63,9 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
-    ```
+```
     
- **混淆**   
+**混淆**   
  
      -keep class com.tamic.novate.** {*;}
 
