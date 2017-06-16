@@ -50,9 +50,11 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
 
         if(e instanceof Throwable){
             Log.e("Novate", "--> e instanceof Throwable");
-            onError((Throwable)e);
+            Log.e("Novate", "--> " + e.getCause().toString());
+            onError(NovateException.handleException(e));
         } else {
             Log.e("Novate", "e !instanceof Throwable");
+            Log.e("Novate", "--> " + e.getCause().toString());
             onError(NovateException.handleException(e));
         }
         onCompleted();
