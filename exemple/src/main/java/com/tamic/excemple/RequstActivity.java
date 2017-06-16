@@ -212,7 +212,7 @@ public class RequstActivity extends AppCompatActivity {
 
             @Override
             public void onNext(Object tag, File file) {
-
+                Toast.makeText(RequstActivity.this, " file is downloaded",  Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -268,7 +268,7 @@ public class RequstActivity extends AppCompatActivity {
 
             @Override
             public void onNext(Object tag, int code, String message, ResultModel response) {
-
+                Toast.makeText(RequstActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
             }
         });
     }
