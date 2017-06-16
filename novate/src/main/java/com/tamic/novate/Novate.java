@@ -33,6 +33,7 @@ import com.tamic.novate.cookie.SharedPrefsCookiePersistor;
 import com.tamic.novate.exception.NovateException;
 import com.tamic.novate.request.NovateRequest;
 import com.tamic.novate.util.FileUtil;
+import com.tamic.novate.util.LogWraper;
 import com.tamic.novate.util.Utils;
 
 import java.io.File;
@@ -1332,6 +1333,8 @@ public final class Novate {
                 callAdapterFactory = RxJavaCallAdapterFactory.create();
             }
             retrofitBuilder.addCallAdapterFactory(callAdapterFactory);
+
+            LogWraper.setDebug(isLog && !BuildConfig.DEBUG);
 
             if (isLog) {
                 okhttpBuilder.addNetworkInterceptor(
