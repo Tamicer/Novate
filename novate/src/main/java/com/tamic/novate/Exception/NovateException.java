@@ -26,6 +26,7 @@ import org.apache.http.conn.ConnectTimeoutException;
 import org.json.JSONException;
 import com.tamic.novate.Throwable;
 import com.tamic.novate.config.ConfigLoader;
+import com.tamic.novate.util.LogWraper;
 
 import java.net.ConnectException;
 import java.net.UnknownHostException;
@@ -53,9 +54,9 @@ public class NovateException {
 
     public static Throwable handleException(java.lang.Throwable e) {
 
-        Log.e("Novate", e.getMessage());
+        LogWraper.e("Novate", e.getMessage());
+        LogWraper.e("Novate", e.getCause().toString());
         Throwable ex;
-
         if (!(e instanceof ServerException) && e instanceof HttpException) {
             HttpException httpException = (HttpException) e;
             ex = new Throwable(e, ERROR.HTTP_ERROR);
@@ -122,13 +123,13 @@ public class NovateException {
             ex.setMessage("证书验证失败");
             return ex;
         } else if (e instanceof java.security.cert.CertPathValidatorException) {
-            Log.e("Novate", e.getMessage());
+            LogWraper.e("Novate", e.getMessage());
             ex = new Throwable(e, ERROR.SSL_NOT_FOUND);
             ex.setMessage("证书路径没找到");
 
             return ex;
         } else if (e instanceof SSLPeerUnverifiedException) {
-            Log.e("Novate", e.getMessage());
+            LogWraper.e("Novate", e.getMessage());
             ex = new Throwable(e, ERROR.SSL_NOT_FOUND);
             ex.setMessage("无有效的SSL证书");
             return ex;
@@ -155,12 +156,12 @@ public class NovateException {
             ex.setMessage(resultException.message);
             return ex;
         } else if (e instanceof UnknownHostException){
-            Log.e("Novate", e.getMessage());
+            LogWraper.e("Novate", e.getMessage());
             ex = new Throwable(e, NOT_FOUND);
             ex.setMessage("服务器地址未找到,请检查网络或Url");
             return ex;
         } else {
-            Log.e("Novate", e.getMessage());
+            LogWraper.e("Novate", e.getMessage());
             ex = new Throwable(e, ERROR.UNKNOWN);
             ex.setMessage(e.getMessage());
             return ex;

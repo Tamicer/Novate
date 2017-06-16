@@ -24,6 +24,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tamic.novate.NovateResponse;
+import com.tamic.novate.util.LogWraper;
 import com.tamic.novate.util.Utils;
 import org.json.JSONObject;
 
@@ -54,7 +55,7 @@ public abstract class RxGenericsCallback<T, E> extends ResponseCallback<T, E> {
             return (T)new String(response.bytes());
         }
         String jstring = new String(response.bytes());
-        Log.d("Novate", jstring);
+        LogWraper.d("Novate", jstring);
         return transform(jstring, entityClass);
     }
 
@@ -82,7 +83,7 @@ public abstract class RxGenericsCallback<T, E> extends ResponseCallback<T, E> {
         }
 
         JSONObject jsonObject = null;
-        Log.e(TAG, response);
+        LogWraper.e(TAG, response);
         try {
             jsonObject = new JSONObject(response);
             code = jsonObject.optInt("code");

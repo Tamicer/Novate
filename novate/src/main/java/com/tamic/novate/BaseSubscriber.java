@@ -21,6 +21,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.tamic.novate.exception.NovateException;
+import com.tamic.novate.util.LogWraper;
 
 import rx.Subscriber;
 
@@ -42,19 +43,19 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
     @Override
     final public void onError(java.lang.Throwable e) {
         if (e != null && e.getMessage() != null){
-            Log.v("Novate", e.getMessage());
+            LogWraper.v("Novate", e.getMessage());
 
         } else {
-            Log.v("Novate", "Throwable  || Message == Null");
+            LogWraper.v("Novate", "Throwable  || Message == Null");
         }
 
         if(e instanceof Throwable){
-            Log.e("Novate", "--> e instanceof Throwable");
-            Log.e("Novate", "--> " + e.getCause().toString());
+            LogWraper.e("Novate", "--> e instanceof Throwable");
+            LogWraper.e("Novate", "--> " + e.getCause().toString());
             onError(NovateException.handleException(e));
         } else {
-            Log.e("Novate", "e !instanceof Throwable");
-            Log.e("Novate", "--> " + e.getCause().toString());
+            LogWraper.e("Novate", "e !instanceof Throwable");
+            LogWraper.e("Novate", "--> " + e.getCause().toString());
             onError(NovateException.handleException(e));
         }
         onCompleted();
@@ -63,14 +64,14 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
     @Override
     public void onStart() {
         super.onStart();
-        Log.v("Novate", "-->http is start");
+        LogWraper.v("Novate", "-->http is start");
         // todo some common as show loadding  and check netWork is NetworkAvailable
         // if  NetworkAvailable no !   must to call onCompleted
     }
 
     @Override
     public void onCompleted() {
-        Log.v("Novate", "-->http is Complete");
+        LogWraper.v("Novate", "-->http is Complete");
         // todo some common as  dismiss loadding
     }
     public abstract void onError(Throwable e);

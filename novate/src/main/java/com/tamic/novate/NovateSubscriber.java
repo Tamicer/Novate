@@ -18,13 +18,13 @@
 package com.tamic.novate;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.tamic.novate.config.ConfigLoader;
 import com.tamic.novate.exception.FormatException;
 import com.tamic.novate.exception.NovateException;
 import com.tamic.novate.exception.ServerException;
+import com.tamic.novate.util.LogWraper;
 import com.tamic.novate.util.ReflectionUtil;
 
 import org.json.JSONObject;
@@ -57,7 +57,7 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
 
         Type[] types = ReflectionUtil.getParameterizedTypeswithInterfaces(callBack);
         if (ReflectionUtil.methodHandler(types) == null || ReflectionUtil.methodHandler(types).size() == 0) {
-            Log.e(TAG, "callBack<T> 中T不合法: -->" + finalNeedType);
+            LogWraper.e(TAG, "callBack<T> 中T不合法: -->" + finalNeedType);
             throw new NullPointerException("callBack<T> 中T不合法");
         }
         finalNeedType = ReflectionUtil.methodHandler(types).get(0);
@@ -88,7 +88,7 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
         try {
             byte[] bytes = responseBody.bytes();
             String jsStr = new String(bytes);
-            Log.d("Novate", "ResponseBody:" + jsStr.trim());
+            LogWraper.d("Novate", "ResponseBody:" + jsStr.trim());
             if (!ConfigLoader.isFormat(context)) {
                 callBack.onsuccess(0, "", null, jsStr);
                 return;
@@ -120,12 +120,12 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
                             }
                             dataResponse = (T) new Gson().fromJson(dataStr, ReflectionUtil.newInstance(finalNeedType).getClass());
                             if (ConfigLoader.isFormat(context) && dataResponse == null) {
-                                Log.e(TAG, "dataResponse 无法解析为:" + finalNeedType);
+                                LogWraper.e(TAG, "dataResponse 无法解析为:" + finalNeedType);
                                 throw new FormatException();
                             }
 
                         } else if (dataStr.charAt(0) == '[') {
-                            Log.e(TAG, "data为数对象无法转换: --- " + finalNeedType);
+                            LogWraper.e(TAG, "data为数对象无法转换: --- " + finalNeedType);
                             //dataStr = jsonObject.optJSONArray("data").toString();
                             //dataResponse = (T) new Gson().fromJson(dataStr, finalNeedType);
                             //dataResponse = (T) new Gson().fromJson(dataStr,  ReflectionUtil.newInstance(finalNeedType).getClass());
@@ -134,7 +134,7 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Log.e(TAG, e.getLocalizedMessage());
+                        LogWraper.e(TAG, e.getLocalizedMessage());
                         if (callBack != null) {
                             callBack.onError(NovateException.handleException(e));
                         }
@@ -153,7 +153,7 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
                     }
 
                     if (ConfigLoader.isFormat(context) && dataResponse == null) {
-                        Log.e(TAG, "dataResponse 无法解析为:" + finalNeedType);
+                        LogWraper.e(TAG, "dataResponse 无法解析为:" + finalNeedType);
                         throw new FormatException();
                     }
                     baseResponse.setData(dataResponse);
@@ -171,7 +171,7 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.e(TAG, e.getLocalizedMessage().toString());
+                    LogWraper.e(TAG, e.getLocalizedMessage().toString());
                     if (callBack != null) {
                         callBack.onError(NovateException.handleException(new NullPointerException("Response 解析失败！")));
                     }

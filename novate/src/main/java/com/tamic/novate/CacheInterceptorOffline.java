@@ -20,6 +20,7 @@ package com.tamic.novate;
 import android.content.Context;
 import android.util.Log;
 
+import com.tamic.novate.util.LogWraper;
 import com.tamic.novate.util.NetworkUtil;
 
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class CacheInterceptorOffline extends CacheInterceptor {
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         if (!NetworkUtil.isNetworkAvailable(context)) {
-            Log.e("Novate", " no network load cache:"+ request.cacheControl().toString());
+            LogWraper.e("Novate", " no network load cache:"+ request.cacheControl().toString());
            /* request = request.newBuilder()
                     .removeHeader("Pragma")
                     .header("Cache-Control", "only-if-cached, " + cacheControlValue_Offline)

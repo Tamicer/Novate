@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.tamic.novate.util.FileUtil;
+import com.tamic.novate.util.LogWraper;
 
 import java.util.HashMap;
 
@@ -25,7 +26,7 @@ public class ConfigLoader {
         if(loadConfig(context) == null){
             return true;
         }
-        Log.v("Novate", "web :" + code + ">>>>>>>>>>>>isOk：" + config.getSucessCode().contains(String.valueOf(code)));
+        LogWraper.v("Novate", "web :" + code + ">>>>>>>>>>>>isOk：" + config.getSucessCode().contains(String.valueOf(code)));
         return config.getSucessCode().contains(String.valueOf(code));
     }
 
@@ -36,13 +37,13 @@ public class ConfigLoader {
         }
         String jsonStr = FileUtil.loadFromAssets(context, CONFIG_NAME);
         if (TextUtils.isEmpty(jsonStr)) {
-            Log.e("Novate", "缺乏默认配置 <" + CONFIG_NAME + ">文件，请加入");
+            LogWraper.e("Novate", "缺乏默认配置 <" + CONFIG_NAME + ">文件，请加入");
             return null;
         }
         try {
             config =  new Gson().fromJson(jsonStr, Config.class);
         } catch(JsonSyntaxException exception) {
-            Log.e("Novate", "loaderConfig 配置数据无法解析: 请正确配置 <" + CONFIG_NAME + ">文件");
+            LogWraper.e("Novate", "loaderConfig 配置数据无法解析: 请正确配置 <" + CONFIG_NAME + ">文件");
             return null;
 
         }

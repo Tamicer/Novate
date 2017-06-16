@@ -22,6 +22,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.tamic.novate.util.LogWraper;
 import com.tamic.novate.util.NetworkUtil;
 
 import java.io.IOException;
@@ -66,7 +67,7 @@ public class CacheInterceptor implements Interceptor {
         okhttp3.Response originalResponse = chain.proceed(chain.request());
         String cacheControl = originalResponse.header("Cache-Control");
         //String cacheControl = request.cacheControl().toString();
-        Log.e("Novate", maxStaleOnline + "s load cache:" + cacheControl);
+        LogWraper.e("Novate", maxStaleOnline + "s load cache:" + cacheControl);
         if (TextUtils.isEmpty(cacheControl) || cacheControl.contains("no-store") || cacheControl.contains("no-cache") ||
                 cacheControl.contains("must-revalidate") || cacheControl.contains("max-age") || cacheControl.contains("max-stale")) {
             return originalResponse.newBuilder()
@@ -96,7 +97,7 @@ public class CacheInterceptor implements Interceptor {
                     Toast.makeText(context, R.string.load_cache, Toast.LENGTH_SHORT).show();
                 }
             });*//*
-            Log.e("Novate", " no network load cache");
+            LogWraper.e("Novate", " no network load cache");
           *//*  request = request.newBuilder()
                     .cacheControl(CacheControl.FORCE_CACHE)
                     .cacheControl(CacheControl.FORCE_NETWORK)

@@ -24,6 +24,7 @@ import android.util.Log;
 
 import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.Throwable;
+import com.tamic.novate.util.LogWraper;
 import com.tamic.novate.util.Utils;
 
 /**
@@ -66,7 +67,7 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
 
     @Override
     public void onError(final Throwable e) {
-        Log.e(NovateDownLoadManager.TAG, "DownSubscriber:>>>> onError:" + e.getMessage());
+        LogWraper.e(NovateDownLoadManager.TAG, "DownSubscriber:>>>> onError:" + e.getMessage());
         if (callBack != null) {
             final Throwable throwable =  new Throwable(e, -100, e.getMessage());
             if (Utils.checkMain()) {
@@ -84,7 +85,7 @@ public class DownSubscriber <ResponseBody extends okhttp3.ResponseBody> extends 
 
     @Override
     public void onNext(ResponseBody responseBody) {
-        Log.d(NovateDownLoadManager.TAG, "DownSubscriber:>>>> onNext");
+        LogWraper.d(NovateDownLoadManager.TAG, "DownSubscriber:>>>> onNext");
         new NovateDownLoadManager(callBack).writeResponseBodyToDisk(key, path, name, context, responseBody);
 
     }

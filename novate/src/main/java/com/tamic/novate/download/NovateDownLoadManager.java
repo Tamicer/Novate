@@ -27,6 +27,7 @@ import com.tamic.novate.Throwable;
 import com.tamic.novate.exception.FormatException;
 import com.tamic.novate.exception.NovateException;
 import com.tamic.novate.util.FileUtil;
+import com.tamic.novate.util.LogWraper;
 import com.tamic.novate.util.Utils;
 
 import java.io.File;
@@ -78,21 +79,21 @@ public class NovateDownLoadManager {
     public boolean writeResponseBodyToDisk(final String key, String path, String name, Context context, ResponseBody body) {
 
         if (body == null) {
-            Log.e(TAG,  key + " : ResponseBody is null");
+           LogWraper.e(TAG,  key + " : ResponseBody is null");
             finalonError(new NullPointerException("the "+ key + " ResponseBody is null"));
             return false;
         }
-        Log.v(TAG,  "Key:-->" + key);
+       LogWraper.v(TAG,  "Key:-->" + key);
 
         String type ="";
         if (body.contentType() != null) {
             type = body.contentType().toString();
         } else {
-            Log.d(TAG, "MediaType-->,无法获取");
+           LogWraper.d(TAG, "MediaType-->,无法获取");
         }
 
         if (!TextUtils.isEmpty(type)) {
-            Log.d(TAG, "contentType:>>>>" + body.contentType().toString());
+           LogWraper.d(TAG, "contentType:>>>>" + body.contentType().toString());
             if (!TextUtils.isEmpty(MimeType.getInstance().getSuffix(type))){
                 fileSuffix = MimeType.getInstance().getSuffix(type);
             }
@@ -115,8 +116,8 @@ public class NovateDownLoadManager {
         if (new File(path + name).exists()) {
             FileUtil.deleteFile(path);
         }
-        Log.d(TAG, "path:-->" + path);
-        Log.d(TAG, "name:->" + name);
+       LogWraper.d(TAG, "path:-->" + path);
+       LogWraper.d(TAG, "name:->" + name);
         try {
             // todo change the file location/name according to your needs
             File futureStudioIconFile = new File(path + name);
@@ -130,7 +131,7 @@ public class NovateDownLoadManager {
                 final long fileSize = body.contentLength();
                 long fileSizeDownloaded = 0;
                 int updateCount = 0;
-                Log.d(TAG, "file length: " + fileSize);
+               LogWraper.d(TAG, "file length: " + fileSize);
                 inputStream = body.byteStream();
                 outputStream = new FileOutputStream(futureStudioIconFile);
 
@@ -141,9 +142,9 @@ public class NovateDownLoadManager {
                     }
                     outputStream.write(fileReader, 0, read);
                     fileSizeDownloaded += read;
-                    Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
+                   LogWraper.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
                     final int progress = (int) (fileSizeDownloaded * 100 / fileSize);
-                    Log.d(TAG, "file download progress : " + progress);
+                   LogWraper.d(TAG, "file download progress : " + progress);
                     if (updateCount == 0 || progress >= updateCount) {
                         updateCount += 1;
                         if (callBack != null) {
@@ -168,7 +169,7 @@ public class NovateDownLoadManager {
                     isDownLoading = true;
                     outputStream.write(fileReader, 0, read);
                     fileSizeDownloaded += read;
-                    Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
+                   LogWraper.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
                     if (callBack != null) {
                         if (callBack != null) {
                             final long finalFileSizeDownloaded = fileSizeDownloaded;
@@ -183,7 +184,7 @@ public class NovateDownLoadManager {
                 }*/
 
                 outputStream.flush();
-                Log.d(TAG, "file downloaded: " + fileSizeDownloaded + " of " + fileSize);
+                LogWraper.d(TAG, "file downloaded: " + fileSizeDownloaded + " of " + fileSize);
                 isDownLoading = false;
                 if (callBack != null) {
                     final String finalName = name;
@@ -194,8 +195,8 @@ public class NovateDownLoadManager {
                             callBack.onSucess(key, finalPath, finalName, fileSize);
                         }
                     });
-                    Log.d(TAG, "file downloaded: " + fileSizeDownloaded + " of " + fileSize);
-                    Log.d(TAG, "file downloaded: is sucess");
+                   LogWraper.d(TAG, "file downloaded: " + fileSizeDownloaded + " of " + fileSize);
+                   LogWraper.d(TAG, "file downloaded: is sucess");
                 }
                 return true;
             } catch (IOException e) {
