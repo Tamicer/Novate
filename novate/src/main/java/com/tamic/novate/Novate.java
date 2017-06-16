@@ -17,29 +17,23 @@
  */
 package com.tamic.novate;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.tamic.novate.callback.ResponseCallback;
 import com.tamic.novate.cookie.NovateCookieManager;
-import com.tamic.novate.config.ConfigLoader;
 import com.tamic.novate.cache.CookieCacheImpl;
 import com.tamic.novate.download.DownLoadCallBack;
 import com.tamic.novate.download.DownSubscriber;
 import com.tamic.novate.cookie.SharedPrefsCookiePersistor;
-import com.tamic.novate.exception.FormatException;
 import com.tamic.novate.exception.NovateException;
-import com.tamic.novate.exception.ServerException;
 import com.tamic.novate.request.NovateRequest;
 import com.tamic.novate.util.FileUtil;
-import com.tamic.novate.util.ReflectionUtil;
 import com.tamic.novate.util.Utils;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
@@ -993,8 +987,11 @@ public final class Novate {
             // ensures correct behavior when using novate that consume all types.
             okhttpBuilder = new OkHttpClient.Builder();
             retrofitBuilder = new Retrofit.Builder();
-            this.context = context;
-
+            if(context instanceof Activity) {
+                this.context  = ((Activity) context).getApplicationContext();
+            } else {
+                this.context = context;
+            }
         }
 
         /**
