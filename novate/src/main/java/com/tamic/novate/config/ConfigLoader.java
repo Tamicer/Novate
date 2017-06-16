@@ -20,10 +20,11 @@ public class ConfigLoader {
 
     private final static String CONFIG_NAME = "novate-config.json";
 
-
-
     public static boolean checkSucess(Context context, int code) {
-        loadConfig(context);
+
+        if(loadConfig(context) == null){
+            return true;
+        }
         Log.v("Novate", "web :" + code + ">>>>>>>>>>>>isOk：" + config.getSucessCode().contains(String.valueOf(code)));
         return config.getSucessCode().contains(String.valueOf(code));
     }
@@ -34,22 +35,25 @@ public class ConfigLoader {
             return config;
         }
         String jsonStr = FileUtil.loadFromAssets(context, CONFIG_NAME);
-        if (jsonStr == null) {
+        if (TextUtils.isEmpty(jsonStr)) {
+            Log.e("Novate", "缺乏默认配置 <" + CONFIG_NAME + ">文件，请加入");
             return null;
         }
         try {
             config =  new Gson().fromJson(jsonStr, Config.class);
         } catch(JsonSyntaxException exception) {
             Log.e("Novate", "loaderConfig 配置数据无法解析: 请正确配置 <" + CONFIG_NAME + ">文件");
+            return null;
+
         }
         return config = new Gson().fromJson(jsonStr, Config.class);
     }
 
     public static boolean isFormat(Context context) {
-        loadConfig(context);
+        if(loadConfig(context) == null){
+            return false;
+        }
         return TextUtils.equals(config.getIsFormat(), "true");
-
-
     }
 
     public static HashMap<String, String> getErrorConfig() {
