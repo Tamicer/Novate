@@ -97,7 +97,7 @@ public abstract class RxGenericsCallback<T, E> extends ResponseCallback<T, E> {
 
             dataStr = jsonObject.opt("data").toString();
             if (TextUtils.isEmpty(dataStr)) {
-                dataStr = jsonObject.optJSONObject("result").toString();
+                dataStr = jsonObject.opt("result").toString();
             }
 
             if (dataStr.charAt(0) == '{') {
@@ -105,7 +105,7 @@ public abstract class RxGenericsCallback<T, E> extends ResponseCallback<T, E> {
             } else if (dataStr.charAt(0) == '[') {
                 dataStr = jsonObject.optJSONArray("data").toString();
                 if (TextUtils.isEmpty(dataStr)) {
-                    dataStr = jsonObject.optJSONObject("result").toString();
+                    dataStr = jsonObject.optJSONArray("result").toString();
                 }
                  Type collectionType = new TypeToken<List<T>>() {
                 }.getType();
