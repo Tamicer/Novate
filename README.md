@@ -40,9 +40,9 @@
 - app:
      
       
-         dependencies {
-             compile 'com.tamic.novate:novate:1.3.3'
-         }
+          dependencies {
+             compile 'com.tamic.novate:novate:1.5.0'
+          }
          
          
         
