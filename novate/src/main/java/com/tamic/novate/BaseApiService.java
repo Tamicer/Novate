@@ -79,7 +79,7 @@ public interface BaseApiService {
     @POST()
     Observable<ResponseBody> uploadFlieWithPart(
             @Url String fileUrl,
-            @Part("image\"; filename=\"image.jpg") MultipartBody.Part file);
+            @Part()MultipartBody.Part file);
 
     @Multipart
     @POST()
