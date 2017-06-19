@@ -60,7 +60,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.BaseUrl;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Converter;
@@ -360,7 +359,7 @@ public final class Novate {
      * @return Rxjava Subscription
      */
     public <T> T RxUploadWithBody(String url, RequestBody requestBody, ResponseCallback<T, ResponseBody> callBack) {
-        return  RxUploadWithBody(url, url, requestBody, callBack);
+        return RxUploadWithBody(url, url, requestBody, callBack);
     }
 
 
@@ -381,12 +380,69 @@ public final class Novate {
     }
 
     /**
+     *  Novate RxUpload by post Body Maps
+     * @param url url
+     * @param maps RequestBody files
+     * @param callBack back
+     * @param <T>
+     * @return Rxjava Subscription
+     */
+    public <T> T RxUploadWithBodyMaps(String url, Map<String, RequestBody> maps, ResponseCallback<T, ResponseBody> callBack) {
+        return RxUploadWithBodyMaps(url, url,maps, callBack);
+    }
+
+
+    /**
+     * Novate RxUpload by post With BodyMaps
+     * @param tag tag
+     * @param url url
+     * @param maps RequestBody files
+     * @param callBack ResponseCallback
+     * @param <T>
+     * @return Rxjav 1.x Subscription
+     */
+    public <T> T RxUploadWithBodyMaps(Object tag, String url, Map<String, RequestBody> maps, ResponseCallback<T, ResponseBody> callBack) {
+        return (T) apiManager.uploadFiles(url, maps)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new RxSubscriber<T, ResponseBody>(tag, callBack));
+    }
+
+    /**
+     * Novate RxUpload by post With BodyMaps
+     * @param url url
+     * @param files  MultipartBody.Part files
+     * @param callBack
+     * @param <T>
+     * @return Rxjav 1.x Subscription
+     */
+    public <T> T RxUploadWithPartMap(String url, Map<String, MultipartBody.Part> files, ResponseCallback<T, ResponseBody> callBack) {
+        return RxUploadWithPartMap(url, url, files, callBack);
+    }
+
+    /**
+     * Novate RxUpload by post With BodyMaps
+     * @param tag tag
+     * @param url url
+     * @param files MultipartBody.Part files
+     * @param callBack ResponseCallback
+     * @param <T>
+     * @return Rxjav 1.x Subscription
+     */
+    public <T> T RxUploadWithPartMap(Object tag, String url, Map<String, MultipartBody.Part> files, ResponseCallback<T, ResponseBody> callBack) {
+        return (T) apiManager.uploadFlieWithPartMap(url, files)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new RxSubscriber<T, ResponseBody>(tag, callBack));
+    }
+
+    /**
      * Novate Post by Form
      * @param url path or url
      * @param parameters  parameters  maps
      * @param callBack  ResponseCallback
      * @param <T>  T return parsed data
-     * @return Subscription
+     * @return Rxjav 1.x Subscription
      */
     public <T> T RxForm(String url, @FieldMap(encoded = true) Map<String, Object> parameters, ResponseCallback<T, ResponseBody> callBack) {
         return RxForm(url, url, parameters, callBack);
