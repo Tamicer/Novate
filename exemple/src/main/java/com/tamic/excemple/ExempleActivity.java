@@ -1,8 +1,13 @@
 package com.tamic.excemple;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,19 +18,22 @@ import com.google.gson.reflect.TypeToken;
 import com.tamic.excemple.model.MovieModel;
 import com.tamic.excemple.model.ResultModel;
 import com.tamic.excemple.model.SouguBean;
-import com.tamic.novate.BaseApiService;
 import com.tamic.novate.NovateResponse;
 import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.Novate;
+import com.tamic.novate.RxApiManager;
 import com.tamic.novate.Throwable;
+import com.tamic.novate.callback.RxStringCallback;
 import com.tamic.novate.download.DownLoadCallBack;
 import com.tamic.novate.download.UpLoadCallback;
 import com.tamic.novate.request.NovateRequestBody;
 import com.tamic.novate.util.FileUtil;
+import com.tamic.novate.util.LogWraper;
 import com.tamic.novate.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +42,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-
+import rx.Subscription;
 
 /**
  * Created by Tamic on 2016-06-15.
@@ -52,6 +60,9 @@ public class ExempleActivity extends AppCompatActivity {
 
     private Button btn, btn_test, btn_get, btn_post, btn_download,
             btn_download_Min, btn_upload, btn_uploadfile, btn_myApi, btn_more;
+
+    private ProgressDialog mProgressDialog;
+    String uploadPath = "";
 
 
 
@@ -71,43 +82,20 @@ public class ExempleActivity extends AppCompatActivity {
         btn_myApi = (Button) findViewById(R.id.bt_my_api);
         btn_more = (Button) findViewById(R.id.bt_more);
 
+        initProgress(this);
+
         parameters.put("ip", "21.22.11.33");
         headers.put("Accept", "application/json");
-
-
-      /*
-         如果想修改默认配置 可以参考下面格式，请修改assets的文件copy到你的项目中
-         isFormat是否对后端数据进行格式化校验
-
-         sucessCode:成功状态码，可以加多个。
-
-         error：非成功状态码，可以支持多个配置
-
-
-        {
-            "isFormat": "false",
-                "sucessCode": [
-                    "0",
-                    "1001"
-            ],
-            "error": {
-                    "23": "网络异常2",
-                    "24": "网络异常2",
-                    "25": "网络异常3"
-        }
-        }*/
 
         novate = new Novate.Builder(this)
                 //.addParameters(parameters)
                 .connectTimeout(20)
                 .writeTimeout(15)
                 .baseUrl(baseUrl)
-                .addHeader(headers)//.addApiManager(ApiManager.class)
+                .addHeader(headers)
+                .addCache(true)
                 .addLog(true)
                 .build();
-
-
-        BaseApiService api = novate.create(BaseApiService.class);
 
         btn_test.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,6 +177,49 @@ public class ExempleActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 初始化进度条
+     */
+    private void initProgress(Context aContext) {
+
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(aContext);
+        }
+
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setTitle("温馨提示");
+        mProgressDialog.setMax(100);
+        mProgressDialog.setMessage("正在上传中...");
+        mProgressDialog.setCancelable(true);
+
+    }
+
+
+    private void showPressDialog() {
+
+        if (mProgressDialog == null || this.isFinishing()) {
+            return;
+        }
+        mProgressDialog.show();
+    }
+
+
+    private void dismissProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
+    }
+
+    private void updateProgressDialog(int progress) {
+
+        if (mProgressDialog != null) {
+            if (!mProgressDialog.isShowing()) {
+                showPressDialog();
+            }
+            mProgressDialog.setProgress(progress);
+        }
+    }
+
 
     /**
      * test
@@ -208,7 +239,8 @@ public class ExempleActivity extends AppCompatActivity {
                 .addLog(true)
                 .build();
 
-        novate.test("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海", null,
+
+        Subscription subscription = novate.test("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海", null,
                 new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
                     @Override
                     public void onError(Throwable e) {
@@ -226,9 +258,21 @@ public class ExempleActivity extends AppCompatActivity {
                     }
                 });
 
+        RxApiManager.get().add("test", subscription);
+        //cancel   RxApiManager.get().cancel("my");
+
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //RxApiManager.get().cancel("my");
+    }
+
+    /**
+     * http://www.dianpingmedia.com/framework/web/user/unauth/login
+     */
     private void perform() {
 
         parameters = new HashMap<>();
@@ -236,15 +280,22 @@ public class ExempleActivity extends AppCompatActivity {
         parameters.put("start", "0");
         parameters.put("count", "1");
 
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("mobileNumber", "18826412577");
+        parameters.put("loginPassword", "123456");
+
+
+
+
         novate = new Novate.Builder(this)
                 .addParameters(parameters)
-                .connectTimeout(5)
+                .connectTimeout(10)
                 .baseUrl("http://api.douban.com/")
                 //.addApiManager(ApiManager.class)
                 .addLog(true)
                 .build();
 
-        novate.get("v2/movie/top250", parameters, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
+        novate.get("v2/movie/top250", parameters, new BaseSubscriber<ResponseBody>() {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -275,18 +326,9 @@ public class ExempleActivity extends AppCompatActivity {
 
     /**
      * performGet
+     * 已废弃
      */
     private void performGet() {
-
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("ip", "21.22.11.33");
-        novate = new Novate.Builder(this)
-                .addHeader(headers)
-                //.addParameters(parameters)
-                .connectTimeout(5)
-                .baseUrl(baseUrl)
-                .addLog(true)
-                .build();
 
         /**
          * 如果不需要数据解析后返回 则调用novate.Get()
@@ -312,17 +354,14 @@ public class ExempleActivity extends AppCompatActivity {
 
             @Override
             public void onSuccee(NovateResponse<ResultModel> response) {
-                Toast.makeText(ExempleActivity.this, response.getData().toString(), Toast.LENGTH_SHORT).show();
+
             }
 
 
             @Override
-            public void onsuccess(int code, String msg, ResultModel response, String originalResponse) {
-
+            public void onsuccess(int code, String msg, ResultModel  response, String originalResponse) {
+                Toast.makeText(ExempleActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
             }
-
-
-
 
         });
 
@@ -342,6 +381,7 @@ public class ExempleActivity extends AppCompatActivity {
                 .addLog(true)
                 .build();
 
+
         /**
          *
          *
@@ -351,10 +391,9 @@ public class ExempleActivity extends AppCompatActivity {
          * 参考 performGet()中的方式
          */
         novate.post("service/getIpInfo.php", parameters, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
-
             @Override
             public void onError(Throwable e) {
-                if (e.getMessage() != null) {
+                if (!TextUtils.isEmpty(e.getMessage())) {
                     Log.e("OkHttp", e.getMessage());
                     Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -367,11 +406,19 @@ public class ExempleActivity extends AppCompatActivity {
                 try {
                     String jstr = new String(responseBody.bytes());
 
+                    if (jstr.trim().isEmpty()) {
+                        return;
+                    }
+
                     Type type = new TypeToken<NovateResponse<ResultModel>>() {
                     }.getType();
 
                     NovateResponse<ResultModel> response = new Gson().fromJson(jstr, type);
-                    Toast.makeText(ExempleActivity.this, response.getData().toString(), Toast.LENGTH_SHORT).show();
+
+                    if (response.getData() != null) {
+                        Toast.makeText(ExempleActivity.this,    response.getData().toString(), Toast.LENGTH_SHORT).show();
+                    }
+                    Toast.makeText(ExempleActivity.this, jstr , Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -393,11 +440,12 @@ public class ExempleActivity extends AppCompatActivity {
 
         novate = new Novate.Builder(this)
                 .addHeader(headers)
-                .connectTimeout(10)
-                .addCookie(false)
+                .addParameters(parameters)
                 .baseUrl("http://lbs.sougu.net.cn/")
                 .addLog(true)
                 .build();
+
+
         MyAPI myAPI = novate.create(MyAPI.class);
 
         novate.call(myAPI.getSougu(parameters),
@@ -424,43 +472,54 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performUpLoadImage() {
 
-
+        String mPath = uploadPath; //"you File path ";
         String url = "";
-        String str = FileUtil.loadFromAssets(this, "novate.png");
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("image/jpg"), new File(mPath));
 
-        RequestBody requestFile = Utils.createFile(str);
+        final NovateRequestBody requestBody = Utils.createNovateRequestBody(requestFile, new UpLoadCallback() {
 
-        NovateRequestBody novateRequestBody = Utils.createNovateRequestBody(requestFile, new UpLoadCallback() {
             @Override
             public void onProgress(Object tag, int progress, long speed, boolean done) {
 
-            }
-        });
+                LogWraper.d("uplaod", "tag:" + tag.toString() + "progress:"+ progress);
+                updateProgressDialog(progress);
 
-        novate.upload(url, novateRequestBody, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
-            @Override
-            public void onError(Throwable e) {
-                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNext(ResponseBody responseBody) {
 
             }
         });
 
-        // or
+        novate.RxUploadWithBody(url, requestBody, new RxStringCallback() {
 
-        String mPath = "you File path ";
-        novate.uploadImage(url, new File(mPath), new BaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
-            public void onError(Throwable e) {
-                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onStart(Object tag) {
+                super.onStart(tag);
+                showPressDialog();
             }
 
             @Override
-            public void onNext(ResponseBody responseBody) {
+            public void onNext(Object tag, String response) {
+                LogWraper.d("novate", response);
+                Toast.makeText(ExempleActivity.this, "成功", Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void onError(Object tag, Throwable e) {
+                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                dismissProgressDialog();
+            }
+
+            @Override
+            public void onCancel(Object tag, Throwable e) {
+
+
+            }
+
+            @Override
+            public void onCompleted(Object tag) {
+                super.onCompleted(tag);
+                dismissProgressDialog();
             }
         });
 
@@ -471,75 +530,113 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performUpLoadFlie() {
 
-        // String mPath = "file:///android_asset/novate-config.json";
+        String mPath = uploadPath; //"you File path ";
         String url = "";
-        String str = FileUtil.loadFromAssets(this, "novate.png");
-        File file = new File(str);
+        File file = new File(mPath);
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data; charset=utf-8"), file);
 
-        // 创建 RequestBody，用于封装 请求RequestBody
-        RequestBody requestFile = Utils.createImage(file);
-
-        // MultipartBody.Part is used to send also the actual file name
-        MultipartBody.Part body  =
-                MultipartBody.Part.createFormData("image", file.getName(), requestFile);
-
-        // 添加描述
-        String descriptionString = "hello, 这是文件描述";
-
-
-        RequestBody description = Utils.createPartFromString(descriptionString);
-
-              /*  RequestBody.create(
-                        MediaType.parse("multipart/form-data; charset=utf-8"), descriptionString);*/
-
-        novate.uploadFlie(url, description, body, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
-            @Override
-            public void onError(Throwable e) {
-                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+        final NovateRequestBody requestBody = Utils.createNovateRequestBody(requestFile, new UpLoadCallback() {
 
             @Override
-            public void onNext(ResponseBody responseBody) {
+            public void onProgress(Object tag, int progress, long speed, boolean done) {
 
+                LogWraper.d("uplaod", "tag:" + tag.toString() + "progress:"+ progress);
+                updateProgressDialog(progress);
             }
         });
 
 
-    }
+        MultipartBody.Part body2 =
+                MultipartBody.Part.createFormData("image", file.getName(), requestBody);
 
-    private void performUpLoadFlies() {
-
-        String path = FileUtil.loadFromAssets(this, "novate.png");
-        String url = "";
-
-        UpLoadCallback callback = new UpLoadCallback() {
+        novate.RxUploadWithPart(url, body2, new RxStringCallback() {
 
             @Override
-            public void onProgress(Object tag, int progress, long speed, boolean come) {
+            public void onStart(Object tag) {
+                super.onStart(tag);
+                showPressDialog();
+            }
+
+            @Override
+            public void onError(Object tag, Throwable e) {
+                Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                dismissProgressDialog();
+            }
+
+            @Override
+            public void onCancel(Object tag, Throwable e) {
 
             }
-        };
+
+            @Override
+            public void onNext(Object tag, String response) {
+                LogWraper.d(response);
+                Toast.makeText(ExempleActivity.this, "成功", Toast.LENGTH_SHORT).show();
+                dismissProgressDialog();
+            }
+
+
+        });
+
+    }
+
+    /**
+     * upload
+     */
+    private void performUpLoadFlies(){
+
+        String path = uploadPath;//"you File path ";
+        String url = "http://workflow.tjcclz.com/GWWorkPlatform/NoticeServlet?GWType=wifiUploadFile";
 
         File file = new File(path);
         // 创建 RequestBody，用于封装 请求RequestBody
-        RequestBody requestFile =  Utils.createFile(file);
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
-        Map<String, RequestBody> maps = new HashMap<>();
-        //Tag可以不设置 批量时候用于区分对待
-        maps.put("file1", Utils.createNovateRequestBody(requestFile, callback));
-        maps.put("file2", Utils.createNovateRequestBody(requestFile, callback));
+        final NovateRequestBody requestBody = Utils.createNovateRequestBody(requestFile, new UpLoadCallback() {
 
-        novate.uploadFlies(url, maps, new MyBaseSubscriber<ResponseBody>(ExempleActivity.this) {
             @Override
-            public void onError(Throwable e) {
+            public void onProgress(Object tag, int progress, long speed, boolean done) {
+
+                LogWraper.d("uplaod", "tag:" + tag.toString() + "progress:"+ progress);
+
+                updateProgressDialog(progress);
+
+
+            }
+        });
+
+        MultipartBody.Part part =
+                MultipartBody.Part.createFormData("image", file.getName(), requestBody);
+        Map<String,  MultipartBody.Part> maps = new HashMap<>();
+        maps.put("image", part);
+
+        novate.RxUploadWithPartMap(url, maps, new RxStringCallback() {
+
+            @Override
+            public void onStart(Object tag) {
+                super.onStart(tag);
+                showPressDialog();
+            }
+
+            @Override
+            public void onNext(Object tag, String response) {
+                LogWraper.d("novate", response);
+                Toast.makeText(ExempleActivity.this, "成功", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Object tag, Throwable e) {
                 Toast.makeText(ExempleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                dismissProgressDialog();
             }
 
             @Override
-            public void onNext(ResponseBody responseBody) {
+            public void onCancel(Object tag, Throwable e) {
+
 
             }
-        } );
+        });
 
     }
 
@@ -548,12 +645,28 @@ public class ExempleActivity extends AppCompatActivity {
      * ex: apk , video...
      */
     private void performDown() {
-        String downUrl = "http://apk.hiapk.com/web/api.do?qt=8051&id=723";
-        novate.download(downUrl, new DownLoadCallBack() {
+        String downUrl = "http://wifiapi02.51y5.net/wifiapi/rd.do?f=wk00003&b=gwanz02&rurl=http%3A%2F%2Fdl.lianwifi.com%2Fdownload%2Fandroid%2FWifiKey-3091-guanwang.apk";
+        novate.download(downUrl, "test.mei",  new DownLoadCallBack() {
 
+            @Override
+            public void onStart(String s) {
+                super.onStart(s);
+
+                btn_download.setText("DownLoad cancel");
+                showPressDialog();
+            }
 
             @Override
             public void onError(Throwable e) {
+                Toast.makeText(ExempleActivity.this,  "onError:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onProgress(String key, int progress, long fileSizeDownloaded, long totalSize) {
+                super.onProgress(key, progress, fileSizeDownloaded, totalSize);
+                Log.v("test", fileSizeDownloaded+"");
+                //Toast.makeText(ExempleActivity.this, "progress: " + progress + "   download: " + fileSizeDownloaded, Toast.LENGTH_SHORT).show();
+                updateProgressDialog(progress);
 
             }
 
@@ -561,18 +674,16 @@ public class ExempleActivity extends AppCompatActivity {
             public void onSucess(String key, String path, String name, long fileSize) {
                 Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
                 btn_download.setText("DownLoad start");
+                dismissProgressDialog();
             }
 
             @Override
             public void onCancel() {
                 super.onCancel();
                 btn_download.setText("DownLoad start");
+                dismissProgressDialog();
             }
 
-            @Override
-            public void onProgress(String key, int progress, long fileSizeDownloaded, long totalSize) {
-                super.onProgress(key, progress, fileSizeDownloaded, totalSize);
-            }
         });
     }
 
@@ -582,26 +693,35 @@ public class ExempleActivity extends AppCompatActivity {
      */
     private void performDownMin() {
 
-        String downUrl = "http://img06.tooopen.com/images/20161022/tooopen_sy_182719487645.jpg";
-        novate.downloadMin(downUrl, new DownLoadCallBack() {
+        String downUrl = "https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png";
+        novate.downloadMin("tag", downUrl, "my.jpg",new DownLoadCallBack() {
 
             @Override
-            public void onStart(String key) {
-                super.onStart(key);
-                Toast.makeText(ExempleActivity.this, "download is start", Toast.LENGTH_SHORT).show();
+            public void onStart(String s) {
+                super.onStart(s);
                 btn_download.setText("DownLoadMin cancel");
+                showPressDialog();
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Toast.makeText(ExempleActivity.this,  "onError:" + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSucess(String key, String path, String name, long fileSize) {
-                Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoadMin start");
-           }
+                btn_download.setText("DownLoad start");
+                uploadPath = path + name;
+                dismissProgressDialog();
+            }
+
+
+            @Override
+            public void onProgress(String key, int progress, long fileSizeDownloaded, long totalSize) {
+                super.onProgress(key, progress, fileSizeDownloaded, totalSize);
+                updateProgressDialog(progress);
+                Toast.makeText(ExempleActivity.this, "progress: " + progress + "  download: " + fileSizeDownloaded, Toast.LENGTH_SHORT).show();
+            }
 
             @Override
             public void onCancel() {
@@ -609,8 +729,9 @@ public class ExempleActivity extends AppCompatActivity {
                 btn_download.setText("DownLoadMin start");
             }
 
-
         });
     }
+
+
 
 }
