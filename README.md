@@ -38,13 +38,15 @@
         }
     
 - app:
-     
-      
-         dependencies {
-             compile 'com.tamic.novate:novate:1.3.3'
-         }
-         
-         
+     
+```
+      
+          dependencies {
+             compile 'com.tamic.novate:novate:1.5.0'
+          }
+```
+
+
         
 Snapshots of the development version are available in Sonatype's snapshots repository.
 
@@ -85,17 +87,18 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
 
 功能
 ----
- 
-   - 加入基础API，减少Api冗余
-   - 支持离线缓存
-   - 支持多种方式访问网络（get, put, post, delete）
-   - 支持Json字符串，表单提交
-   - 支持文件下载和上传，并有进度
-   - 支持请求头统一加入
-   - 支持对返回结果的统一处理
-   - 支持自定义的扩展API
-   - 支持统一请求访问网络的流程控制
-   
+  - 优化设计：加入基础API，减少Api冗余
+ - 强大的缓存模式： 支持离线缓存， 无网络智能加载缓存，可配置是否需要缓存
+ - cookie管理：自带cookie管理机制
+ - 全方位请求模式：支持多种方式访问网络（get,put, post ,delete）
+ - 轻送调用：支持表单,图文一起，json上传。
+ - 文件传输：支持文件下载和上传，支持进度
+ - 动态添加：支持请求头和参数统一添加，分别添加。
+ - 结果处理：支持对返回结果的统一处理
+ - 扩展性强：支持自定义的扩展API，默认Api无法满足时可自定义自己的Service
+ - 悠雅方便：支持统一请求访问网络的流程控制，以方便帮你完美加入Processbar进度。
+ - RxJava结合： 结合RxJava，线程智能控制
+
    请求网络无需关心是否在主线程和非UI线程，操作UI直接可在回调处理, 保留了HttpClient的编码习惯，又加入了Builder模式编程！
    
 用法
@@ -126,11 +129,59 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
                 .build(); 
                 
    ```
+   
+#  RxApi 
    
+RxGet为例子：多种方式供你选择,通过不同返回需求，选择不同方式。
+
+**String**
+```
+novate.rxGet("path or url", parameters, new RxStringCallback() {
+
+
+ });
+ ```
+**Bean**
+
+
+```
+
+novate.rxGet("path or url", parameters, new RxResultCallback<ResultModel>() {
+
+
+
+   });
    
+   ```
+**List**
+
+```
+novate.rxGet("path or url", parameters, new RxListCallback<List<ResultModel>>() {
+
+
+      ....
+
+   });
    
+```
+   
+**File**
+
+```
+
+novate.rxGet("path or url", null, new RxFileCallBack(filePath, "name.jpg") {
+
+
+
+   });
+   
+   ```
+   
+其他方式RxApi同RxGet的用法，有RxPost, RxPut,RxDelete,RxBody， RxJson, RxUpload等 
   
 # GET
+
+```
         
         novate.executeGet("pathUrl", parameters（k-v）, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
@@ -138,18 +189,22 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
         
         });
         
-        
+ ```       
 # POST        
         
-        
+  ```     
         novate.executePost("pathUrl", parameters（k-v）, new Novate.ResponseCallBack<NovateResponse<MyModel>>() {
         
            .............
         
         });
         
+```
+        
 # BODY
 
+
+```
      novate.body(url, Object, new BaseSubscriber<ResponseBody>() {
             @Override
             public void onError(Throwable e) {
@@ -161,8 +216,11 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
 
             }
         });
+```
 
 # FORM
+
+```
 
         novate.form(url, new HashMap<K-V>(), new BaseSubscriber<ResponseBody>() {
             @Override
@@ -175,6 +233,8 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
 
             }
         });
+        
+ ```       
 
 # JSON #
         
@@ -427,35 +487,7 @@ Q&A
 Update Log   
 -----
 版本历史: https://bintray.com/neglectedbyboss/maven/Novate
-
-
-- **V1.3.1**: 提供文件上传进度功能。`2017.6`。
-
-
-- **V1.3.0**: 修复下载API在某些机型上文件夹创建失败情况。`2017.5`。
-
-- **V1.2.9***: 强化取消请求API.`2017.1`。
-
-- **V1.2.8***: 修复数据被备份的安全漏洞。 `2017.1`
-
-- **V1.2.7***: 优化相关下载代码。优化cookie同步时对某些网站不兼容问题，`2016.12`。
-
-
-- **V1.2.6.x**: 优化相关下载代码，并提交遗漏的put和delete方法，并将Http默认结果码回调到错误结果码中，并增加对请求参数的泛型支持
-。`2016.12`
-
-- **V1.2.5-bata**: 提供只对Response真实数据（T data）处理的功能，简化上层调用方式，但是不灵活，可选择使用，。`2016.11`
-
-- **V1.2.3**:		增加对缓存功能的配置开关，可选择的对api进行缓存。`2016.11`
-- **V1.2.2**:		解决对Response一些转换异常。`2016.11`
-- **V1.2.1**:		增加对json的提交的支持。`2016.11`
-- **V1.2.0**:		增加对Response数据结构格式，业务码，错误码的配置功能。提供自定义配置成功码和错误码功能。`2016.11`
-- **V 1.1.1** :   更新对返回结果异常的判断分发出处理 `2016.10`
-- **V1.1.0:**	  增加Response异常处理和容错处理。`2016.10`
-- **V 1.0.2** :  增加body提交方式，增加小文件下载，增加表单方式提交功能，并新增设置是否同步cookie接口 . `2016.9`
-- **V1.0.1:**	  扩展下载接口，可以制定下载路径和文件名，包括修复下载抛异常问题。`2016.8`
-- **V 1.0 :**    基于retrofit和Rxjava完成以泛型基础的get, put, Post delete, upLoad, downLoad功能 `2016.6`
-  
+更新历史请看：https://bintray.com/neglectedbyboss/maven/Novate/view/release#release
   
    
 #License
