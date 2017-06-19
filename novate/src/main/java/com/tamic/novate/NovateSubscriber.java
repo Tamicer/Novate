@@ -18,6 +18,7 @@
 package com.tamic.novate;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.tamic.novate.config.ConfigLoader;
@@ -106,14 +107,26 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
                     int code = 1;
                     String msg = "";
                     String dataStr ="";
-                    T dataResponse= null;
+                    T dataResponse = null;
+                    NovateResponse<T> baseResponse = null;
+
                     try {
                         JSONObject jsonObject = new JSONObject(jsStr.trim());
                         code = jsonObject.optInt("code");
                         msg = jsonObject.optString("msg");
+                        baseResponse = new NovateResponse<>();
+                        baseResponse.setCode(code);
+                        baseResponse.setMessage(msg);
                         dataStr = jsonObject.opt("data").toString();
+                        if (dataStr.isEmpty())  {
+                            dataStr = jsonObject.opt("result").toString();
+                        }
 
-                        if (dataStr.charAt(0) == '{') {
+                        if (dataStr.isEmpty())  {
+                          baseResponse.setResult(null);
+                        }
+
+                        if (!dataStr.isEmpty() && dataStr.charAt(0) == '{') {
                             dataStr = jsonObject.optJSONObject("data").toString();
                             if (dataStr.isEmpty())  {
                                 dataStr = jsonObject.optJSONObject("result").toString();
@@ -140,19 +153,19 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
                         }
                     }
 
-                    NovateResponse<T> baseResponse = new NovateResponse<>();
-                    baseResponse.setCode(code);
-                    baseResponse.setMessage(msg);
+
 
                     if(dataResponse != null) {
                         baseResponse.setData(dataResponse);
                     }
 
-                    if (!baseResponse.isOk(context) && dataResponse == null) {
-                        throw new NullPointerException("Response data解析失败！");
+                    if (baseResponse.isOk(context) && dataResponse == null) {
+
+                        LogWraper.d(TAG, "Response data 数据获取失败！");
+                        callBack.onsuccess(0, "", null, jsStr);
                     }
 
-                    if (ConfigLoader.isFormat(context) && dataResponse == null) {
+                    if (ConfigLoader.isFormat(context) && baseResponse == null) {
                         LogWraper.e(TAG, "dataResponse 无法解析为:" + finalNeedType);
                         throw new FormatException();
                     }

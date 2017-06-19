@@ -18,6 +18,7 @@
 package com.tamic.novate.exception;
 
 import android.net.ParseException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.JsonParseException;
@@ -55,48 +56,62 @@ public class NovateException {
     public static Throwable handleException(java.lang.Throwable e) {
 
         LogWraper.e("Novate", e.getMessage());
-        LogWraper.e("Novate", e.getCause().toString());
+        String detail = "";
+        if (e.getCause() != null) {
+            detail = e.getCause().getMessage();
+        }
+        LogWraper.e("Novate", detail);
         Throwable ex;
         if (!(e instanceof ServerException) && e instanceof HttpException) {
             HttpException httpException = (HttpException) e;
-            ex = new Throwable(e, ERROR.HTTP_ERROR);
-            switch (httpException.code()) {
+            ex = new Throwable(e, httpException.code());
+            switch (ex.getCode()) {
 
                 case UNAUTHORIZED:
                     ex.setMessage("未授权的请求");
+                    break;
                 case FORBIDDEN:
                     ex.setMessage("禁止访问");
+                    break;
                 case NOT_FOUND:
                     ex.setMessage("服务器地址未找到");
+                    break;
                 case REQUEST_TIMEOUT:
                     ex.setMessage("请求超时");
+                    break;
                 case GATEWAY_TIMEOUT:
                     ex.setMessage("网关响应超时");
+                    break;
                 case INTERNAL_SERVER_ERROR:
                     ex.setMessage("服务器出错");
                 case BAD_GATEWAY:
                     ex.setMessage("无效的请求");
+                    break;
                 case SERVICE_UNAVAILABLE:
                     ex.setMessage("服务器不可用");
+                    break;
                 case ACCESS_DENIED:
                     ex.setMessage("网络错误");
+                    break;
                 case HANDEL_ERRROR:
                     ex.setMessage("接口处理失败");
+                    break;
 
                 default:
-                    if (e.getMessage() != null ) {
+                    if (TextUtils.isEmpty(ex.getMessage())) {
                         ex.setMessage(e.getMessage());
                         break;
                     }
 
-                    if (e.getLocalizedMessage() != null) {
+                    if (TextUtils.isEmpty(ex.getMessage()) && e.getLocalizedMessage() != null) {
                         ex.setMessage(e.getLocalizedMessage());
                         break;
                     }
-                    ex.setMessage("未知错误");
+                    if (TextUtils.isEmpty(ex.getMessage()) ) {
+                        ex.setMessage("未知错误");
+                    }
                     break;
             }
-            ex.setCode(httpException.code());
             return ex;
         } else if (e instanceof ServerException) {
             ServerException resultException = (ServerException) e;

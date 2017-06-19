@@ -52,10 +52,14 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
         if(e instanceof Throwable){
             LogWraper.e("Novate", "--> e instanceof Throwable");
             LogWraper.e("Novate", "--> " + e.getCause().toString());
-            onError(NovateException.handleException(e));
+            onError((Throwable)e);
         } else {
             LogWraper.e("Novate", "e !instanceof Throwable");
-            LogWraper.e("Novate", "--> " + e.getCause().toString());
+            String detail = "";
+            if (e.getCause() != null) {
+                detail = e.getCause().getMessage();
+            }
+            LogWraper.e("Novate", "--> " + detail);
             onError(NovateException.handleException(e));
         }
         onCompleted();

@@ -49,6 +49,9 @@ public class CacheInterceptorOffline extends CacheInterceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
+        LogWraper.d("Novate", "request url :" +  request.url().url());
+        LogWraper.d("Novate", "request tag :" +  request.tag().toString());
+        LogWraper.d("Novate", "request header :" +  request.headers().toString());
         if (!NetworkUtil.isNetworkAvailable(context)) {
             LogWraper.e("Novate", " no network load cache:"+ request.cacheControl().toString());
            /* request = request.newBuilder()
