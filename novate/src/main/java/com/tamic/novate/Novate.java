@@ -294,19 +294,19 @@ public final class Novate {
     }
 
     /**
-     *  Novate RxUpload by post
+     *  Novate RxUpload by post With Part
      * @param url path or url
      * @param requestBody  requestBody
      * @param callBack  ResponseCallback
      * @param <T>  T return parsed data
      * @return Subscription
      */
-    public <T> T RxUpload(String url, RequestBody requestBody, ResponseCallback<T, ResponseBody> callBack) {
-        return RxUpload(url, url, requestBody, callBack);
+    public <T> T RxUploadWithPart(String url, MultipartBody.Part requestBody, ResponseCallback<T, ResponseBody> callBack) {
+        return RxUploadWithPart(url, url, requestBody, callBack);
     }
 
     /**
-     * Novate RxUpload by post
+     * Novate RxUpload by post With Part
      * @param tag request tag
      * @param url path or url
      * @param requestBody requestBody
@@ -314,7 +314,66 @@ public final class Novate {
      * @param <T>  T return parsed data
      * @return Subscription
      */
-    public <T> T RxUpload(Object tag, String url, RequestBody requestBody, ResponseCallback<T, ResponseBody> callBack) {
+    public <T> T RxUploadWithPart(Object tag, String url, MultipartBody.Part requestBody, ResponseCallback<T, ResponseBody> callBack) {
+        return (T) apiManager.uploadFlieWithPart(url, requestBody)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new RxSubscriber<T, ResponseBody>(tag, callBack));
+    }
+
+    /**
+     *  Novate RxUpload by post
+     * @param url path or url
+     * @param description description
+     * @param requestBody  requestBody
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Subscription
+     */
+    public <T> T RxUpload(String url, RequestBody description, MultipartBody.Part requestBody, ResponseCallback<T, ResponseBody> callBack) {
+        return RxUpload(url, url, description, requestBody, callBack);
+    }
+
+    /**
+     * Novate RxUpload by post
+     * @param tag request tag
+     * @param url path or url
+     * @param description description
+     * @param requestBody     MultipartBody.Part
+     * @param callBack  ResponseCallback
+     * @param <T>  T return parsed data
+     * @return Rxjava Subscription
+     */
+    public <T> T RxUpload(Object tag, String url, RequestBody description, MultipartBody.Part requestBody, ResponseCallback<T, ResponseBody> callBack) {
+        return (T) apiManager.uploadFlie(url, description, requestBody)
+                .compose(schedulersTransformer)
+                .compose(handleErrTransformer())
+                .subscribe(new RxSubscriber<T, ResponseBody>(tag, callBack));
+    }
+
+    /**
+     *  Novate RxUpload by post With Body
+     * @param url url
+     * @param requestBody requestBody
+     * @param callBack back
+     * @param <T>
+     * @return Rxjava Subscription
+     */
+    public <T> T RxUploadWithBody(String url, RequestBody requestBody, ResponseCallback<T, ResponseBody> callBack) {
+        return  RxUploadWithBody(url, url, requestBody, callBack);
+    }
+
+
+    /**
+     *  Novate RxUpload by post With Body
+     * @param tag tag
+     * @param url url
+     * @param requestBody requestBody
+     * @param callBack back
+     * @param <T>
+     * @return Rxjava Subscription
+     */
+    public <T> T RxUploadWithBody(Object tag, String url, RequestBody requestBody, ResponseCallback<T, ResponseBody> callBack) {
         return (T) apiManager.postRequestBody(url, requestBody)
                 .compose(schedulersTransformer)
                 .compose(handleErrTransformer())

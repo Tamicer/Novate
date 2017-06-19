@@ -68,13 +68,19 @@ public interface BaseApiService {
     Observable<ResponseBody> uploadFlie(
             @Url String fileUrl,
             @Part("description") RequestBody description,
-            @Part("files") MultipartBody.Part file);
-
+            @Part("image\"; filename=\"image.jpg") MultipartBody.Part file);
 
     @POST()
     Observable<ResponseBody> uploadFiles(
             @Url() String url,
             @Body Map<String, RequestBody> maps);
+
+    @Multipart
+    @POST()
+    Observable<ResponseBody> uploadFlieWithPart(
+            @Url String fileUrl,
+            @Part("image\"; filename=\"image.png") MultipartBody.Part file);
+
 
     @POST()
     Observable<ResponseBody> uploadFile(
