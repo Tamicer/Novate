@@ -94,8 +94,8 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
  - 轻送调用：支持表单,图文一起，json上传。
  - 文件传输：支持文件下载和上传，支持进度
  - 动态添加：支持请求头和参数统一添加，分别添加。
- - 结果处理：支持对返回结果的统一处理
- - 扩展性强：支持自定义的扩展API，默认Api无法满足时可自定义自己的Service
+ - 结果处理：支持对返回结果的统一处理，自动帮你序列化复杂的数据。
+ - 扩展性强：支持自定义的Retrofit的API，默认Api无法满足时可自定义自己的Service
  - 悠雅方便：支持统一请求访问网络的流程控制，以方便帮你完美加入Processbar进度。
  - RxJava结合： 结合RxJava，线程智能控制
 
