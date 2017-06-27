@@ -42,7 +42,7 @@
 ```
       
           dependencies {
-             compile 'com.tamic.novate:novate:1.5.0'
+             compile 'com.tamic.novate:novate:1.5.2.3'
           }
 ```
 
