@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".ExempleActivity"
+    tools:context=".ExampleActivity"
     android:orientation="vertical">
 
     <Button
@@ -44,8 +44,34 @@
         android:id="@+id/get_File"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Post"
+        android:text="get_File"
         />
 
+    <Button
+        android:id="@+id/up_File"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="up_File"
+        />
 
+    <Button
+        android:id="@+id/down_File"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="down_File"
+        />
+
+    <Button
+        android:id="@+id/post_Bean"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="post_Bean"
+        />
+
+    <Button
+        android:id="@+id/post_Json"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="post_Json"
+        />
 </LinearLayout>
