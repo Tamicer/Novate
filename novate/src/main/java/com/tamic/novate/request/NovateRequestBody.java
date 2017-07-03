@@ -18,6 +18,7 @@
 package com.tamic.novate.request;
 
 
+import com.tamic.novate.callback.ResponseCallback;
 import com.tamic.novate.download.UpLoadCallback;
 
 import java.io.IOException;
@@ -30,20 +31,23 @@ import okio.ForwardingSink;
 import okio.Okio;
 import okio.Sink;
 
+/**
+ * NovateRequestBody
+ * Created by Tamic on 2017-06-23.
+ */
 public class NovateRequestBody extends RequestBody {
 
     private Object Tag;
     private long previousTime;
     protected RequestBody requestBody;
-    protected UpLoadCallback callback;
+    protected ResponseCallback callback;
     protected CountingSink countingSink;
 
-    public NovateRequestBody(RequestBody requestBody, UpLoadCallback callback) {
-        this(requestBody, callback, null);
+    public NovateRequestBody(RequestBody requestBody, ResponseCallback callback) {
+        this(requestBody, callback, callback.getTag());
     }
 
-
-    public NovateRequestBody(RequestBody requestBody, UpLoadCallback callback, Object tag) {
+    public NovateRequestBody(RequestBody requestBody, ResponseCallback callback, Object tag) {
         this.requestBody = requestBody;
         this.callback = callback;
         this.Tag = tag;
@@ -69,11 +73,8 @@ public class NovateRequestBody extends RequestBody {
         previousTime = System.currentTimeMillis();
         countingSink = new CountingSink(sink);
         BufferedSink bufferedSink = Okio.buffer(countingSink);
-
         requestBody.writeTo(bufferedSink);
-
         bufferedSink.flush();
-
     }
 
     public Object getTag() {
@@ -109,9 +110,9 @@ public class NovateRequestBody extends RequestBody {
                 }
                 long networkSpeed = bytesWritten / totalTime;
                 int progress = (int) (bytesWritten * 100 / contentLength);
-                boolean  complete = bytesWritten == contentLength;
-
-                callback.onProgress(Tag == null? "": Tag, progress, networkSpeed, complete);
+               // callback.onProgress(Tag == null? "": Tag, progress, networkSpeed, complete);
+                callback.onProgress(Tag == null? "": Tag, progress, bytesWritten, contentLength);
+                callback.onProgress(Tag == null? "": Tag, progress, networkSpeed,bytesWritten, contentLength);
             }
         }
     }

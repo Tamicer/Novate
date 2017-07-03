@@ -2,6 +2,8 @@ package com.tamic.novate.download;
 
 import android.text.TextUtils;
 
+import com.tamic.novate.ContentType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,7 @@ import java.util.List;
  * Created by Tamic on 2017-06-13.
  */
 
-public class MimeType {
+public class MimeType  {
 
     /** html */
     public static final String HTML = "html";

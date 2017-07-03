@@ -24,6 +24,7 @@ import okhttp3.ResponseBody;
 import retrofit2.http.*;
 import rx.Observable;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -83,9 +84,16 @@ public interface BaseApiService {
 
     @Multipart
     @POST()
+    Observable<ResponseBody> uploadFlieWithPartList(
+            @Url String fileUrl,
+            @Part List<MultipartBody.Part> list);
+
+
+    @Multipart
+    @POST()
     Observable<ResponseBody> uploadFlieWithPartMap(
             @Url String fileUrl,
-            @PartMap() Map<String, MultipartBody.Part> maps);
+            @PartMap Map<String, MultipartBody.Part> maps);
 
 
     @POST()
@@ -98,7 +106,7 @@ public interface BaseApiService {
     Observable<ResponseBody> uploadFileWithPartMap(
             @Url() String url,
             @PartMap() Map<String, RequestBody> partMap,
-            @Part("file") MultipartBody.Part file);
+            @Part() MultipartBody.Part file);
 
     @Streaming
     @GET
@@ -119,12 +127,10 @@ public interface BaseApiService {
             @Url() String url,
             @FieldMap Map<String, Object> maps);
 
-
     @POST()
     Observable<ResponseBody> postRequestBody(
             @Url() String url,
             @Body RequestBody Body);
-
 }
 
 

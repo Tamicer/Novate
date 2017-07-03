@@ -17,6 +17,8 @@
  */
 package com.tamic.novate;
 
+import android.content.Context;
+
 import com.tamic.novate.callback.ResponseCallback;
 import com.tamic.novate.exception.NovateException;
 
@@ -26,20 +28,30 @@ import okhttp3.ResponseBody;
  * RXSubscriber RxSubscribe
  * Created by Tamic on 2017/5/23.
  */
-
 public class RxSubscriber<T, E> extends BaseSubscriber<ResponseBody>{
 
     private ResponseCallback<T, E> callBack;
     private Object tag = null;
+    private Context context;
 
     public RxSubscriber(Object tag, ResponseCallback<T, E> callBack) {
         super();
         if (callBack == null) {
             this.callBack = ResponseCallback.CALLBACK_DEFAULT;
+        } else {
+            this.callBack = callBack;
         }
-        callBack.setTag(tag);
-        this.callBack = callBack;
+        this.callBack.setTag(tag);
         this.tag = tag;
+    }
+
+    public Context context() {
+        return context;
+    }
+
+    public RxSubscriber addContext(Context context) {
+        this.context = context;
+        return this;
     }
 
     @Override
@@ -48,7 +60,6 @@ public class RxSubscriber<T, E> extends BaseSubscriber<ResponseBody>{
         if (callBack != null) {
             callBack.onStart(tag);
         }
-
     }
 
     @Override
@@ -70,8 +81,9 @@ public class RxSubscriber<T, E> extends BaseSubscriber<ResponseBody>{
     @Override
     public void onNext(ResponseBody responseBody) {
         try {
-            callBack.onNext(tag, null, callBack.onHandleResponse(responseBody));
-
+            if (callBack.isReponseOk(tag, responseBody)) {
+                callBack.onNext(tag, null, callBack.onHandleResponse(responseBody));
+            }
         } catch (Exception e) {
             e.printStackTrace();
             if (callBack != null) {

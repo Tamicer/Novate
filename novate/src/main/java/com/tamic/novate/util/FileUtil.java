@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
@@ -785,6 +786,34 @@ public class FileUtil {
      */
     public static String generateFileKey(String url, String name) {
         return System.currentTimeMillis() + url + name;
+    }
+
+    /**
+     * 新建下载文件
+     *
+     * @param savePath
+     * @return
+     */
+    public static File createDownloadFile(String savePath, String fileName) {
+        if (TextUtils.isEmpty(savePath)) {
+            throw new RuntimeException("you should define downloadFolder path!");
+        }
+        if (TextUtils.isEmpty(fileName)) {
+            throw new RuntimeException("you should define downloadFileName !");
+        }
+        File file = new File(savePath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        file = new File(savePath, fileName);
+        return file;
+    }
+
+    public static boolean exists(@NonNull File file){
+        /*if (!file.exists()) {
+            throw new Resources.NotFoundException(file.getPath() + "file 路径无法找到");
+        }*/
+        return file.exists();
     }
 
 }

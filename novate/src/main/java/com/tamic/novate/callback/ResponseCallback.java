@@ -17,6 +17,7 @@
  */
 package com.tamic.novate.callback;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -39,6 +40,15 @@ public abstract class ResponseCallback<T, E> implements IGenericsConvert<E> {
     protected Object tag;
     protected Handler handler;
     protected String TAG ="novateCallback";
+    private Context context;
+
+    public Handler getHandler() {
+        return handler == null ? handler = new Handler(Looper.getMainLooper()) : null;
+    }
+
+    public void setHandler(Handler handler) {
+        this.handler = handler;
+    }
 
     public ResponseCallback(Object tag) {
         this.tag = tag;
@@ -53,9 +63,7 @@ public abstract class ResponseCallback<T, E> implements IGenericsConvert<E> {
     }
 
     public ResponseCallback() {
-        if(handler == null) {
-            handler = new Handler(Looper.getMainLooper());
-        }
+        if (handler == null) handler = new Handler(Looper.getMainLooper());
     }
 
     /**
@@ -78,7 +86,18 @@ public abstract class ResponseCallback<T, E> implements IGenericsConvert<E> {
      *
      * @param progress
      */
-    public void onProgress(Object tag, float progress, long downloaded, long total) {
+    public void onProgress(Object tag, float progress, long transfered, long total) {
+    }
+
+    /**
+     * UI Thread
+     * @param tag
+     * @param progress
+     * @param speed
+     * @param transfered
+     * @param total
+     */
+    public void onProgress(Object tag, int progress, long speed, long transfered, long total) {
     }
 
     /**
@@ -138,16 +157,16 @@ public abstract class ResponseCallback<T, E> implements IGenericsConvert<E> {
     }
 
     /**
-     * Onrelease 子类可以复写
+     * OnRelease 子类可以复写
      */
     public void onRelease() {
-        if (tag != null) {
+        /*if (tag != null) {
             tag = null;
-        }
+        }*/
 
-        if(handler != null) {
+       /* if(handler != null) {
             handler = null;
-        }
+        }*/
     }
 
     public static ResponseCallback CALLBACK_DEFAULT = new ResponseCallback() {

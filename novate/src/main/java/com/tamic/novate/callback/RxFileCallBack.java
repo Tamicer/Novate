@@ -20,11 +20,14 @@ package com.tamic.novate.callback;
 
 
 import com.tamic.novate.Throwable;
+import com.tamic.novate.config.ConfigLoader;
+import com.tamic.novate.util.FileUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 
 import okhttp3.ResponseBody;
 
@@ -37,16 +40,21 @@ public abstract class RxFileCallBack extends ResponseCallback<File, ResponseBody
     private String destFileDir;
     /*** 文件名*/
     private String destFileName;
+    /*** FileOutputStream*/
+    FileOutputStream fos = null;
+    /*** FileOutputStream*/
+    InputStream is = null;
 
     public RxFileCallBack() {
-        this(null, null);
+        this(FileUtil.getBasePath(ConfigLoader.getContext()), null);
     }
 
     public RxFileCallBack(String destFileName) {
-        this(null, destFileName);
+        this(FileUtil.getBasePath(ConfigLoader.getContext()), destFileName);
     }
 
     public RxFileCallBack(String fileDir, String fileName) {
+        super();
         this.destFileDir = fileDir;
         this.destFileName = fileName;
     }
@@ -61,8 +69,6 @@ public abstract class RxFileCallBack extends ResponseCallback<File, ResponseBody
     }
 
     public File onNextFile(ResponseBody response) throws Exception {
-
-        InputStream is = null;
         byte[] buf = new byte[2048];
         int len = 0;
         FileOutputStream fos = null;
@@ -81,33 +87,41 @@ public abstract class RxFileCallBack extends ResponseCallback<File, ResponseBody
                 sum += len;
                 fos.write(buf, 0, len);
                 final long finalSum = sum;
-                onProgress(tag, finalSum * 1.0f / total, sum, total);
-
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onProgress(tag, finalSum * 1.0f / total, finalSum, total);
+                    }
+                });
             }
             fos.flush();
-
             return file;
 
         } finally {
-            try {
-                response.close();
-                if (is != null) is.close();
-            } catch (IOException e) {
-
-                onError(tag, new Throwable(e, -100, "file write io Exception"));
-            }
-            try {
-                if (fos != null) fos.close();
-            } catch (IOException e) {
-
-                onError(tag, new Throwable(e, -100, "file write io Exception"));
-            }
+           onRelease();
         }
     }
 
     @Override
-    public void onNext(Object tag, okhttp3.Call call, File response) {
-       onNext(tag, response);
+    public void onNext(final Object tag, okhttp3.Call call, final File response) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                onNext(tag, response);
+            }
+        });
+    }
+
+    @Override
+    public void onRelease() {
+        super.onRelease();
+        if (is != null) try {
+            is.close();
+            if (fos != null) fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            onError(tag, new Throwable(e, -100, "file write io Exception"));
+        }
     }
 
     public abstract void onNext(Object tag, File file);

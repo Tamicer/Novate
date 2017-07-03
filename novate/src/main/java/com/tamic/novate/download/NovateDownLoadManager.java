@@ -143,45 +143,29 @@ public class NovateDownLoadManager {
                     outputStream.write(fileReader, 0, read);
                     fileSizeDownloaded += read;
                    LogWraper.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
-                    final int progress = (int) (fileSizeDownloaded * 100 / fileSize);
+                    int  progress = 0;
+                    if (fileSize == -1 || fileSize ==  0) {
+                        progress = 100;
+                    } else {
+                        progress = (int) (fileSizeDownloaded * 100 / fileSize);
+                    }
+
                    LogWraper.d(TAG, "file download progress : " + progress);
                     if (updateCount == 0 || progress >= updateCount) {
                         updateCount += 1;
                         if (callBack != null) {
                             handler = new Handler(Looper.getMainLooper());
                             final long finalFileSizeDownloaded = fileSizeDownloaded;
+                            final int finalProgress = progress;
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    callBack.onProgress(key, progress, finalFileSizeDownloaded, fileSize);
+                                    callBack.onProgress(key, finalProgress, finalFileSizeDownloaded, fileSize);
                                 }
                             });
                         }
                     }
                 }
-              /*  while (true) {
-                    int read = inputStream.read(fileReader);
-
-                    if (read == -1 || isCancel) {
-                        break;
-                    }
-
-                    isDownLoading = true;
-                    outputStream.write(fileReader, 0, read);
-                    fileSizeDownloaded += read;
-                   LogWraper.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
-                    if (callBack != null) {
-                        if (callBack != null) {
-                            final long finalFileSizeDownloaded = fileSizeDownloaded;
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    callBack.onProgress(key, finalFileSizeDownloaded, fileSize);
-                                }
-                            }, 200);
-                        }
-                    }
-                }*/
 
                 outputStream.flush();
                 LogWraper.d(TAG, "file downloaded: " + fileSizeDownloaded + " of " + fileSize);

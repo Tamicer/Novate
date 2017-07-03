@@ -31,14 +31,14 @@ import java.util.Set;
 import okhttp3.CacheControl;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.internal.http.HttpMethod;
 
 /**
- * Request
  * Created by Tamic on 2016-12-02.
  */
-public final class NovateRequest {
+public final class NovateRequest{
     private static NovateRequest.Builder builder;
     private static Map<String, RequestBody> params;
     private final String url;
@@ -272,7 +272,7 @@ public final class NovateRequest {
             return delete(RequestBody.create(null, new byte[0]));
         }
 
-        public NovateRequest.Builder put(RequestBody body) {
+        public NovateRequest.Builder put(@NonNull RequestBody body) {
             return method("PUT", body);
         }
 

@@ -53,7 +53,7 @@ public class CacheInterceptorOffline extends CacheInterceptor {
         LogWraper.d("Novate", "request tag :" +  request.tag().toString());
         LogWraper.d("Novate", "request header :" +  request.headers().toString());
         if (!NetworkUtil.isNetworkAvailable(context)) {
-            LogWraper.e("Novate", " no network load cache:"+ request.cacheControl().toString());
+            LogWraper.d("Novate", " no network load cache:"+ request.cacheControl().toString());
            /* request = request.newBuilder()
                     .removeHeader("Pragma")
                     .header("Cache-Control", "only-if-cached, " + cacheControlValue_Offline)

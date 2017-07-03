@@ -67,7 +67,7 @@ public class CacheInterceptor implements Interceptor {
         okhttp3.Response originalResponse = chain.proceed(chain.request());
         String cacheControl = originalResponse.header("Cache-Control");
         //String cacheControl = request.cacheControl().toString();
-        LogWraper.e("Novate", maxStaleOnline + "s load cache:" + cacheControl);
+        LogWraper.d("Novate", maxStaleOnline + "s load cache:" + cacheControl);
         if (TextUtils.isEmpty(cacheControl) || cacheControl.contains("no-store") || cacheControl.contains("no-cache") ||
                 cacheControl.contains("must-revalidate") || cacheControl.contains("max-age") || cacheControl.contains("max-stale")) {
             return originalResponse.newBuilder()
