@@ -172,7 +172,7 @@ public class ExempleActivity extends AppCompatActivity {
         btn_more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(ExempleActivity.this, RequstActivity.class));
+                startActivity(new Intent(ExempleActivity.this, RequstActivity.class));
             }
         });
     }
