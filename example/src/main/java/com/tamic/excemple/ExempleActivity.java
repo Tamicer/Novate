@@ -489,7 +489,7 @@ public class ExempleActivity extends AppCompatActivity {
             }
         });
 
-        novate.RxUploadWithBody(url, requestBody, new RxStringCallback() {
+        novate.rxUploadWithBody(url, requestBody, new RxStringCallback() {
 
             @Override
             public void onStart(Object tag) {
@@ -549,7 +549,7 @@ public class ExempleActivity extends AppCompatActivity {
         MultipartBody.Part body2 =
                 MultipartBody.Part.createFormData("image", file.getName(), requestBody);
 
-        novate.RxUploadWithPart(url, body2, new RxStringCallback() {
+        novate.rxUploadWithPart(url, body2, new RxStringCallback() {
 
             @Override
             public void onStart(Object tag) {
@@ -610,7 +610,7 @@ public class ExempleActivity extends AppCompatActivity {
         Map<String,  MultipartBody.Part> maps = new HashMap<>();
         maps.put("image", part);
 
-        novate.RxUploadWithPartMap(url, maps, new RxStringCallback() {
+        novate.rxUploadWithPartMap(url, maps, new RxStringCallback() {
 
             @Override
             public void onStart(Object tag) {
@@ -673,14 +673,12 @@ public class ExempleActivity extends AppCompatActivity {
             @Override
             public void onSucess(String key, String path, String name, long fileSize) {
                 Toast.makeText(ExempleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoad start");
                 dismissProgressDialog();
             }
 
             @Override
             public void onCancel() {
                 super.onCancel();
-                btn_download.setText("DownLoad start");
                 dismissProgressDialog();
             }
 
