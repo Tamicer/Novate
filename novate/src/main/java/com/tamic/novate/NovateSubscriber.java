@@ -119,7 +119,7 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
                         baseResponse.setMessage(msg);
                         dataStr = jsonObject.opt("data").toString();
                         if (dataStr.isEmpty())  {
-                            dataStr = jsonObject.opt("result").toString();
+                            dataStr = jsonObject.optString("result");
                         }
 
                         if (dataStr.isEmpty())  {
@@ -137,7 +137,7 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
                                 throw new FormatException();
                             }
 
-                        } else if (dataStr.charAt(0) == '[') {
+                        } else if (!dataStr.isEmpty() && dataStr.charAt(0) == '[') {
                             LogWraper.e(TAG, "data为数对象无法转换: --- " + finalNeedType);
                             //dataStr = jsonObject.optJSONArray("data").toString();
                             //dataResponse = (T) new Gson().fromJson(dataStr, finalNeedType);
@@ -159,7 +159,7 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
                         baseResponse.setData(dataResponse);
                     }
 
-                    if (baseResponse.isOk(context) && dataResponse == null) {
+                    if (dataResponse != null && baseResponse.isOk(context)) {
 
                         LogWraper.d(TAG, "Response data 数据获取失败！");
                         callBack.onsuccess(0, "", null, jsStr);

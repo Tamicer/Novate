@@ -38,9 +38,9 @@ public interface BaseApiService {
             @Url() String url,
             @FieldMap Map<String, Object> maps);
 
-    @POST("{url}")
+    @POST()
     Observable<ResponseBody> executePostBody(
-            @Path("url") String url,
+            @Url String url,
             @Body Object object);
 
     @GET()
