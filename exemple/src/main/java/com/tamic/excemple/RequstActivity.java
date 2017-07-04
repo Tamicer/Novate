@@ -434,7 +434,7 @@ public class RequstActivity extends BaseActivity {
         String downUrl = "http://img06.tooopen.com/images/20161022/tooopen_sy_182719487645.jpg";
         String path = FileUtil.getBasePath(this);
 
-        novate.rxGet(downUrl, new RxFileCallBack(path, "my.jpg") {
+        novate.rxGet(downUrl, parameters, new RxFileCallBack(path, "my.jpg") {
 
 
             @Override
