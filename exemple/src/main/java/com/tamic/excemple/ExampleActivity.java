@@ -86,8 +86,9 @@ public class ExampleActivity extends BaseActivity {
 
         novate = new Novate.Builder(this)
                 //.addParameters(parameters)
-                .connectTimeout(20)
+                .connectTimeout(30)
                 .writeTimeout(15)
+                .readTimeout(30)
                 .baseUrl(baseUrl)
                 .addHeader(headers)
                 .addCache(true)
@@ -678,12 +679,11 @@ public class ExampleActivity extends BaseActivity {
      */
     private void performDown() {
 
-        String downUrl = "https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png";
-        //String downUrl = "http://wap.dl.pinyin.sogou.com/wapdl/hole/201512/03/SogouInput_android_v7.11_sweb.apk";
+        //String downUrl = "https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png";
+        String downUrl = "http://wap.dl.pinyin.sogou.com/wapdl/hole/201512/03/SogouInput_android_v7.11_sweb.apk";
         new Novate.Builder(this)
                 .connectTimeout(20)
                 .writeTimeout(15)
-                .tag("sdsdsd")
                 .baseUrl(baseUrl)
                 .build()
                 .rxDownload(downUrl, new RxFileCallBack(FileUtil.getBasePath(this), "test.apk") {
