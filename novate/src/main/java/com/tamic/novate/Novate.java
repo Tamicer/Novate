@@ -121,6 +121,10 @@ public final class Novate {
     private Map<Object, Observable<ResponseBody>> downMaps = new HashMap<Object, Observable<ResponseBody>>() {
     };
     private Observable.Transformer exceptTransformer = null;
+    private static final int DEFAULT_TIMEOUT = 15;
+    private static final int DEFAULT_MAXIDLE_CONNECTIONS = 5;
+    private static final long DEFAULT_KEEP_ALIVEDURATION = 8;
+    private static final long DEFAULT_CACHEMAXSIZE = 10 * 1024 * 1024;
     public static final String TAG = "Novate";
 
     /**
@@ -206,9 +210,6 @@ public final class Novate {
     public <T> T rxGet(final String url, final Map<String, Object> maps, ResponseCallback<T, ResponseBody> callBack) {
         return rxGet(url, url, maps, callBack);
     }
-
-
-
 
     /**
      * Novate execute get request
@@ -1437,12 +1438,12 @@ public final class Novate {
      * Mandatory Builder for the Builder
      */
     public static final class Builder {
-
-        private static final int DEFAULT_TIMEOUT = 15;
-        private static final int DEFAULT_MAXIDLE_CONNECTIONS = 5;
-        private static final long DEFAULT_KEEP_ALIVEDURATION = 8;
-        private static final long caheMaxSize = 10 * 1024 * 1024;
-
+        private int connectTimeout = DEFAULT_TIMEOUT;
+        private int writeTimeout = DEFAULT_TIMEOUT;
+        private int readTimeout = DEFAULT_TIMEOUT;
+        private int default_maxidle_connections = DEFAULT_MAXIDLE_CONNECTIONS;
+        private long default_keep_aliveduration = DEFAULT_MAXIDLE_CONNECTIONS;
+        private long caheMaxSize = DEFAULT_CACHEMAXSIZE;
         private okhttp3.Call.Factory callFactory;
         private String baseUrl;
         private Boolean isLog = false;
@@ -1537,6 +1538,15 @@ public final class Novate {
             return writeTimeout(timeout, TimeUnit.SECONDS);
         }
 
+
+        /**
+         * Sets the default read timeout for new connections. A value of 0 means no timeout, otherwise
+         * values must be between 1 and {@link Integer#MAX_VALUE} when converted to milliseconds.
+         */
+        public Builder readTimeout(int timeout) {
+            return readTimeout(timeout, TimeUnit.SECONDS);
+        }
+
         /**
          * Attaches {@code tag} to the request. It can be used later to cancel the request. If the tag
          * is unspecified or null, the request is canceled by using the request itself as the tag.
@@ -1589,12 +1599,26 @@ public final class Novate {
          * Sets the default write timeout for new connections. A value of 0 means no timeout,
          * otherwise values must be between 1 and {@link TimeUnit #MAX_VALUE} when converted to
          * milliseconds.
+         * TimeUnit {@link TimeUnit}
          */
         public Builder writeTimeout(int timeout, TimeUnit unit) {
+            this.writeTimeout = Utils.checkDuration("timeout", timeout, unit);
             if (timeout != -1) {
                 okhttpBuilder.writeTimeout(timeout, unit);
-            } else {
-                okhttpBuilder.writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+            }
+            return this;
+        }
+
+
+        /**
+         * Sets the default read timeout for new connections. A value of 0 means no timeout, otherwise
+         * values must be between 1 and {@link Integer#MAX_VALUE} when converted to milliseconds.
+         * TimeUnit {@link TimeUnit}
+         */
+        public Builder readTimeout(int timeout, TimeUnit unit) {
+            this.readTimeout = Utils.checkDuration("timeout", timeout, unit);
+            if (timeout != -1) {
+                okhttpBuilder.readTimeout(readTimeout, unit);
             }
             return this;
         }
@@ -1603,6 +1627,10 @@ public final class Novate {
          * Sets the connection pool used to recycle HTTP and HTTPS connections.
          * <p>
          * <p>If unset, a new connection pool will be used.
+         * <p>
+         *  connectionPool =
+         *   new ConnectionPool(DEFAULT_MAXIDLE_CONNECTIONS, DEFAULT_KEEP_ALIVEDURATION, TimeUnit.SECONDS);
+         * <p>
          */
         public Builder connectionPool(ConnectionPool connectionPool) {
             if (connectionPool == null) throw new NullPointerException("connectionPool == null");
@@ -1614,12 +1642,12 @@ public final class Novate {
          * Sets the default connect timeout for new connections. A value of 0 means no timeout,
          * otherwise values must be between 1 and {@link TimeUnit #MAX_VALUE} when converted to
          * milliseconds.
+         * TimeUnit {@link TimeUnit}
          */
         public Builder connectTimeout(int timeout, TimeUnit unit) {
+            this.readTimeout = Utils.checkDuration("timeout", timeout, unit);;
             if (timeout != -1) {
-                okhttpBuilder.connectTimeout(timeout, unit);
-            } else {
-                okhttpBuilder.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+                okhttpBuilder.connectTimeout(readTimeout, unit);
             }
             return this;
         }
@@ -1867,7 +1895,6 @@ public final class Novate {
                     if (cache == null) {
                         cache = new Cache(httpCacheDirectory, caheMaxSize);
                     }
-
                     addCache(cache);
 
                 } catch (Exception e) {
@@ -1881,15 +1908,30 @@ public final class Novate {
             if (cache != null) {
                 okhttpBuilder.cache(cache);
             }
+            /**
+             * Sets the default write timeout for new connections. A value of 0 means no timeout, otherwise
+             * values must be between 1 and {@link Integer#MAX_VALUE} when converted to milliseconds.
+             */
 
+            //okhttpBuilder.writeTimeout(writeTimeout, TimeUnit.SECONDS);
+            /**
+             * Sets the default connect timeout for new connections. A value of 0 means no timeout,
+             * otherwise values must be between 1 and {@link Integer#MAX_VALUE} when converted to
+             * milliseconds.
+             */
+            //okhttpBuilder.connectTimeout(connectTimeout, TimeUnit.SECONDS);
+            /**
+             * Sets the default read timeout for new connections. A value of 0 means no timeout, otherwise
+             * values must be between 1 and {@link Integer#MAX_VALUE} when converted to milliseconds.
+             */
+            //okhttpBuilder.readTimeout(readTimeout, TimeUnit.SECONDS);
             /**
              * Sets the connection pool used to recycle HTTP and HTTPS connections.
              *
              * <p>If unset, a new connection pool will be used.
              */
             if (connectionPool == null) {
-
-                connectionPool = new ConnectionPool(DEFAULT_MAXIDLE_CONNECTIONS, DEFAULT_KEEP_ALIVEDURATION, TimeUnit.SECONDS);
+                connectionPool = new ConnectionPool(default_maxidle_connections, default_maxidle_connections, TimeUnit.SECONDS);
             }
             okhttpBuilder.connectionPool(connectionPool);
 
@@ -1898,7 +1940,7 @@ public final class Novate {
              * precedence over {@link #proxySelector}, which is only honored when this proxy is null (which
              * it is by default). To disable proxy use completely, call {@code setProxy(Proxy.NO_PROXY)}.
              */
-            if (proxy == null) {
+            if (proxy != null) {
                 okhttpBuilder.proxy(proxy);
             }
 

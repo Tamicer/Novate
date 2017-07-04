@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -304,5 +305,14 @@ public class Utils {
             return null;
         }
         return new Gson().fromJson(json, new TypeToken<T>(){}.getType());
+    }
+
+    public static int checkDuration(String name, long duration, TimeUnit unit) {
+        if (duration < 0) throw new IllegalArgumentException(name + " < 0");
+        if (unit == null) throw new NullPointerException("unit == null");
+        long millis = unit.toMillis(duration);
+        if (millis > Integer.MAX_VALUE) throw new IllegalArgumentException(name + " too large.");
+        if (millis == 0 && duration > 0) throw new IllegalArgumentException(name + " too small.");
+        return (int) millis;
     }
 }
