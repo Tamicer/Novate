@@ -102,7 +102,7 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
    请求网络无需关心是否在主线程和非UI线程，操作UI直接可在回调处理, 保留了HttpClient的编码习惯，又加入了Builder模式编程！
    
    
-**详细介绍 请看：Wiki, wiki, wiki!**
+## [详细介绍 请看：Wiki, wiki, wiki!](https://github.com/Tamicer/Novate/wiki) ##
  
 Update Log   
 -----
