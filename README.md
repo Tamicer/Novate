@@ -107,7 +107,7 @@ Laster vension: https://bintray.com/neglectedbyboss/maven/Novate  最新版本�
 Update Log   
 -----
 版本历史: https://bintray.com/neglectedbyboss/maven/Novate
-更新历史请看：https://bintray.com/neglectedbyboss/maven/Novate/view/release#release
+更新历史请看：https://github.com/Tamicer/Novate/releases
   
    
 #License
