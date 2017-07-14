@@ -20,6 +20,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import com.tamic.novate.config.ConfigLoader;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -54,7 +56,9 @@ public class FileUtil {
     public static final String MIME_TYPE_IMAGE = "image/*";
     public static final String MIME_TYPE_VIDEO = "video/*";
     public static final String MIME_TYPE_APP = "application/*";
-    private static final String DEFAULT_FILENAME = "novatedownfile";
+    private static String FILE_SUFFIX = ".tmpl";
+    public static final String DEFAULT_FILENAME = "novatedownfile" + FILE_SUFFIX;
+    private static final String DEFAULT_FILETAG = "DownLoads";
     /**content disposition */
     private static final Pattern CONTENT_DISPOSITION_PATTERN = Pattern.compile(
             "attachment;\\s*filename\\s*=\\s*(\"?)([^\"]*)\\1\\s*$", Pattern.CASE_INSENSITIVE);
@@ -112,7 +116,18 @@ public class FileUtil {
         return file.getAbsolutePath();
     }
 
+    public static String getDownLoadPath(Context context) {
+          if (null == getSDPath()) {
+              File filepath = new File(context.getExternalFilesDir(null) + File.separator + DEFAULT_FILETAG);
+              if (!filepath.exists()){
+                  filepath.mkdirs();
+              }
+              return context.getExternalFilesDir(null) + File.separator + DEFAULT_FILETAG + File.separator;
+          }
 
+          return getBasePath(context) + File.separator + DEFAULT_FILETAG + File.separator;
+
+    }
 
     private static void closeStream(Closeable stream) {
         if (stream != null) {
@@ -795,6 +810,24 @@ public class FileUtil {
      * @return
      */
     public static File createDownloadFile(String savePath, String fileName) {
+        if (TextUtils.isEmpty(fileName)) {
+            fileName = FileUtil.DEFAULT_FILENAME;
+        }
+
+        if (TextUtils.isEmpty(savePath)) {
+            savePath = FileUtil.getDownLoadPath(ConfigLoader.getContext());
+        }
+
+        return createFile(savePath, fileName);
+    }
+
+    /**
+     * 新建下载文件
+     *
+     * @param savePath
+     * @return
+     */
+    public static File createFile(String savePath, String fileName) {
         if (TextUtils.isEmpty(savePath)) {
             throw new RuntimeException("you should define downloadFolder path!");
         }
@@ -806,6 +839,9 @@ public class FileUtil {
             file.mkdirs();
         }
         file = new File(savePath, fileName);
+        if (file.exists()) {
+            file.delete();
+        }
         return file;
     }
 
