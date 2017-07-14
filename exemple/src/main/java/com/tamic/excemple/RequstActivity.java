@@ -245,7 +245,7 @@ public class RequstActivity extends BaseActivity {
                 .writeTimeout(15)
                 .baseUrl(baseUrl)
                 .build()
-                .rxDownload(downUrl, new RxFileCallBack(FileUtil.getBasePath(this), "test.apk") {
+                .rxDownload(downUrl, new RxFileCallBack() {
                     @Override
                     public void onStart(Object tag) {
                         super.onStart(tag);

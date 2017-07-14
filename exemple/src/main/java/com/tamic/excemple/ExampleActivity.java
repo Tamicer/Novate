@@ -21,6 +21,7 @@ import com.tamic.novate.Novate;
 import com.tamic.novate.RxApiManager;
 import com.tamic.novate.Throwable;
 import com.tamic.novate.callback.RxFileCallBack;
+import com.tamic.novate.callback.RxGenericsCallback;
 import com.tamic.novate.callback.RxStringCallback;
 import com.tamic.novate.download.UpLoadCallback;
 import com.tamic.novate.request.NovateRequest;
@@ -37,10 +38,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
+import retrofit2.Converter;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import rx.Subscription;
 
 /**
@@ -80,7 +88,6 @@ public class ExampleActivity extends BaseActivity {
         btn_more = (Button) findViewById(R.id.bt_more);
 
 
-
         parameters.put("ip", "21.22.11.33");
         headers.put("Accept", "application/json");
 
@@ -98,8 +105,8 @@ public class ExampleActivity extends BaseActivity {
         btn_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                performTest();
+                resquestOkhttp();
+               // performTest();
 
             }
 
@@ -177,6 +184,36 @@ public class ExampleActivity extends BaseActivity {
     }
 
 
+    private void resquestOkhttp() {
+        // RequestBody requestBody = RequestBody.create(MediaType.parse("这里个格式"), "这里是内容");
+
+        Request request =
+                new Request.Builder()
+                        .get()
+                        .url("http://ip.taobao.com/service/getIpInfo.php?ip=21.22.11.33")
+                        .build();
+        OkHttpClient client = new OkHttpClient();
+        final Call call = client.newCall(request);
+        call.enqueue(new RxStringCallback() {
+
+            @Override
+            public void onError(Object tag, Throwable e) {
+                Log.e("OkHttp", e.getMessage());
+                Toast.makeText(ExampleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel(Object tag, Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Object tag, String response) {
+                Toast.makeText(ExampleActivity.this, response, Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
 
     private void resquestByOkhttp() {
 
@@ -207,8 +244,6 @@ public class ExampleActivity extends BaseActivity {
     }
 
 
-
-
     /**
      * test
      */
@@ -221,12 +256,10 @@ public class ExampleActivity extends BaseActivity {
         novate = new Novate.Builder(this)
                 .addHeader(headers)
                 .addParameters(parameters)
-                .connectTimeout(5)
                 .baseUrl("https://apis.baidu.com/")
                 .addHeader(headers)
                 .addLog(true)
                 .build();
-
 
         Subscription subscription = novate.test("https://apis.baidu.com/apistore/weatherservice/cityname?cityname=上海", null,
                 new MyBaseSubscriber<ResponseBody>(ExampleActivity.this) {
@@ -275,7 +308,6 @@ public class ExampleActivity extends BaseActivity {
         novate = new Novate.Builder(this)
                 .addParameters(parameters)
                 .baseUrl("http://api.douban.com/")
-                //.addApiManager(ApiManager.class)
                 .addLog(true)
                 .build();
 
@@ -361,11 +393,8 @@ public class ExampleActivity extends BaseActivity {
         novate = new Novate.Builder(this)
                 .connectTimeout(8)
                 .baseUrl(baseUrl)
-                //.addApiManager(ApiManager.class)
                 .addLog(true)
                 .build();
-
-
         /**
          *
          *
@@ -432,10 +461,10 @@ public class ExampleActivity extends BaseActivity {
 
         MyAPI myAPI = novate.create(MyAPI.class);
 
-        novate.call(myAPI.getSougu(parameters),
-                new MyBaseSubscriber<SouguBean>(ExampleActivity.this) {
+        //以下方法二选一
 
-
+       novate.schedulersMain(myAPI.getSougu(parameters))
+                .subscribe(new MyBaseSubscriber<SouguBean>(ExampleActivity.this) {
                     @Override
                     public void onError(Throwable e) {
                         Toast.makeText(ExampleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -448,6 +477,23 @@ public class ExampleActivity extends BaseActivity {
                     }
                 });
 
+      /*  novate.call(myAPI.getSougu(parameters), new RxStringCallback() {
+            @Override
+            public void onNext(Object tag, String response) {
+                Toast.makeText(ExampleActivity.this, response, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Object tag, Throwable e) {
+                Toast.makeText(ExampleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel(Object tag, Throwable e) {
+
+            }
+        });
+*/
     }
 
 
@@ -670,7 +716,6 @@ public class ExampleActivity extends BaseActivity {
         });
 
 
-
     }
 
     /**
@@ -727,52 +772,6 @@ public class ExampleActivity extends BaseActivity {
                     }
                 });
 
-       /* new Novate.Builder(this)
-                .connectTimeout(20)
-                .writeTimeout(15)
-                .baseUrl(baseUrl)
-                .addCache(false)
-                .addLog(true)
-                .build()
-                .download(downUrl,  new DownLoadCallBack() {
-
-            @Override
-            public void onStart(String s) {
-                super.onStart(s);
-
-                btn_download.setText("DownLoad cancel");
-                showPressDialog();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Toast.makeText(ExampleActivity.this,  "onError:" + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-
-           @Override
-            public void onProgress(String key, int progress, long fileSizeDownloaded, long totalSize) {
-                super.onProgress(key, progress, fileSizeDownloaded, totalSize);
-                Log.v("test", fileSizeDownloaded+"");
-                //Toast.makeText(ExampleActivity.this, "progress: " + progress + "   download: " + fileSizeDownloaded, Toast.LENGTH_SHORT).show();
-                updateProgressDialog(progress);
-
-            }
-
-            @Override
-            public void onSucess(String key, String path, String name, long fileSize) {
-                Toast.makeText(ExampleActivity.this, "download  onSucess", Toast.LENGTH_SHORT).show();
-                btn_download.setText("DownLoad start");
-                dismissProgressDialog();
-            }
-
-            @Override
-            public void onCancel() {
-                super.onCancel();
-                btn_download.setText("DownLoad start");
-                dismissProgressDialog();
-            }
-
-        });*/
     }
 
     /**
