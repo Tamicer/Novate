@@ -25,7 +25,11 @@ import com.tamic.novate.Throwable;
 import com.tamic.novate.exception.NovateException;
 import com.tamic.novate.util.Utils;
 
+import java.io.IOException;
+
 import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 
@@ -35,7 +39,7 @@ import okhttp3.ResponseBody;
  * @param <T>  result T
  * @param <E>  E response
  */
-public abstract class ResponseCallback<T, E> implements IGenericsConvert<E> {
+public abstract class ResponseCallback<T, E>  implements Callback, IGenericsConvert<E> {
 
     protected Object tag;
     protected Handler handler;
@@ -156,6 +160,39 @@ public abstract class ResponseCallback<T, E> implements IGenericsConvert<E> {
         }
     }
 
+    @Override
+    public void  onFailure(final Call call, final IOException e) {
+        if (Utils.checkMain()) {
+            onError(tag, NovateException.handleException(e));
+        } else {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onError(call.request().tag(), NovateException.handleException(e));
+                }
+            });
+        }
+
+
+    }
+
+    @Override
+    public void onResponse(Call call, Response response) throws IOException {
+        if (call.isCanceled()) {
+            onCancel(call.request().tag(), new Throwable(null, -200, "已取消"));
+        }
+        tag = call.request().tag();
+        if(isReponseOk(tag, response.body())) {
+            try {
+                onHandleResponse(response.body());
+            } catch (Exception e) {
+                e.printStackTrace();
+                onError(tag, NovateException.handleException(e));
+            }
+        }
+
+    }
+
     /**
      * OnRelease 子类可以复写
      */
@@ -170,6 +207,21 @@ public abstract class ResponseCallback<T, E> implements IGenericsConvert<E> {
     }
 
     public static ResponseCallback CALLBACK_DEFAULT = new ResponseCallback() {
+
+        @Override
+        public void onFailure(Call call, IOException e) {
+            onError(call.request().tag(), NovateException.handleException(e));
+
+        }
+
+        @Override
+        public void onResponse(Call call, Response response) throws IOException {
+            try {
+                onHandleResponse(response.body());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         @Override
         public Object transform(Object response, Class classOfT) {
@@ -203,5 +255,6 @@ public abstract class ResponseCallback<T, E> implements IGenericsConvert<E> {
             onRelease();
         }
     };
+
 
 }
