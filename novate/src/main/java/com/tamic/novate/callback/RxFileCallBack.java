@@ -19,9 +19,14 @@ package com.tamic.novate.callback;
 
 
 
+import android.os.Handler;
+import android.os.Looper;
+import android.text.TextUtils;
+
 import com.tamic.novate.Throwable;
 import com.tamic.novate.config.ConfigLoader;
 import com.tamic.novate.util.FileUtil;
+import com.tamic.novate.util.LogWraper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,18 +44,21 @@ public abstract class RxFileCallBack extends ResponseCallback<File, ResponseBody
     /*** 文件夹路径*/
     private String destFileDir;
     /*** 文件名*/
-    private String destFileName;
+    private String destFileName = FileUtil.DEFAULT_FILENAME;
     /*** FileOutputStream*/
     FileOutputStream fos = null;
     /*** FileOutputStream*/
     InputStream is = null;
+    private long sum = 0;
+    private int updateCount = 0;
+    private int interval = 1;
+    private int  progress = 0;
 
     public RxFileCallBack() {
-        this(FileUtil.getBasePath(ConfigLoader.getContext()), null);
     }
 
     public RxFileCallBack(String destFileName) {
-        this(FileUtil.getBasePath(ConfigLoader.getContext()), destFileName);
+        this("", destFileName);
     }
 
     public RxFileCallBack(String fileDir, String fileName) {
@@ -75,24 +83,34 @@ public abstract class RxFileCallBack extends ResponseCallback<File, ResponseBody
         try {
             is = response.byteStream();
             final long total = response.contentLength();
-            long sum = 0;
-
-            File dir = new File(destFileDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
+            if (total < 2048) {
+                interval = (int) 0.2;
+            } else {
+                interval = 1;
             }
-            File file = new File(dir, destFileName);
+            File file = FileUtil.createDownloadFile(destFileDir, destFileName);
             fos = new FileOutputStream(file);
             while ((len = is.read(buf)) != -1) {
                 sum += len;
                 fos.write(buf, 0, len);
                 final long finalSum = sum;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onProgress(tag, finalSum * 1.0f / total, finalSum, total);
-                    }
-                });
+                if (total == -1 || total ==  0) {
+                    progress = 100;
+                } else {
+                    progress = (int) (finalSum * 100 / total);
+                }
+                LogWraper.d(TAG, "file download progress : " + progress);
+                if (updateCount == 0 || progress >= updateCount) {
+                    updateCount += interval;
+                    handler = new Handler(Looper.getMainLooper());
+                    final int finalProgress = progress;
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onProgress(tag, finalProgress, finalSum, total);
+                        }
+                    });
+                }
             }
             fos.flush();
             return file;

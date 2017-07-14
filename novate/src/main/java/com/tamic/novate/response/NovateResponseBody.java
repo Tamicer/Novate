@@ -79,6 +79,9 @@ public class NovateResponseBody extends ResponseBody {
             public long read(Buffer sink, long byteCount) throws IOException {
                 long bytesRead = super.read(sink, byteCount);
                 final long fbytesRead = contentLength();
+                if (fbytesRead > 2048) {
+                    frequency = 1;
+                }
                 totalBytesRead += bytesRead != -1 ? bytesRead : 0;
 
                 long totalTime = (System.currentTimeMillis() - previousTime) / 1000;
