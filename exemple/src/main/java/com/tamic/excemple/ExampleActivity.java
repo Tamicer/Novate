@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -98,7 +99,6 @@ public class ExampleActivity extends BaseActivity {
                 .readTimeout(30)
                 .baseUrl(baseUrl)
                 .addHeader(headers)
-                .addCache(true)
                 .addLog(true)
                 .build();
 
@@ -345,7 +345,15 @@ public class ExampleActivity extends BaseActivity {
      */
     private void performGet() {
 
-
+        novate = new Novate.Builder(this)
+                .connectTimeout(30)
+                .writeTimeout(15)
+                .readTimeout(30)
+                .baseUrl(baseUrl)
+                .addHeader(headers)
+                .addCache(false)
+                .addLog(true)
+                .build();
         /**
          * 如果不需要数据解析后返回 则调用novate.Get()
          * 参考 performPost()中的方式
@@ -376,7 +384,7 @@ public class ExampleActivity extends BaseActivity {
 
             @Override
             public void onsuccess(int code, String msg, ResultModel response, String originalResponse) {
-                Toast.makeText(ExampleActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ExampleActivity.this, response != null ? response.toString(): "无数据", Toast.LENGTH_SHORT).show();
             }
 
         });

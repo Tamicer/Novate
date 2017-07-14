@@ -127,6 +127,7 @@ public final class Novate {
     private static final int DEFAULT_MAXIDLE_CONNECTIONS = 5;
     private static final long DEFAULT_KEEP_ALIVEDURATION = 8;
     private static final long DEFAULT_CACHEMAXSIZE = 10 * 1024 * 1024;
+    private static int DEFAULT_MAX_STALE = 60 * 60 * 24 * 3;
     public static final String TAG = "Novate";
 
     /**
@@ -1574,7 +1575,8 @@ public final class Novate {
         private int readTimeout = DEFAULT_TIMEOUT;
         private int default_maxidle_connections = DEFAULT_MAXIDLE_CONNECTIONS;
         private long default_keep_aliveduration = DEFAULT_MAXIDLE_CONNECTIONS;
-        private long caheMaxSize = DEFAULT_CACHEMAXSIZE;
+        private long cacheMaxSize = DEFAULT_CACHEMAXSIZE;
+        private int cacheTimeout = DEFAULT_MAX_STALE;
         private okhttp3.Call.Factory callFactory;
         private String baseUrl;
         private Boolean isLog = false;
@@ -1710,6 +1712,18 @@ public final class Novate {
             return this;
         }
 
+
+        /**
+         * set Cache MaxSize
+         * @param size MaxSize unit kb
+         *          def  10 * 1024 * 1024
+         * @return
+         */
+        public Builder addCacheMaxSize(int size) {
+            this.cacheMaxSize = size;
+            return this;
+        }
+
         /**
          * open default Cache
          *
@@ -1734,8 +1748,8 @@ public final class Novate {
          * TimeUnit {@link TimeUnit}
          */
         public Builder writeTimeout(int timeout, TimeUnit unit) {
-            this.writeTimeout = Utils.checkDuration("timeout", timeout, unit);
-            if (timeout != -1) {
+            this.writeTimeout = timeout;
+            if (timeout >= 0) {
                 okhttpBuilder.writeTimeout(timeout, unit);
             }
             return this;
@@ -1748,8 +1762,8 @@ public final class Novate {
          * TimeUnit {@link TimeUnit}
          */
         public Builder readTimeout(int timeout, TimeUnit unit) {
-            this.readTimeout = Utils.checkDuration("timeout", timeout, unit);
-            if (timeout != -1) {
+            if (readTimeout > 0) {
+                this.readTimeout = timeout;
                 okhttpBuilder.readTimeout(readTimeout, unit);
             }
             return this;
@@ -1778,8 +1792,8 @@ public final class Novate {
          */
         public Builder connectTimeout(int timeout, TimeUnit unit) {
             this.readTimeout = Utils.checkDuration("timeout", timeout, unit);
-            ;
-            if (timeout != -1) {
+            if (timeout >= 0) {
+                this.readTimeout = timeout;
                 okhttpBuilder.connectTimeout(readTimeout, unit);
             }
             return this;
@@ -1919,23 +1933,23 @@ public final class Novate {
          * @return Builder
          */
         public Builder addCache(Cache cache) {
-            int maxStale = 60 * 60 * 24 * 3;
-            return addCache(cache, maxStale);
+            return addCache(cache, cacheTimeout);
         }
 
         /**
          * @param cache
-         * @param cacheTime ms
+         * @param cacheTimeOut ms
          * @return
          */
-        public Builder addCache(Cache cache, final int cacheTime) {
-            addCache(cache, String.format("max-age=%d", cacheTime));
+        public Builder addCache(Cache cache, final int cacheTimeOut) {
+            addCache(cache, String.format("max-age=%d", cacheTimeOut));
             return this;
         }
 
         /**
          * @param cache
          * @param cacheControlValue Cache-Control
+         *                          def max-age=
          * @return
          */
         private Builder addCache(Cache cache, final String cacheControlValue) {
@@ -1984,7 +1998,6 @@ public final class Novate {
             if (converterFactory == null) {
                 converterFactory = GsonConverterFactory.create();
             }
-            ;
 
             retrofitBuilder.addConverterFactory(converterFactory);
             /**
@@ -2026,7 +2039,7 @@ public final class Novate {
             if (isCache) {
                 try {
                     if (cache == null) {
-                        cache = new Cache(httpCacheDirectory, caheMaxSize);
+                        cache = new Cache(httpCacheDirectory, cacheMaxSize);
                     }
                     addCache(cache);
 
@@ -2034,7 +2047,7 @@ public final class Novate {
                     Log.e("OKHttp", "Could not create http cache", e);
                 }
                 if (cache == null) {
-                    cache = new Cache(httpCacheDirectory, caheMaxSize);
+                    cache = new Cache(httpCacheDirectory, cacheMaxSize);
                 }
             }
 

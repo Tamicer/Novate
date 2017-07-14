@@ -40,7 +40,7 @@ public interface BaseApiService {
 
     @POST()
     Observable<ResponseBody> executePostBody(
-            @Url() String url,
+            @Url String url,
             @Body Object object);
 
     @GET()
