@@ -38,9 +38,9 @@ import okhttp3.internal.http.HttpMethod;
 /**
  * Created by Tamic on 2016-12-02.
  */
-public final class NovateRequest{
+public final class NovateRequest<T>{
     private static NovateRequest.Builder builder;
-    private static Map<String, RequestBody> params;
+    private static Map<String, Object> params;
     private final String url;
     private final String method;
     private final Headers headers;
@@ -83,6 +83,10 @@ public final class NovateRequest{
 
     public Object tag() {
         return tag;
+    }
+
+    public Map<String, Object> params() {
+        return params;
     }
 
     public NovateRequest.Builder newBuilder() {
