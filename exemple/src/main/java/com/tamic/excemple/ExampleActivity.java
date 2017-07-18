@@ -15,6 +15,7 @@ import com.tamic.excemple.model.MovieModel;
 import com.tamic.excemple.model.ResultModel;
 import com.tamic.excemple.model.SouguBean;
 import com.tamic.novate.ContentType;
+import com.tamic.novate.NovateHttpsFactroy;
 import com.tamic.novate.NovateResponse;
 import com.tamic.novate.BaseSubscriber;
 import com.tamic.novate.Novate;
@@ -93,12 +94,13 @@ public class ExampleActivity extends BaseActivity {
         headers.put("Accept", "application/json");
 
         novate = new Novate.Builder(this)
-                //.addParameters(parameters)
                 .connectTimeout(30)
                 .writeTimeout(15)
                 .readTimeout(30)
                 .baseUrl(baseUrl)
                 .addHeader(headers)
+                .addSSLSocketFactory(
+                        NovateHttpsFactroy.creatSSLSocketFactory(getApplicationContext(), "file.cer"))
                 .addLog(true)
                 .build();
 
