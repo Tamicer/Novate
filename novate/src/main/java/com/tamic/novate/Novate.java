@@ -123,6 +123,8 @@ public final class Novate {
     private Map<Object, Observable<ResponseBody>> downMaps = new HashMap<Object, Observable<ResponseBody>>() {
     };
     private Observable.Transformer exceptTransformer = null;
+
+    public static final String KEY_CACHE = "Novate_Http_cache";
     private static final int DEFAULT_TIMEOUT = 15;
     private static final int DEFAULT_MAXIDLE_CONNECTIONS = 5;
     private static final long DEFAULT_KEEP_ALIVEDURATION = 8;
@@ -152,7 +154,6 @@ public final class Novate {
      * create ApiService
      */
     public <T> T create(final Class<T> service) {
-
         return retrofit.create(service);
     }
 
@@ -181,16 +182,26 @@ public final class Novate {
                 .subscribe(new RxSubscriber<T, ResponseBody>(observable.getClass().getSimpleName(), callback));
     }
 
+
     /*public <R> Observable<R> compose() {
         return schedulersIo(okhttpBuilder);
     }
 */
+
+    /**
+     * Thread IO
+     * @param observable
+     */
     public <T> Observable<T> schedulersIo(Observable<T> observable) {
         return observable.subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
     }
 
+    /**
+     * Thread mainThread
+     * @param observable
+     */
     public <T> Observable<T> schedulersMain(Observable<T> observable) {
         return observable.subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
@@ -211,6 +222,13 @@ public final class Novate {
         return call(request, subscriber);
     }
 
+    /**
+     * call NovateRequest
+     * @param request
+     * @param subscriber
+     * @param <T>
+     * @return
+     */
     private <T> T call(NovateRequest request, BaseSubscriber<T> subscriber) {
         return (T) createRx(request)
                 .compose(schedulersTransformer)
@@ -1574,7 +1592,7 @@ public final class Novate {
         private int writeTimeout = DEFAULT_TIMEOUT;
         private int readTimeout = DEFAULT_TIMEOUT;
         private int default_maxidle_connections = DEFAULT_MAXIDLE_CONNECTIONS;
-        private long default_keep_aliveduration = DEFAULT_MAXIDLE_CONNECTIONS;
+        private long default_keep_aliveduration = DEFAULT_KEEP_ALIVEDURATION;
         private long cacheMaxSize = DEFAULT_CACHEMAXSIZE;
         private int cacheTimeout = DEFAULT_MAX_STALE;
         private okhttp3.Call.Factory callFactory;
@@ -1583,6 +1601,7 @@ public final class Novate {
         private Object tag;
         private Boolean isCookie = false;
         private Boolean isCache = true;
+        private Boolean isSkip = false;
         private List<InputStream> certificateList;
         private HostnameVerifier hostnameVerifier;
         private CertificatePinner certificatePinner;
@@ -1887,18 +1906,35 @@ public final class Novate {
         }
 
         /**
-         *
+         *skipSSLSocketFactory
+         */
+        public Builder skipSSLSocketFactory(boolean isSkip) {
+            this.isSkip = isSkip;
+            return this;
+        }
+
+        /**
+         * addSSLSocketFactory
          */
         public Builder addSSLSocketFactory(SSLSocketFactory sslSocketFactory) {
+            if (sslSocketFactory == null) throw new NullPointerException("sslSocketFactory == null");
             this.sslSocketFactory = sslSocketFactory;
             return this;
         }
 
+        /**
+         * HostnameVerifier
+         * @param hostnameVerifier
+         * @return Builder
+         */
         public Builder addHostnameVerifier(HostnameVerifier hostnameVerifier) {
             this.hostnameVerifier = hostnameVerifier;
             return this;
         }
 
+        /**
+         * addCertificatePinner
+         */
         public Builder addCertificatePinner(CertificatePinner certificatePinner) {
             this.certificatePinner = certificatePinner;
             return this;
@@ -1922,6 +1958,7 @@ public final class Novate {
         }
 
         public Builder addNetworkInterceptor(Interceptor interceptor) {
+            if (interceptor == null) throw new NullPointerException("interceptor == null");
             okhttpBuilder.addNetworkInterceptor(interceptor);
             return this;
         }
@@ -2023,7 +2060,14 @@ public final class Novate {
                         new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
             }
 
-            if (sslSocketFactory != null) {
+            if (isSkip) {
+                okhttpBuilder.sslSocketFactory(NovateHttpsFactroy.getSSLSocketFactory(),
+                        NovateHttpsFactroy.creatX509TrustManager());
+
+                okhttpBuilder.hostnameVerifier(NovateHttpsFactroy.creatSkipHostnameVerifier());
+            }
+
+            if (!isSkip && sslSocketFactory != null) {
                 okhttpBuilder.sslSocketFactory(sslSocketFactory);
             }
 
@@ -2031,9 +2075,8 @@ public final class Novate {
                 okhttpBuilder.hostnameVerifier(hostnameVerifier);
             }
 
-
             if (httpCacheDirectory == null) {
-                httpCacheDirectory = new File(mContext.getCacheDir(), "Novate_Http_cache");
+                httpCacheDirectory = new File(mContext.getCacheDir(), KEY_CACHE);
             }
 
             if (isCache) {
@@ -2077,7 +2120,7 @@ public final class Novate {
              * <p>If unset, a new connection pool will be used.
              */
             if (connectionPool == null) {
-                connectionPool = new ConnectionPool(default_maxidle_connections, default_maxidle_connections, TimeUnit.SECONDS);
+                connectionPool = new ConnectionPool(default_maxidle_connections, default_keep_aliveduration, TimeUnit.SECONDS);
             }
             okhttpBuilder.connectionPool(connectionPool);
 
@@ -2102,6 +2145,11 @@ public final class Novate {
             }
 
             if (isCookie) {
+                /**
+                 * Returns a modifiable list of interceptors that observe a single network request and response.
+                 * These interceptors must call {@link Interceptor.Chain#proceed} exactly once: it is an error
+                 * for a network interceptor to short-circuit or repeat a network request.
+                 */
                 okhttpBuilder.addInterceptor(new ReceivedCookiesInterceptor(context));
                 okhttpBuilder.addInterceptor(new AddCookiesInterceptor(context, ""));
             }
@@ -2187,16 +2235,16 @@ public final class Novate {
     @Deprecated
     public interface ResponseCallBack<T> {
 
-        public void onStart();
+        void onStart();
 
-        public void onCompleted();
+        void onCompleted();
 
-        public abstract void onError(Throwable e);
+        void onError(Throwable e);
 
         @Deprecated
-        public abstract void onSuccee(NovateResponse<T> response);
+        void onSuccee(NovateResponse<T> response);
 
-        public void onsuccess(int code, String msg, T response, String originalResponse);
+        void onsuccess(int code, String msg, T response, String originalResponse);
 
     }
 }

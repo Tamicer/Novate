@@ -32,6 +32,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -98,7 +99,7 @@ public class NovateHttpsFactroy {
      * set HostnameVerifier
      * {@link HostnameVerifier}
      */
-    protected static HostnameVerifier getHostnameVerifier(final String[] hostUrls) {
+    public static HostnameVerifier getHostnameVerifier(final String[] hostUrls) {
 
         HostnameVerifier TRUSTED_VERIFIER = new HostnameVerifier() {
 
@@ -112,7 +113,6 @@ public class NovateHttpsFactroy {
                 return ret;
             }
         };
-
         return TRUSTED_VERIFIER;
     }
 
@@ -136,6 +136,16 @@ public class NovateHttpsFactroy {
         }
         return out.toString();
 
+    }
+
+    public static SSLSocketFactory getSSLSocketFactory() {
+        try {
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, creatTrustManager(), new SecureRandom());
+            return sslContext.getSocketFactory();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -181,6 +191,7 @@ public class NovateHttpsFactroy {
 
     /**
      * get SkipHostnameVerifier
+     *
      * @return
      */
     public static HostnameVerifier creatSkipHostnameVerifier() {
@@ -195,24 +206,49 @@ public class NovateHttpsFactroy {
 
 
     /**
+     * X509TrustManager
+     */
+    public static X509TrustManager creatX509TrustManager() {
+
+        return new X509TrustManager(){
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+            }
+
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+        };
+
+    }
+
+    /**
      * TrustManager
      */
-    private static TrustManager[] creatTrustManager() {
-                TrustManager[] trustAllCerts = new TrustManager[]{
-                               new X509TrustManager() {
-                             @Override
-                               public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                                   }
-                                        @Override
-                                public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                                   }
+    public static TrustManager[] creatTrustManager() {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                    }
 
-                                       @Override
-                               public X509Certificate[] getAcceptedIssuers() {
-                                       return new X509Certificate[]{};
-                                   }
-                          }
-                        };
-               return trustAllCerts;
-            }
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                    }
+
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[]{};
+                    }
+                }
+        };
+        return trustAllCerts;
+    }
 }
