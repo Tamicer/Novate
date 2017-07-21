@@ -90,12 +90,11 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
             byte[] bytes = responseBody.bytes();
             String jsStr = new String(bytes);
             LogWraper.d("Novate", "ResponseBody:" + jsStr.trim());
-            if (!ConfigLoader.isFormat(context)) {
+      /*      if (!ConfigLoader.isFormat(context)) {
                 callBack.onsuccess(0, "", null, jsStr);
                 return;
-            }
+            }*/
             if (callBack != null) {
-
                 try {
 
                     /**
@@ -109,11 +108,16 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
                     String dataStr ="";
                     T dataResponse = null;
                     NovateResponse<T> baseResponse = null;
-
                     try {
                         JSONObject jsonObject = new JSONObject(jsStr.trim());
                         code = jsonObject.optInt("code");
                         msg = jsonObject.optString("msg");
+                        if (TextUtils.isEmpty(msg)) {
+                            msg = jsonObject.optString("message");
+                        }
+                        if (TextUtils.isEmpty(msg)) {
+                            msg = jsonObject.optString("error");
+                        }
                         baseResponse = new NovateResponse<>();
                         baseResponse.setCode(code);
                         baseResponse.setMessage(msg);
@@ -153,31 +157,27 @@ class NovateSubscriber<T> extends BaseSubscriber<ResponseBody> {
                         }
                     }
 
-
-
                     if(dataResponse != null) {
                         baseResponse.setData(dataResponse);
                     }
 
-                    if (dataResponse != null && baseResponse.isOk(context)) {
-
+                    if (dataResponse == null && baseResponse.isOk(context)) {
                         LogWraper.d(TAG, "Response data 数据获取失败！");
-                        callBack.onsuccess(0, "", null, jsStr);
+                        callBack.onsuccess(code, msg, null, jsStr);
+                        return;
                     }
 
                     if (ConfigLoader.isFormat(context) && baseResponse == null) {
                         LogWraper.e(TAG, "dataResponse 无法解析为:" + finalNeedType);
                         throw new FormatException();
                     }
-                    baseResponse.setData(dataResponse);
 
+                    baseResponse.setData(dataResponse);
                     if (baseResponse.isOk(context)) {
                         callBack.onsuccess(code, msg, dataResponse, jsStr);
                         callBack.onSuccee(baseResponse);
-
                     } else {
                         msg = baseResponse.getMsg() != null ? baseResponse.getMsg() : baseResponse.getError() != null ? baseResponse.getError() : baseResponse.getMessage() != null ? baseResponse.getMessage() : "api未知异常";
-
                         ServerException serverException = new ServerException(baseResponse.getCode(), msg);
                         callBack.onError(NovateException.handleException(serverException));
                     }
