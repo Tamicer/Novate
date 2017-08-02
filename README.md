@@ -2,7 +2,7 @@
 ![](http://upload-images.jianshu.io/upload_images/2022038-6a900d93d8acb091.jpg)
 
 # Novate
-   a  safety client by Https for Android,  (Android网路络，基于Retrofit和RxJava打造的链式网络库, 强大的泛型解析功能和错误驱动功能，支持okhttp的调用风格，又兼容Retrofit注解方式，并支持rxJava链式操作。方便扩展，并能实现高速加载)
+   a  safety Framework by OkHttp for Android,  (一款Android网络框架，基于Retrofit和RxJava打造的链式网络库, 强大的泛型解析功能和错误驱动功能，支持okhttp的调用风格，又兼容Retrofit注解方式，并支持rxJava链式操作。方便扩展，并能实现高速加载)
   
    
 # Summary
