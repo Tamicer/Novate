@@ -1858,7 +1858,7 @@ public final class Novate {
          * Add parameters for serialization and deserialization of objects.
          */
         public <T> Builder addParameters(Map<String, T> parameters) {
-            okhttpBuilder.addInterceptor(new BaseInterceptor(Utils.checkNotNull(parameters, "parameters == null")));
+            okhttpBuilder.addInterceptor(new BaseParameters(Utils.checkNotNull(parameters, "parameters == null")));
             return this;
         }
 

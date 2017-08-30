@@ -19,12 +19,10 @@ package com.tamic.novate;
 
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.*;
-import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Set;
 
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -33,38 +31,29 @@ import okhttp3.Response;
  * BaseInterceptor，use set okhttp call header
  * Created by Tamic on 2016-06-30.
  */
-public class BaseInterceptor<T> implements Interceptor{
+public class BaseParameters<T> implements Interceptor{
 
-    private Map<String, T> headers;
+    private Map<String, T> parameters;
 
-    public BaseInterceptor(Map<String, T> headers) {
-       this.headers = headers;
+    public BaseParameters(Map<String, T> headers) {
+       this.parameters = headers;
     }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-
-        Request.Builder builder = chain.request()
-                .newBuilder();
-        if (headers != null && headers.size() > 0) {
-            Set<String> keys = headers.keySet();
+        Request original = chain.request();
+        HttpUrl originalHttpUrl = original.url();
+       HttpUrl.Builder builder = originalHttpUrl.newBuilder();
+        if (parameters != null && parameters.size() > 0) {
+            Set<String> keys = parameters.keySet();
             for (String headerKey : keys) {
-                builder.addHeader(headerKey, headers.get(headerKey) == null? "": getValueEncoded((String)headers.get(headerKey))).build();
+                builder.addQueryParameter(headerKey, parameters.get(headerKey) == null? "": (String)parameters.get(headerKey)).build();
             }
         }
-        return chain.proceed(builder.build());
+        HttpUrl url = builder.build();
+        Request.Builder requestBuilder = original.newBuilder()
+                .url(url);
+        return chain.proceed(requestBuilder.build());
 
-    }
-
-    private static String getValueEncoded(String value) throws UnsupportedEncodingException {
-        if (value == null) return "null";
-        String newValue = value.replace("\n", "");
-        for (int i = 0, length = newValue.length(); i < length; i++) {
-            char c = newValue.charAt(i);
-            if (c <= '\u001f' || c >= '\u007f') {
-                return URLEncoder.encode(newValue, "UTF-8");
-            }
-        }
-        return newValue;
     }
 }
