@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.tamic.novate;
 
 import android.app.Activity;
@@ -38,15 +39,12 @@ import com.tamic.novate.exception.NovateException;
 import com.tamic.novate.request.NovateRequest;
 import com.tamic.novate.request.NovateRequestBody;
 import com.tamic.novate.request.RequestInterceptor;
-import com.tamic.novate.response.NovateResponseBody;
 import com.tamic.novate.util.FileUtil;
 import com.tamic.novate.util.LogWraper;
 import com.tamic.novate.util.Utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.Proxy;
 import java.util.ArrayList;
@@ -121,6 +119,7 @@ public final class Novate {
     private final boolean validateEagerly;
     private Observable<ResponseBody> downObservable;
     private Map<Object, Observable<ResponseBody>> downMaps = new HashMap<Object, Observable<ResponseBody>>() {
+
     };
     private Observable.Transformer exceptTransformer = null;
 
@@ -190,6 +189,7 @@ public final class Novate {
 
     /**
      * Thread IO
+     *
      * @param observable
      */
     public <T> Observable<T> schedulersIo(Observable<T> observable) {
@@ -200,6 +200,7 @@ public final class Novate {
 
     /**
      * Thread mainThread
+     *
      * @param observable
      */
     public <T> Observable<T> schedulersMain(Observable<T> observable) {
@@ -224,6 +225,7 @@ public final class Novate {
 
     /**
      * call NovateRequest
+     *
      * @param request
      * @param subscriber
      * @param <T>
@@ -236,7 +238,9 @@ public final class Novate {
                 .subscribe(subscriber);
     }
 
-    /** createRx
+    /**
+     * createRx
+     *
      * @param request
      * @return Observable
      */
@@ -994,9 +998,11 @@ public final class Novate {
      * AndroidSchedulers.mainThread()
      */
     final Observable.Transformer onDdoTransformer = new Observable.Transformer() {
+
         @Override
         public Object call(Object observable) {
             return ((Observable) observable).doOnUnsubscribe(new Action0() {
+
                 @Override
                 public void call() {
 
@@ -1019,6 +1025,7 @@ public final class Novate {
         @Override
         public Object call(Object observable) {
             return ((Observable) observable).doOnUnsubscribe(new Action0() {
+
                 @Override
                 public void call() {
                   /*  if (callback != null) {
@@ -1039,6 +1046,7 @@ public final class Novate {
      * AndroidSchedulers.mainThread()
      */
     final Observable.Transformer schedulersTransformer = new Observable.Transformer() {
+
         @Override
         public Object call(Object observable) {
             return ((Observable) observable).subscribeOn(Schedulers.io())
@@ -1053,6 +1061,7 @@ public final class Novate {
      * Schedulers.io()
      */
     final Observable.Transformer schedulersTransformerDown = new Observable.Transformer() {
+
         @Override
         public Object call(Object observable) {
             return ((Observable) observable).subscribeOn(Schedulers.io())
@@ -1070,13 +1079,17 @@ public final class Novate {
      */
     public <T> Observable.Transformer<NovateResponse<T>, T> handleErrTransformer() {
 
-        if (exceptTransformer != null) return exceptTransformer;
-        else return exceptTransformer = new Observable.Transformer() {
-            @Override
-            public Object call(Object observable) {
-                return ((Observable) observable)/*.map(new HandleFuc<T>())*/.onErrorResumeNext(new HttpResponseFunc<T>());
-            }
-        };
+        if (exceptTransformer != null) {
+            return exceptTransformer;
+        } else {
+            return exceptTransformer = new Observable.Transformer() {
+
+                @Override
+                public Object call(Object observable) {
+                    return ((Observable) observable)/*.map(new HandleFuc<T>())*/.onErrorResumeNext(new HttpResponseFunc<T>());
+                }
+            };
+        }
     }
 
 
@@ -1086,6 +1099,7 @@ public final class Novate {
      * @param <T> Observable
      */
     private static class HttpResponseFunc<T> implements Func1<java.lang.Throwable, Observable<T>> {
+
         @Override
         public Observable<T> call(java.lang.Throwable t) {
             return Observable.error(NovateException.handleException(t));
@@ -1098,6 +1112,7 @@ public final class Novate {
      * @param <T> response
      */
     private class HandleFuc<T> implements Func1<NovateResponse<T>, T> {
+
         @Override
         public T call(NovateResponse<T> response) {
             if (response == null || (response.getData() == null && response.getResult() == null)) {
@@ -1588,6 +1603,7 @@ public final class Novate {
      * Mandatory Builder for the Builder
      */
     public static final class Builder {
+
         private int connectTimeout = DEFAULT_TIMEOUT;
         private int writeTimeout = DEFAULT_TIMEOUT;
         private int readTimeout = DEFAULT_TIMEOUT;
@@ -1734,8 +1750,9 @@ public final class Novate {
 
         /**
          * set Cache MaxSize
+         *
          * @param size MaxSize unit kb
-         *          def  10 * 1024 * 1024
+         *             def  10 * 1024 * 1024
          * @return
          */
         public Builder addCacheMaxSize(int size) {
@@ -1798,7 +1815,9 @@ public final class Novate {
          * <p>
          */
         public Builder connectionPool(ConnectionPool connectionPool) {
-            if (connectionPool == null) throw new NullPointerException("connectionPool == null");
+            if (connectionPool == null) {
+                throw new NullPointerException("connectionPool == null");
+            }
             this.connectionPool = connectionPool;
             return this;
         }
@@ -1847,12 +1866,30 @@ public final class Novate {
         }
 
         /**
+         * update Header for serialization and deserialization of objects.
+         */
+        public <T> Builder header(Map<String, T> headers) {
+            okhttpBuilder.addInterceptor(new BaseHeaderInterceptor(Utils.checkNotNull(headers, "header == null"), AbsRequestInterceptor.Type.UPDATE));
+            return this;
+        }
+
+
+        /**
          * Add Header for serialization and deserialization of objects.
          */
         public <T> Builder addHeader(Map<String, T> headers) {
-            okhttpBuilder.addInterceptor(new BaseInterceptor(Utils.checkNotNull(headers, "header == null")));
+            okhttpBuilder.addInterceptor(new BaseHeaderInterceptor(Utils.checkNotNull(headers, "header == null")));
             return this;
         }
+
+        /**
+         * update parameters for serialization and deserialization of objects.
+         */
+        public <T> Builder parameters(Map<String, T> parameters) {
+            okhttpBuilder.addInterceptor(new BaseParameters(Utils.checkNotNull(parameters, "parameters == null"), AbsRequestInterceptor.Type.UPDATE));
+            return this;
+        }
+
 
         /**
          * Add parameters for serialization and deserialization of objects.
@@ -1900,13 +1937,15 @@ public final class Novate {
          * <p>If unset, {@linkplain NovateCookieManager#NO_COOKIES no cookies} will be accepted nor provided.
          */
         public Builder cookieManager(NovateCookieManager cookie) {
-            if (cookie == null) throw new NullPointerException("cookieManager == null");
+            if (cookie == null) {
+                throw new NullPointerException("cookieManager == null");
+            }
             this.cookieManager = cookie;
             return this;
         }
 
         /**
-         *skipSSLSocketFactory
+         * skipSSLSocketFactory
          */
         public Builder skipSSLSocketFactory(boolean isSkip) {
             this.isSkip = isSkip;
@@ -1917,13 +1956,16 @@ public final class Novate {
          * addSSLSocketFactory
          */
         public Builder addSSLSocketFactory(SSLSocketFactory sslSocketFactory) {
-            if (sslSocketFactory == null) throw new NullPointerException("sslSocketFactory == null");
+            if (sslSocketFactory == null) {
+                throw new NullPointerException("sslSocketFactory == null");
+            }
             this.sslSocketFactory = sslSocketFactory;
             return this;
         }
 
         /**
          * HostnameVerifier
+         *
          * @param hostnameVerifier
          * @return Builder
          */
@@ -1948,8 +1990,12 @@ public final class Novate {
          * <p>If unset, {@linkplain NovateCookieManager#NO_COOKIES no cookies} will be accepted nor provided.
          */
         public Builder addSSL(String[] hosts, int[] certificates) {
-            if (hosts == null) throw new NullPointerException("hosts == null");
-            if (certificates == null) throw new NullPointerException("ids == null");
+            if (hosts == null) {
+                throw new NullPointerException("hosts == null");
+            }
+            if (certificates == null) {
+                throw new NullPointerException("ids == null");
+            }
 
 
             addSSLSocketFactory(NovateHttpsFactroy.getSSLSocketFactory(context, certificates));
@@ -1958,7 +2004,9 @@ public final class Novate {
         }
 
         public Builder addNetworkInterceptor(Interceptor interceptor) {
-            if (interceptor == null) throw new NullPointerException("interceptor == null");
+            if (interceptor == null) {
+                throw new NullPointerException("interceptor == null");
+            }
             okhttpBuilder.addNetworkInterceptor(interceptor);
             return this;
         }
@@ -2211,6 +2259,7 @@ public final class Novate {
         public Observable<?> call(Observable<? extends Throwable> attempts) {
             return attempts
                     .flatMap(new Func1<Throwable, Observable<?>>() {
+
                         @Override
                         public Observable<?> call(Throwable throwable) {
                             if (++retryCount <= maxRetries) {

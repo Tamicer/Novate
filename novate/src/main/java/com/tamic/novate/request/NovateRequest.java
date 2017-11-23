@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.tamic.novate.request;
 
 import android.net.Uri;
@@ -38,7 +39,8 @@ import okhttp3.internal.http.HttpMethod;
 /**
  * Created by Tamic on 2016-12-02.
  */
-public final class NovateRequest<T>{
+public final class NovateRequest<T> {
+
     private static NovateRequest.Builder builder;
     private static Map<String, Object> params;
     private final String url;
@@ -55,6 +57,11 @@ public final class NovateRequest<T>{
         this.headers = builder.headers.build();
         this.body = builder.body;
         this.tag = builder.tag != null ? builder.tag : this;
+    }
+
+    public NovateRequest create(Request request) {
+        //todo dev
+        return null;
     }
 
     public String url() {
@@ -118,6 +125,7 @@ public final class NovateRequest<T>{
     }
 
     public static class Builder {
+
         private String url;
         private String method;
         private Headers.Builder headers;
@@ -138,7 +146,9 @@ public final class NovateRequest<T>{
         }
 
         public NovateRequest.Builder url(HttpUrl url) {
-            if (url == null) throw new NullPointerException("url == null");
+            if (url == null) {
+                throw new NullPointerException("url == null");
+            }
             this.url = url.url().toString();
             return this;
         }
@@ -150,7 +160,9 @@ public final class NovateRequest<T>{
          *                                  exception by calling {@link HttpUrl#parse}; it returns null for invalid URLs.
          */
         public NovateRequest.Builder url(String url) {
-            if (url == null) throw new NullPointerException("url == null");
+            if (url == null) {
+                throw new NullPointerException("url == null");
+            }
 
             // Silently replace websocket URLs with HTTP URLs.
             if (url.regionMatches(true, 0, "ws:", 0, 3)) {
@@ -160,7 +172,9 @@ public final class NovateRequest<T>{
             }
 
             HttpUrl parsed = HttpUrl.parse(url);
-            if (parsed == null) throw new IllegalArgumentException("unexpected url: " + url);
+            if (parsed == null) {
+                throw new IllegalArgumentException("unexpected url: " + url);
+            }
             return url(parsed);
         }
 
@@ -171,9 +185,13 @@ public final class NovateRequest<T>{
          *                                  https}.
          */
         public NovateRequest.Builder url(URL url) {
-            if (url == null) throw new NullPointerException("url == null");
+            if (url == null) {
+                throw new NullPointerException("url == null");
+            }
             HttpUrl parsed = HttpUrl.get(url);
-            if (parsed == null) throw new IllegalArgumentException("unexpected url: " + url);
+            if (parsed == null) {
+                throw new IllegalArgumentException("unexpected url: " + url);
+            }
             return url(parsed);
         }
 
@@ -219,7 +237,7 @@ public final class NovateRequest<T>{
             if (headers != null && headers.size() > 0) {
                 Set<String> keys = headers.keySet();
                 for (String headerKey : keys) {
-                    this.headers.add(headerKey, headers.get(headerKey) == null? "": headers.get(headerKey));
+                    this.headers.add(headerKey, headers.get(headerKey) == null ? "" : headers.get(headerKey));
                 }
             }
 
@@ -252,7 +270,9 @@ public final class NovateRequest<T>{
          */
         public NovateRequest.Builder cacheControl(CacheControl cacheControl) {
             String value = cacheControl.toString();
-            if (value.isEmpty()) return removeHeader("Cache-Control");
+            if (value.isEmpty()) {
+                return removeHeader("Cache-Control");
+            }
             return header("Cache-Control", value);
         }
 
@@ -285,8 +305,12 @@ public final class NovateRequest<T>{
         }
 
         public NovateRequest.Builder method(String method, RequestBody body) {
-            if (method == null) throw new NullPointerException("method == null");
-            if (method.length() == 0) throw new IllegalArgumentException("method.length() == 0");
+            if (method == null) {
+                throw new NullPointerException("method == null");
+            }
+            if (method.length() == 0) {
+                throw new IllegalArgumentException("method.length() == 0");
+            }
             if (body != null && !HttpMethod.permitsRequestBody(method)) {
                 throw new IllegalArgumentException("method " + method + " must not have a request body.");
             }
@@ -308,7 +332,9 @@ public final class NovateRequest<T>{
         }
 
         public NovateRequest build() {
-            if (url == null) throw new IllegalStateException("url == null");
+            if (url == null) {
+                throw new IllegalStateException("url == null");
+            }
             return new NovateRequest(this);
         }
     }

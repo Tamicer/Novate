@@ -64,9 +64,8 @@ public class RequstActivity extends BaseActivity {
         parameters.put("ip", "21.22.11.33");
         headers.put("Accept", "application/json");
 
-        novate = new Novate.Builder(this)
-                .connectTimeout(20)
-                .writeTimeout(15)
+        novate = new Novate
+                .Builder(this)
                 .baseUrl(baseUrl)
                 .addHeader(headers)
                 .addLog(true)

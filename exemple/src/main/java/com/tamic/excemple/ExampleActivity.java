@@ -397,7 +397,6 @@ public class ExampleActivity extends BaseActivity {
      * performPost
      */
     private void performPost() {
-
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("ip", "21.22.11.33");
         novate = new Novate.Builder(this)
