@@ -31,14 +31,14 @@ import okhttp3.RequestBody;
  */
 public class Utils {
 
-    public static final String MULTIPART_FORM_DATA = "multipart/form-data;";
+    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String MULTIPART_IMAGE_DATA = "image/*; charset=utf-8";
     public static final String MULTIPART_JSON_DATA = "application/json; charset=utf-8";
     public static final String MULTIPART_VIDEO_DATA = "video/*";
     public static final String MULTIPART_AUDIO_DATA = "audio/*";
     public static final String MULTIPART_TEXT_DATA = "text/plain";
     public static final String MULTIPART_APK_DATA = "application/vnd.android.package-archive";
-    public static final String MULTIPART_JAVA_DATA = "java/*";
+    public static final String MULTIPART_JAVA_DATA = "java/jpg";
     public static final String MULTIPART_MESSAGE_DATA = "message/rfc822";
 
 

@@ -173,7 +173,7 @@ public final class Novate {
      * @param observable observable
      * @param callback   callback
      * @param <T>
-     * @return Subscription
+     * @return Subscription.
      */
     public <T> T call(Observable<T> observable, ResponseCallback callback) {
         return (T) observable.compose(schedulersTransformer)
@@ -1650,7 +1650,13 @@ public final class Novate {
         }
 
         public Builder(Novate novate) {
-
+            this.callFactory = novate.callFactory;
+            this.baseUrl = novate.baseUrl;
+            this.converterFactories = novate.converterFactories;
+            this.adapterFactories = novate.adapterFactories;
+            this.callbackExecutor = novate.callbackExecutor;
+            this.validateEagerly = novate.validateEagerly;
+            okhttpBuilder.addInterceptor(novate.okhttpBuilder.interceptors().iterator().next());
         }
 
         /**
