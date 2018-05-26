@@ -40,10 +40,16 @@
 - app:
      
 ```
-      
-          dependencies {
-             compile 'com.tamic.novate:novate:1.5.2.3'
+     Gradle < 2.1
+          dependencies {
+             compile 'com.tamic.novate:novate:1.5.5'
           }
+          
+    Gradle > 2.1
+          
+         plugins {
+            id "com.tamic.novate:novate "1.5.5"
+         } 
 ```
 
 
